@@ -1,0 +1,30 @@
+.plan-day {
+    padding: 20px;
+    color: #333;
+}
+
+.menu-list {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.menu-card {
+    background: #1e2a38;
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 250px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.add-button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}

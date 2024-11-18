@@ -1,0 +1,50 @@
+.shopping-list-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+    color: #fff;
+    overflow-y: auto;
+}
+
+.close-button {
+    background-color: #ff8080;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.shopping-list {
+    width: 90%;
+    max-width: 600px;
+}
+
+.shopping-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #fff;
+}
+
+.shopping-item input {
+    width: 60px;
+    padding: 5px;
+    margin: 0 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.shopping-item span {
+    flex: 1;
+    text-align: right;
+}

@@ -1,198 +1,168 @@
-/* Define que todas as bordas dos elementos consideram a largura interna */
-* {
-  box-sizing: border-box;
-  /* Faz com que o padding e a borda do elemento não aumentem a sua largura total */
-}
+/* Home Page Styles */
 
-/* Estilos básicos para o corpo da página */
 body {
-  font-family: 'Arial', sans-serif;
-  /* Define a fonte padrão para o texto */
-  background: url('../../../assets/fotos/food-background.jpg') no-repeat center center fixed;
-  /* Define uma imagem de fundo fixa e centralizada */
-  background-size: cover;
-  /* Faz com que a imagem de fundo cubra toda a tela */
-  color: #fff;
-  /* Define a cor do texto como branco */
+  color: #333;
+  background: #1f1f1f;
   margin: 0;
-  /* Remove a margem padrão ao redor da página */
   padding: 0;
-  /* Remove o padding padrão ao redor da página */
 }
 
-/* Contêiner principal da página */
 .home-container {
-  display: flex;
-  /* Define que os elementos filhos serão dispostos em linha (horizontalmente) */
-  gap: 20px;
-  /* Define um espaçamento de 20px entre os elementos filhos */
-  padding: 80px 20px 20px;
-  /* Adiciona espaçamento interno: 80px no topo, 20px nas laterais, 20px na parte inferior */
-}
-
-/* Barra de pesquisa */
-.search-bar {
-  position: fixed;
-  /* Fixa a barra de pesquisa em uma posição específica na tela, independentemente do scroll */
-  top: 20px;
-  /* Define a posição superior da barra, 20px a partir do topo da janela */
-  left: 20px;
-  /* Define a posição à esquerda da barra, 20px a partir da borda esquerda */
-  width: calc(100% - 40px);
-  /* Faz com que a barra ocupe quase toda a largura da tela, deixando 20px de cada lado */
-  z-index: 10;
-  /* Coloca a barra acima de outros elementos para garantir que ela fique visível */
-}
-
-/* Input de pesquisa dentro da barra */
-.search-input {
-  width: 100%;
-  /* Faz com que o input ocupe toda a largura da barra de pesquisa */
-  padding: 10px 20px;
-  /* Define um espaçamento interno: 10px em cima e embaixo, 20px nas laterais */
-  border: none;
-  /* Remove a borda padrão do input */
-  border-radius: 20px;
-  /* Arredonda as bordas do input */
-  backdrop-filter: blur(15px);
-  /* Aplica um efeito de desfoque ao fundo do input */
-  background: rgba(255, 255, 255, 0.2);
-  /* Define uma cor de fundo semitransparente para o input */
-  color: #fff;
-  /* Define a cor do texto como branco */
-  font-size: 16px;
-  /* Define o tamanho da fonte */
-  outline: none;
-  /* Remove o contorno azul que aparece ao clicar no input */
-}
-
-/* Conteúdo principal */
-.main-content {
-  flex: 2;
-  /* Define que o contêiner principal ocupa duas vezes o espaço do elemento adjacente (side-panel) */
-  display: flex;
-  /* Define que os elementos filhos são dispostos em linha ou coluna */
-  flex-direction: column;
-  /* Muda a direção dos elementos filhos para uma coluna (vertical) */
-  gap: 20px;
-  /* Define um espaçamento de 20px entre os elementos filhos */
-}
-
-/* Cartões e painéis com estilo de desfoque */
-.highlight-card,
-.recommended-section,
-.side-panel {
-  backdrop-filter: blur(10px);
-  /* Aplica um efeito de desfoque no fundo dos cartões */
-  background: rgba(255, 255, 255, 0.1);
-  /* Define uma cor de fundo semitransparente para criar o efeito de sobreposição */
-  border-radius: 20px;
-  /* Arredonda as bordas dos cartões */
   padding: 20px;
-  /* Adiciona um espaçamento interno de 20px */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  /* Adiciona uma sombra ao redor dos cartões para destacá-los */
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* Grid para as recomendações */
-.recommendation-grid {
+/* Header Styles */
+.header {
   display: flex;
-  /* Define que os elementos filhos serão dispostos em linha */
-  gap: 10px;
-  /* Define um espaçamento de 10px entre os elementos filhos */
-}
-
-/* Estilos para os itens do inventário */
-.inventory-list {
-  list-style: none;
-  /* Remove os marcadores padrão da lista */
-  padding: 0;
-  /* Remove o padding padrão da lista */
-}
-
-.inventory-list li {
-  margin: 10px 0;
-  /* Define um espaçamento de 10px acima e abaixo de cada item */
-  color: #ffffff;
-  /* Define a cor do texto como branco */
-}
-
-/* Cor específica para certos textos dentro da lista do inventário */
-.inventory-list span {
-  color: #ff8080;
-  /* Define a cor do texto dos spans para um tom de vermelho */
-}
-
-/* Adicione esses estilos em Home.css */
-
-/* Estilo para o cartão de cada prato */
-.dish-info {
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  margin-bottom: 15px;
-  overflow: hidden;
-  transition: transform 0.2s;
+  margin-bottom: 40px;
 }
 
-.dish-info:hover {
-  transform: scale(1.02);
+.logo {
+  font-size: 1.8rem;
+  color: #67cf89;
+  font-weight: bold;
 }
 
-/* Estilo para a imagem do prato */
-.dish-image {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  margin-right: 15px;
-  object-fit: cover;
+.nav {
+  display: flex;
+  gap: 20px;
 }
 
-/* Estilo para o conteúdo do prato */
-.dish-content {
+.nav-link {
+  font-weight: normal;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-link.active {
+  font-weight: bold;
+  border-bottom: 2px solid #ffcc00;
+}
+
+.nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #67cf89;
+}
+
+/* Suggestion Section */
+.suggestion-section {
+  margin-top: 100px;
+}
+
+.suggestion-card {
+  color: #fff;
+  padding: 30px;
+  margin-top: 80px;
+  border-radius: 20px;
+  flex-direction: row;
+  /* position: relative; */
+  display: flex;
+  flex-direction: row;
+  /* max-width: 800px; */
+  width: 100%;
+  text-align: left;
+}
+
+.suggestion-title {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.suggestion-content {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  justify-content: space-between;
 }
 
-/* Estilo para o título do prato */
-.dish-content h3 {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #fff;
-  margin: 0;
-  margin-bottom: 5px;
-}
-
-/* Estilo para a descrição do prato */
-.dish-content p {
-  font-size: 0.9rem;
-  color: #ddd;
-  margin: 0;
-  margin-bottom: 10px;
-}
-
-/* Estilo para o grupo de botões */
-.button-group {
+.suggestion-text {
   display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
-.button {
-  padding: 8px 12px;
-  font-size: 0.85rem;
-  font-weight: bold;
-  color: #fff;
-  background-color: #ff8080;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.highlight {
+  color: #00cc66;
 }
 
-.button:hover {
-  background-color: #ff6666;
+.dish-name {
+  font-size: 1.5rem;
+  color: #fff;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.dish-description {
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.button-orange {
+  background-color: #ff7f00;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button-orange:hover {
+  background-color: #e67000;
+}
+
+.button-blue {
+  background-color: #0066cc;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button-blue:hover {
+  background-color: #005bb5;
+}
+
+.suggestion-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* Pantry Section */
+.home-pantry-section {
+  margin-top: 150px;
+}
+
+.home-pantry-section h2 {
+  font-size: 2rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+.home-pantry-cards {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 150px;
+  align-content: center;
+  justify-content: center;
 }

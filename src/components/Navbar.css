@@ -1,0 +1,61 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px;
+    color: #fff;
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.logo {
+    font-size: 1.5rem;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.navbar-menu {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.navbar-item {
+    font-size: 1.2rem;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.navbar-item:hover {
+    color: #ffd700;
+    /* Amarelo para o hover */
+}
+
+.navbar-item.active {
+    font-weight: bold;
+    border-bottom: 2px solid #ffd700;
+}
+
+.highlight-dark-green {
+    color: #4CAF50;
+}
+
+.highlight-green {
+    color: #8CFF90;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #ffd700;
+    /* Borda amarela */
+    cursor: pointer;
+}

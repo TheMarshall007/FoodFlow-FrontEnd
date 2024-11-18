@@ -1,7 +1,8 @@
+// src/pages/Login/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { postLogin } from '../../services/authService'; // Corrigido de 'login' para 'postLogin'
-import { useUser } from '../../src/context/UserContext';
+import { postLogin } from '../../services/authService';
+import { useUser } from '../../context/UserContext';
 import './Login.css';
 
 const Login: React.FC = () => {
@@ -13,10 +14,12 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result: any = await postLogin({ username, password, reminder }); // Usa 'postLogin' aqui
+    const result: any = await postLogin({ username, password, reminder });
     if (result.status === 200) {
-      setUser(result.data)
-      navigate('/home'); // Redireciona para a página inicial ao fazer login
+      const userData = result.data;
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData)); // Salva o usuário no localStorage
+      navigate('/home');
     }
   };
 

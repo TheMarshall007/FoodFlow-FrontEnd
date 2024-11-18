@@ -1,0 +1,19 @@
+.pantry-page {
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.pantry-section h2 {
+    font-size: 2rem;
+    color: #ffffff;
+    text-align: center;
+}
+
+.pantry-cards {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 150px;
+    align-content: center;
+    justify-content: center;
+}

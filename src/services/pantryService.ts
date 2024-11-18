@@ -1,11 +1,30 @@
+import User from '../context/UserContext';
 import { api } from './apiConfig';
-interface inventoryData {
-    userId: number;
-    inventoryId: number;
+interface PantryData {
+    userId?: number;
+    inventoryId?: number;
     page: number;
 }
 
-export async function fetchInventory(data: inventoryData) {
+export interface Pantry {
+    id: number;
+    propertyName: string;
+    items: PantryItem[];
+    sharedWith: User[];
+    lastUpdated: string;
+    lowQuantityItems: PantryItem[];
+    image: string;
+}
+
+export interface PantryItem {
+    ingredient: {
+        name: string;
+        status: string;
+    }
+    quantity: number;
+}
+
+export async function fetchPantry(data: PantryData) {
     try {
         const response = await api.post('/inventory/pagination', data);
         return response.data.content;
@@ -15,12 +34,23 @@ export async function fetchInventory(data: inventoryData) {
     }
 }
 
-export async function fetchInventoryByUser(userId: number) {
+export async function fetchPantryByUserId(userId: number) {
     try {
         const response = await api.post(`/inventory/userId=${userId}`);
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar o inventário:', error);
+        return [];
+    }
+}
+
+export async function fetchItemsByPantryId(inventoryId: number) {
+    try {
+        const response = await api.get(`/inventory/${inventoryId}/items`);
+        console.log("LOGG RESP", response)
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao buscar o itens do inventário:', error);
         return [];
     }
 }

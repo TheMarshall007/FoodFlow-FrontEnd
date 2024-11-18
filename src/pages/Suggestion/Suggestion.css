@@ -1,0 +1,108 @@
+/* src/pages/Suggestion/Suggestion.css
+
+.suggestion-container {
+    padding: 40px;
+    color: #333;
+    background: #f6f7fb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .suggestion-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .suggestion-header h1 {
+    font-size: 2.5rem;
+    color: #222;
+  }
+  
+  .suggestion-header p {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  .view-menu-button {
+    padding: 10px 20px;
+    background-color: #ff6b6b;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+  }
+  
+  .suggestion-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .suggestion-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .suggestion-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .suggestion-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .suggestion-info {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .suggestion-info h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .suggestion-info p {
+    color: #777;
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+  
+  .suggestion-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+  }
+  
+  .suggestion-rating {
+    color: #f6b93b;
+  }
+  
+  .suggestion-price {
+    color: #ff6b6b;
+  }
+  
+  .add-cart-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff6b6b;
+    color: #fff;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-cart-button:hover {
+    background-color: #e55b5b;
+  }
+   */
