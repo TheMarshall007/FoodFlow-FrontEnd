@@ -18,7 +18,7 @@ const Suggestion: React.FC = () => {
   useEffect(() => {
     async function fetchData() {
       const daily = await fetchDailySuggestion(1);
-      const suggestedWithImages = await Promise.all(daily.map(async (item: Dish) => {
+      const suggestedWithImages = await Promise.all(daily?.map(async (item: Dish) => {
         if (typeof item.image === 'object' && item.image.id) {
             const imageResponse = await fetchDishImage(item.image.id);
             return {
@@ -42,7 +42,7 @@ const Suggestion: React.FC = () => {
       </header>
 
       <section className="suggestion-grid">
-        {dishes.map((dish) => (
+        {dishes?.map((dish) => (
           <div key={dish.id} className="suggestion-card">
             <img src={`${dish.image}`} alt={dish.name} className="suggestion-image" />
             <div className="suggestion-info">

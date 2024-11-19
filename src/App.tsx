@@ -1,24 +1,23 @@
-// src/App.tsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './pages/Home/Home';
 import Login from './pages/Login/Login';
 import Suggestion from './pages/Suggestion/Suggestion';
-import './App.css'; // Certifique-se de adicionar o estilo da imagem de fundo borrada aqui
+import './App.css'; 
 
 // Importe as imagens de fundo
 import homeBackground from './assets/fotos/food-background.jpg';
 import loginBackground from './assets/fotos/food-background.jpg';
 import suggestionBackground from './assets/fotos/food-background.jpg';
-import inventoryBackground from './assets/fotos/food-background.jpg';
+import pantryBackground from './assets/fotos/food-background.jpg';
 
 import LowQuantityItems from './components/Pantry/LowQuantityItems';
-import RecipeModal from './components/RecipeModal';
 import { UserProvider } from './context/UserContext';
-import Navbar from './components/Navbar';
 import PantryPage from './pages/Pantry/Pantries';
 import PlanDay from './pages/PlanDay/PlanDay';
 import Menus from './pages/Menu/Menus';
+import PantryDetail from './pages/Pantry/PantryDetail';
+import Navbar from './components/Navbar/Navbar';
 
 // Componente que gerencia a imagem de fundo
 function AppContent() {
@@ -38,7 +37,7 @@ function AppContent() {
         setBackgroundImage(suggestionBackground);
         break;
       case '/pantry':
-        setBackgroundImage(inventoryBackground);
+        setBackgroundImage(pantryBackground);
         break;
       default:
         setBackgroundImage(homeBackground);
@@ -57,10 +56,11 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/Home" element={<Home />} />
-          <Route path="/pantry" element={<PantryPage />} />
           <Route path="/menu" element={<Menus />} />
-          <Route path="/plan-day/:inventoryId" element={<PlanDay />} />
-          <Route path="/pantry/:inventoryId/low-quantity" element={<LowQuantityItems />} />
+          <Route path="/plan-day/:pantryId" element={<PlanDay />} />
+          <Route path="/pantries" element={<PantryPage />} />
+          <Route path="/pantry/:id" element={<PantryDetail />} />
+          <Route path="/pantry/:pantryId/low-quantity" element={<LowQuantityItems />} />
           <Route path="/suggestion" element={<Suggestion />} />
         </Routes>
       </div>

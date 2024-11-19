@@ -15,7 +15,7 @@ interface ShoppingListProps {
 }
 
 const ShoppingList: React.FC<ShoppingListProps> = ({ items, onClose }) => {
-    const [shoppingList, setShoppingList] = useState<ShoppingItem[]>(items.map(item => ({
+    const [shoppingList, setShoppingList] = useState<ShoppingItem[]>(items?.map(item => ({
         ingredientName: item.ingredient.name,
         quantity: 1, // Default quantity
         unitPrice: 0,
@@ -41,7 +41,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ items, onClose }) => {
             <h2>Lista de Compras</h2>
             <button onClick={onClose} className="close-button">Fechar</button>
             <ul className="shopping-list">
-                {shoppingList.map((item, index) => (
+                {shoppingList?.map((item, index) => (
                     <li key={index} className="shopping-item">
                         <span>{item.ingredientName}</span>
                         <input

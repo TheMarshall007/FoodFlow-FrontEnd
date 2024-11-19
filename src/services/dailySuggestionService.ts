@@ -1,8 +1,8 @@
 import { api } from './apiConfig';
 
-export async function fetchDailySuggestion(inventoryId: number) {
+export async function fetchDailySuggestion(pantryId: number) {
   try {
-    const response = await api.get(`/dish/daily_suggestion/${inventoryId}`);
+    const response = await api.get(`/dish/daily_suggestion/${pantryId}`);
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar as sugestãos do dia:', error);

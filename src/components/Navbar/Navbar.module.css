@@ -1,0 +1,40 @@
+.navbar {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-logo {
+    font-size: 1.5rem;
+    color: #67cf89;
+    text-transform: uppercase;
+}
+
+.navbar-menu {
+    display: flex;
+    gap: 20px;
+}
+
+.navbar-item {
+    color: #fff;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.navbar-item:hover {
+    color: #ffd700;
+}
+
+.navbar-item.active {
+    font-weight: bold;
+    border-bottom: 2px solid #ffd700;
+}
+
+.highlight-dark-green {
+    color: #006400;
+}
+
+.highlight-green {
+    color: #67cf89;
+}

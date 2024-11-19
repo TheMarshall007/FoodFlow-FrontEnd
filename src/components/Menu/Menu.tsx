@@ -26,7 +26,7 @@ const Menu = ({ menu }: MenuParams) => {
             <div className="dishes-container">
                 <h1 className="dishes-title">{menu.name}</h1>
                 <div className="dishes-card-container">
-                    {dishes.map((dish, index) => (
+                    {dishes?.map((dish, index) => (
                         <div className="dish-card" key={index}>
                             {/* <img src={dish.image} alt={dish.name} className="dish-image" /> */}
                             <h2 className="dish-name">{dish.name}</h2>

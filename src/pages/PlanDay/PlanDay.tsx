@@ -9,21 +9,21 @@ interface MenuItem {
 }
 
 const PlanDay: React.FC = () => {
-    const { inventoryId } = useParams<{ inventoryId: string }>();
+    const { pantryId } = useParams<{ pantryId: string }>();
     const [menuItems, setMenuItems] = React.useState<MenuItem[]>([
         { id: 1, name: 'Strogonoff de Frango', description: 'Delicioso strogonoff de frango com arroz.' },
         { id: 2, name: 'Salada de Frutas', description: 'Salada fresca de frutas.' },
     ]);
 
     const handleAddToPantry = (menuItemId: number) => {
-        alert(`Prato ${menuItemId} vinculado ao inventário ${inventoryId}!`);
+        alert(`Prato ${menuItemId} vinculado ao inventário ${pantryId}!`);
     };
 
     return (
         <div className="plan-day">
-            <h1>Planejar Dia - Inventário {inventoryId}</h1>
+            <h1>Planejar Dia - Inventário {pantryId}</h1>
             <div className="menu-list">
-                {menuItems.map((item) => (
+                {menuItems?.map((item) => (
                     <div key={item.id} className="menu-card">
                         <h2>{item.name}</h2>
                         <p>{item.description}</p>

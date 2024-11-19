@@ -1,44 +1,29 @@
-import userEvent from '@testing-library/user-event';
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PantryCard from '../../components/Pantry/PantryCard';
 import { useUser } from '../../context/UserContext';
 import { fetchPantry, fetchLowQuantityItems, Pantry } from '../../services/pantryService';
 import './Pantries.css';
+import PantryForm from './PantryForm';
 
 const Pantries = () => {
     const navigate = useNavigate();
     const { user } = useUser();
-    // const [inventories, setInventories] = React.useState<Pantry[]>([
-    //     { id: 1, propertyName: 'Casa Principal', items: [], lowStock: false },
-    //     { id: 2, propertyName: 'Casa de Praia', items: [], sharedWith:[],  },
-    // ]);
-    const [inventories, setInventories] = useState<Pantry[]>([]);
+    const [pantries, setPantries] = useState<Pantry[]>([]);
+    const [selectNewPantry, setSelectNewPantry] = useState<Boolean>(false);
 
     useEffect(() => {
         async function fetchData() {
             if (user) {
-                const inv = await fetchPantry({ userId: user.id, inventoryId: 1, page: 0 });
-                const inventoryWithLowItem = await Promise.all(inv?.map(async (invent: Pantry) => {
+                const pant = await fetchPantry({ userId: user.id, page: 0 });
+                const pantryWithLowItem = await Promise.all(pant?.map(async (invent: Pantry) => {
                     const lowItem = await fetchLowQuantityItems(invent?.id, 5);
                     return {
                         ...invent,
                         lowQuantityItems: lowItem,
-                        image: require('../../assets/fotos/summer-beach-house.png'),
-                        sharedWith: [{
-                            id: 1,
-                            name: 'leo',
-                            email: 'leo',
-                            picture: ''
-                        }, {
-                            id: 2,
-                            name: 'leo',
-                            email: 'leo',
-                            picture: ''
-                        }]
                     }
                 }))
-                setInventories(inventoryWithLowItem)
+                setPantries(pantryWithLowItem)
             } else {
                 navigate('/');
                 return;
@@ -47,19 +32,28 @@ const Pantries = () => {
         fetchData()
     }, [user, navigate])
 
-    const handlePlanDay = (inventoryId: number) => {
-        navigate(`/plan-day/${inventoryId}`);
+    const closeModal = () => {
+        setSelectNewPantry(false);
     };
 
     return (
-        <div className="pantry-section">
-            <h2>Inventários</h2>
-            <div className="pantry-cards">
-                {inventories.map((inventories) => (
-                    <PantryCard inv={inventories} />
-                ))}
+        <>
+            {selectNewPantry && (
+                <>
+                    <div className="modal-backdrop" onClick={closeModal}></div>
+                    <PantryForm />
+                </>
+            )}
+            <div className="pantry-section">
+                <h2>Despensas</h2>
+                <h4 className='add-button' onClick={() => setSelectNewPantry(true)}>Adicionar</h4>
+                <div className="pantry-cards">
+                    {pantries?.map((pant) => (
+                        <PantryCard key={pant.id} pant={pant} onClick={() => { navigate(`/pantry/${pant.id}`) }} />
+                    ))}
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

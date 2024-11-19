@@ -1,43 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchDailySuggestion } from '../../services/dailySuggestionService';
-import { fetchPantry, fetchLowQuantityItems } from '../../services/pantryService';
-import { fetchDishImage } from '../../services/dishImageService';
-import './Home.css';
-import User, { useUser } from '../../context/UserContext';
+import { fetchPantry, fetchLowQuantityItems, Pantry } from '../../services/pantryService';
+import  { useUser } from '../../context/UserContext';
 import PantryCard from '../../components/Pantry/PantryCard';
-
-interface Dish {
-    id: number;
-    name: string;
-    description: string;
-    ingredientsId: number[];
-    image?: string | { id: number };
-    steps: string[];
-}
-
-interface Pantry {
-    id: number;
-    propertyName: string;
-    items: PantryItem[];
-    sharedWith: User[];
-    lastUpdated: string;
-    lowQuantityItems: PantryItem[];
-}
-
-interface PantryItem {
-    ingredient: {
-        name: string;
-        status: string;
-    }
-    quantity: number;
-}
+import { Dish } from '../../services/dishService';
+import './Home.css';
 
 const Home: React.FC = () => {
     const { user } = useUser();
     const navigate = useNavigate();
     const [dailySuggestion, setDailySuggestion] = useState<Dish>();
-    const [inventory, setPantry] = useState<Pantry[]>([]);
+    const [pantry, setPantry] = useState<Pantry[]>([]);
 
     useEffect(() => {
         if (!user) {
@@ -46,46 +20,39 @@ const Home: React.FC = () => {
         }
 
         async function fetchData() {
-            const daily = await fetchDailySuggestion(1);
-
-            let inventoryWithLowItem = []
             if (user) {
-                const inv = await fetchPantry({ userId: user.id, inventoryId: 1, page: 0 });
-                inventoryWithLowItem = await Promise.all(inv?.map(async (invent: Pantry) => {
-                    const lowItem = await fetchLowQuantityItems(invent?.id, 5);
-                    return {
-                        ...invent,
-                        lowQuantityItems: lowItem,
-                        sharedWith: [{
-                            id: 1,
-                            name: 'leo',
-                            email: 'leo',
-                            picture: ''
-                        }, {
-                            id: 2,
-                            name: 'leo',
-                            email: 'leo',
-                            picture: ''
-                        }]
-                    }
-                }))
+                const pant = await fetchPantry({ userId: user.id, pantryId: 1, page: 0 });
+                if (pant) {
+                    const pantryWithLowItem = await Promise.all(pant?.map(async (invent: Pantry) => {
+                        const lowItem = await fetchLowQuantityItems(invent?.id, 5);
+                        if (lowItem) {
+                            return {
+                                ...invent,
+                                lowQuantityItems: lowItem,
+                            }
+                        }
+                    }))
+                    setPantry(pantryWithLowItem);
+                }
             }
 
-            const dailyWithImages = await Promise.any(daily.map(async (dish: Dish) => {
-                if (typeof dish.image === 'object' && dish.image.id) {
-                    const imageResponse = await fetchDishImage(dish.image.id);
-                    return {
-                        ...dish,
-                        image: `data:image/${imageResponse.type};base64,${imageResponse.image}`,
-                    };
-                }
-                return dish;
-            }));
-
-            setDailySuggestion(dailyWithImages);
-            setPantry(inventoryWithLowItem);
+            const daily = await fetchDailySuggestion(1);
+            if (daily) {
+                // const dailyWithImages = await Promise.any(daily?.map(async (dish: Dish) => {
+                //     if (typeof dish.image === 'object' && dish.image.id) {
+                //         const imageResponse = await fetchDishImage(dish.image.id);
+                //         if (imageResponse) {
+                //             return {
+                //                 ...dish,
+                //                 image: imageResponse.image
+                //             };
+                //         }
+                //     }
+                //     return dish;
+                // }));
+                // setDailySuggestion(dailyWithImages);
+            }
         }
-
         fetchData();
     }, [user, navigate]);
 
@@ -106,19 +73,18 @@ const Home: React.FC = () => {
                             </div>
                         </div>
                         <img
-                            src={typeof dailySuggestion.image === 'string' ? require('../../assets/fotos/strogonoff.png') : require('../../assets/fotos/strogonoff.png')}
+                            src={typeof dailySuggestion.image === 'string' && require(dailySuggestion.image)}
                             alt="Suggested Dish"
                             className="suggestion-image"
                         />
                     </div>
                 )}
             </section>
-
             <section className="home-pantry-section">
                 <h2>Dispensas</h2>
                 <div className="home-pantry-cards">
-                    {inventory.map((inv, index) => (
-                        <PantryCard inv={{ ...inv, image: require('../../assets/fotos/summer-beach-house.png') }} key={index} />
+                    {pantry?.map((pant, index) => (
+                        <PantryCard pant={pant} key={index} onClick={()=>{navigate(`/pantry/${pant.id}`)}} />
                     ))}
                 </div>
             </section>

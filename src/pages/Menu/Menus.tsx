@@ -39,7 +39,7 @@ const Menus = () => {
                 <>
                     <h2>Menus</h2>
                     <div className="menu-cards">
-                        {menuData.map((menu, index) => (
+                        {menuData?.map((menu, index) => (
                             <div className="menu-card" key={index}>
                                 <h3 className="menu-name">{menu.name}</h3>
                                 <p className="menu-info">{menu.dishesId.length} Receitas</p>
