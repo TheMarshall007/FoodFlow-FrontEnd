@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { fetchLowQuantityItems, fetchPantry, Pantry } from '../../services/pantryService';
 import './PantryDetail.css';
 import { useUser } from '../../context/UserContext';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const PantryDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { user } = useUser();
+    const navigate = useNavigate();
     const [pantry, setPantry] = useState<Pantry>();
 
     useEffect(() => {
@@ -34,6 +35,10 @@ const PantryDetail: React.FC = () => {
         return <p>Carregando ou despensa não encontrada...</p>;
     }
 
+    const handleAddItemsClick = () => {
+        navigate(`/pantry/${id}/add-items`);
+    };
+
     return (
         <div className="pantry-detail-container">
             <div className="pantry-header">
@@ -53,6 +58,7 @@ const PantryDetail: React.FC = () => {
                     </div>
                 ))}
             </div>
+            <button className="add-items-button" onClick={handleAddItemsClick}>Adicionar Itens</button>
         </div>
     );
 };
