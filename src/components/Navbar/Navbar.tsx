@@ -16,6 +16,7 @@ const Navbar: React.FC = () => {
         <Link to="/Home" className={`${styles['navbar-item']} ${location.pathname === '/Home' ? styles.active : ''}`}>INICIO</Link>
         <Link to="/pantries" className={`${styles['navbar-item']} ${location.pathname === '/pantries' ? styles.active : ''}`}>DISPENSA</Link>
         <Link to="/menu" className={`${styles['navbar-item']} ${location.pathname === '/menu' ? styles.active : ''}`}>MENU</Link>
+        <Link to="/shopping" className={`${styles['navbar-item']} ${location.pathname === '/shopping' ? styles.active : ''}`}>COMPRAS</Link>
       </div>
     </nav>
   );

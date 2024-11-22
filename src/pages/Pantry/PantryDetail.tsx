@@ -35,10 +35,6 @@ const PantryDetail: React.FC = () => {
         return <p>Carregando ou despensa não encontrada...</p>;
     }
 
-    const handleAddItemsClick = () => {
-        navigate(`/pantry/${id}/add-items`);
-    };
-
     return (
         <div className="pantry-detail-container">
             <div className="pantry-header">
@@ -58,7 +54,7 @@ const PantryDetail: React.FC = () => {
                     </div>
                 ))}
             </div>
-            <button className="add-items-button" onClick={handleAddItemsClick}>Adicionar Itens</button>
+            <button className="add-items-button" onClick={()=> navigate(`/pantry/${id}/add-items`)}>Adicionar Itens</button>
         </div>
     );
 };

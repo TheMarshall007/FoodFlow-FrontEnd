@@ -19,6 +19,8 @@ import Menus from './pages/Menu/Menus';
 import PantryDetail from './pages/Pantry/PantryDetail';
 import Navbar from './components/Navbar/Navbar';
 import PantryAddItems from './pages/Pantry/PantryAddItems';
+import ShoppingListForm from './pages/ShoppingList/ShoppingListForm';
+import ShoppingList from './pages/ShoppingList/ShoppingList';
 
 // Componente que gerencia a imagem de fundo
 function AppContent() {
@@ -56,14 +58,22 @@ function AppContent() {
       <div className="content">
         <Routes>
           <Route path="/" element={<Login />} />
+
           <Route path="/Home" element={<Home />} />
+
           <Route path="/menu" element={<Menus />} />
+
           <Route path="/plan-day/:pantryId" element={<PlanDay />} />
+          <Route path="/suggestion" element={<Suggestion />} />
+
           <Route path="/pantries" element={<PantryPage />} />
           <Route path="/pantry/:id" element={<PantryDetail />} />
           <Route path="/pantry/:pantryId/low-quantity" element={<LowQuantityItems />} />
-          <Route path="/pantry/:pantryId/add-items" element={<PantryAddItems />} />
-          <Route path="/suggestion" element={<Suggestion />} />
+          <Route path="/pantry/:id/add-items" element={<PantryAddItems />} />
+
+          <Route path="/shopping" element={<ShoppingList />} />
+          <Route path="/shopping/form" element={<ShoppingListForm />} />
+
         </Routes>
       </div>
     </div>
