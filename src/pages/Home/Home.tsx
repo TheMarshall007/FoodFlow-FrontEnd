@@ -21,7 +21,7 @@ const Home: React.FC = () => {
 
         async function fetchData() {
             if (user) {
-                const pant = await fetchPantry({ userId: user.id, pantryId: 1, page: 0 });
+                const pant = await fetchPantry({ userId: user.id, page: 0 });
                 if (pant) {
                     const pantryWithLowItem = await Promise.all(pant?.map(async (invent: Pantry) => {
                         const lowItem = await fetchLowQuantityItems(invent?.id, 5);

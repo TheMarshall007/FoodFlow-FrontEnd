@@ -41,49 +41,38 @@ const PantryForm = () => {
         }
     };
 
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-
     return (
-        <>
-            {isModalOpen && <div className="modal-backdrop" onClick={closeModal}></div>}
-            <div className={`pantry-form-container ${isModalOpen ? 'open' : ''}`}>
-                <h2>Cadastrar Nova Despensa</h2>
-                <form onSubmit={handleSubmit} className="pantry-form">
-                    <div className="form-group">
-                        <label htmlFor="propertyName">Nome da Despensa:</label>
-                        <input
-                            type="text"
-                            id="propertyName"
-                            value={propertyName}
-                            onChange={(e) => setPropertyName(e.target.value)}
-                            required
-                        />
+        <div className={`pantry-form-container open`}>
+            <h2>Cadastrar Nova Despensa</h2>
+            <form onSubmit={handleSubmit} className="pantry-form">
+                <div className="form-group">
+                    <label htmlFor="propertyName">Nome da Despensa:</label>
+                    <input
+                        type="text"
+                        id="propertyName"
+                        value={propertyName}
+                        onChange={(e) => setPropertyName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Escolha uma imagem para a despensa:</label>
+                    <div className="image-selection">
+                        {availableImages.map((image, index) => (
+                            <img
+                                key={index}
+                                src={image}
+                                alt={`Imagem ${index + 1}`}
+                                className={`pantry-form-image ${selectedImage === image ? 'selected' : ''}`}
+                                onClick={() => setSelectedImage(image)}
+                            />
+                        ))}
                     </div>
-                    <div className="form-group">
-                        <label>Escolha uma imagem para a despensa:</label>
-                        <div className="image-selection">
-                            {availableImages.map((image, index) => (
-                                <img
-                                    key={index}
-                                    src={image}
-                                    alt={`Imagem ${index + 1}`}
-                                    className={`pantry-form-image ${selectedImage === image ? 'selected' : ''}`}
-                                    onClick={() => setSelectedImage(image)}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                    {error && <p className="error-message">{error}</p>}
-                    <button type="submit" className="submit-button">Cadastrar</button>
-                </form>
-            </div>
-        </>
+                </div>
+                {error && <p className="error-message">{error}</p>}
+                <button type="submit" className="submit-button">Cadastrar</button>
+            </form>
+        </div>
     );
 };
 
