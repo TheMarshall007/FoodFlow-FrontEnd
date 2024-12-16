@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Card, CardContent, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Grid, MenuItem, Select, Typography } from '@mui/material';
 import { fetchIngredients } from '../../services/ingredientsService';
 import { createShoppingList, ShoppingListInsertParam } from '../../services/shoppingListService';
 import { useUser } from '../../context/UserContext';
@@ -30,32 +30,19 @@ const ShoppingListForm: React.FC = () => {
             if (user) {
                 const ingredients = await fetchIngredients({ page: 0 });
                 setAvailableItems(ingredients);
-                console.log("LOGG INGr", ingredients)
+                console.log("LOGG availableItems", ingredients);
+
                 const fetchedPantries = await fetchPantry({ userId: user?.id, page: 0 });
                 setPantries(fetchedPantries);
+                console.log("LOGG pantries", fetchedPantries);
+
                 const fetchedMenus = await fetchMenu({ userId: user?.id, page: 0 });
                 setMenus(fetchedMenus);
+                console.log("LOGG menus", fetchedMenus);
             }
         };
         fetchData();
     }, [user]);
-
-    const handleItemChange = (index: number, key: keyof Item, value: string | number) => {
-        setItems((prevItems) =>
-            prevItems.map((item, i) => {
-                if (i === index) {
-                    const updatedItem = { ...item, [key]: value };
-                    if (key === 'quantity' || key === 'price') {
-                        if (updatedItem.quantity > 0 && updatedItem.price > 0) {
-                            updatedItem.unitValue = updatedItem.price / updatedItem.quantity;
-                        }
-                    }
-                    return updatedItem;
-                }
-                return item;
-            })
-        );
-    };
 
     const handleAddItem = () => {
         setItems((prevItems) => [
@@ -65,7 +52,12 @@ const ShoppingListForm: React.FC = () => {
     };
 
     const handleRemoveItem = (index: number) => {
-        setItems((prevItems) => prevItems.filter((_, i) => i !== index));
+        setItems((prevItems) => {
+            const removedItem = prevItems[index];
+            setAvailableItems((prevAvailableItems) => [...prevAvailableItems, removedItem]);
+            console.log("LOGG removedItem", removedItem);
+            return prevItems.filter((_, i) => i !== index);
+        });
     };
 
     const handleConfirmItems = async () => {
@@ -76,10 +68,9 @@ const ShoppingListForm: React.FC = () => {
                 menuId,
                 itemsId: items.map((item) => item.id),
             };
-            console.log("DTO para enviar:", shoppingListDTO);
+            console.log("LOGG DTO para enviar", shoppingListDTO);
             try {
                 const response = await createShoppingList(shoppingListDTO);
-                console.log(response);
                 if (response === 200) {
                     navigate('/shopping');
                 }
@@ -92,22 +83,23 @@ const ShoppingListForm: React.FC = () => {
     const handleSelectItem = (index: number, itemId: number) => {
         const selectedItem = availableItems.find((item) => item.id === itemId);
         if (selectedItem) {
-            setItems((prevItems) =>
-                prevItems.map((item, i) =>
-                    i === index ? { ...selectedItem, quantity: item.quantity, price: item.price, unitValue: item.unitValue } : item
-                )
-            );
+            setItems((prevItems) => {
+                const updatedItems = [...prevItems];
+                updatedItems[index] = { ...selectedItem, quantity: 1, price: 0, unitValue: 0 };
+                console.log("LOGG updatedItems", updatedItems);
+                return updatedItems;
+            });
+            setAvailableItems((prevAvailableItems) => {
+                const filteredAvailableItems = prevAvailableItems.filter((item) => item.id !== itemId);
+                console.log("LOGG availableItems after removal", filteredAvailableItems);
+                return filteredAvailableItems;
+            });
         }
     };
 
     return (
-        <Box sx={{ padding: 4, backgroundColor:'#7777' }}>
+        <Box sx={{ padding: 4, backgroundColor: '#7777' }}>
             <Typography variant="h4" gutterBottom>Adicionar Itens à Lista de Compras</Typography>
-
-            <Button variant="contained" color="primary" onClick={handleAddItem} sx={{ mb: 2 }}>
-                Adicionar Item Manualmente
-            </Button>
-
             <Card sx={{ mb: 4 }}>
                 <CardContent>
                     <Grid container spacing={2}>
@@ -151,7 +143,7 @@ const ShoppingListForm: React.FC = () => {
 
             <Grid container spacing={2}>
                 {items.map((item, index) => (
-                    <Grid item xs={6} md={3} key={index}>
+                    <Grid item xs={2} md={2} key={index}>
                         <Card>
                             <CardContent>
                                 <Typography variant="h6">Item {index + 1}</Typography>
@@ -172,15 +164,6 @@ const ShoppingListForm: React.FC = () => {
                                         ))}
                                     </Select>
                                 </Box>
-                                <Box sx={{ mt: 2 }}>
-                                    <TextField
-                                        label="Quantidade"
-                                        type="number"
-                                        fullWidth
-                                        value={item.quantity}
-                                        onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value))}
-                                    />
-                                </Box>
                                 <Button
                                     variant="outlined"
                                     color="secondary"
@@ -193,8 +176,21 @@ const ShoppingListForm: React.FC = () => {
                         </Card>
                     </Grid>
                 ))}
+                <Grid item xs={6} md={3} >
+                    <Card>
+                        <CardContent>
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                onClick={handleAddItem}
+                                sx={{ mt: 2 }}
+                            >
+                                Adicionar Item Manualmente
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </Grid>
             </Grid>
-
             <Button
                 variant="contained"
                 color="success"
