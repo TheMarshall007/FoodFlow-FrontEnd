@@ -2,7 +2,7 @@ import { api } from './apiConfig';
 import { Items } from './ingredientsService';
 
 export interface ShoppingListInsertParam {
-    itemsId: number[];
+    items: {ingredientId:number, quantity:number}[];
     pantryId?: number;
     menuId?: number;
     userId: number

@@ -54,9 +54,9 @@ const ShoppingList: React.FC = () => {
                                     <Typography variant="body2" color="textSecondary">
                                         Data de Criação: {new Date(list.dateCreated).toLocaleDateString('pt-BR')}
                                     </Typography>
-                                    <Typography variant="body2" color="textSecondary">
+                                    {/* <Typography variant="body2" color="textSecondary">
                                         Itens na lista: {list.itemsId.length}
-                                    </Typography>
+                                    </Typography> */}
                                 </CardContent>
                             </Card>
                         </Grid>
