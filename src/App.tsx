@@ -17,10 +17,7 @@ import PantryPage from './pages/Pantry/Pantries';
 import PlanDay from './pages/PlanDay/PlanDay';
 import Menus from './pages/Menu/Menus';
 import PantryDetail from './pages/Pantry/PantryDetail';
-import Navbar from './components/Navbar/Navbar';
-import PantryAddItems from './pages/Pantry/PantryAddItems';
-import ShoppingListForm from './pages/ShoppingList/ShoppingListForm';
-import ShoppingList from './pages/ShoppingList/ShoppingList';
+import Navbar from './layouts/Navbar/Navbar';
 
 // Componente que gerencia a imagem de fundo
 function AppContent() {
@@ -69,11 +66,6 @@ function AppContent() {
           <Route path="/pantries" element={<PantryPage />} />
           <Route path="/pantry/:id" element={<PantryDetail />} />
           <Route path="/pantry/:pantryId/low-quantity" element={<LowQuantityItems />} />
-          <Route path="/pantry/:id/add-items" element={<PantryAddItems />} />
-
-          <Route path="/shopping" element={<ShoppingList />} />
-          <Route path="/shopping/form" element={<ShoppingListForm />} />
-
         </Routes>
       </div>
     </div>

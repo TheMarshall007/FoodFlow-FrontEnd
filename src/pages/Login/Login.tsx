@@ -1,9 +1,9 @@
 // src/pages/Login/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { postLogin } from '../../services/authService';
 import { useUser } from '../../context/UserContext';
-import './Login.css';
+import '../../styles/Login.css';
+import { postLogin } from '../../services/auth/authService';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('leonardovinicius_silva@hotmail.com');

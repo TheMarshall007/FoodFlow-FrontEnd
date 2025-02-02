@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Dish, fetchDish, fetchDishesByIds } from "../../services/dishService";
-import { MenuData } from "../../services/menuService";
+import { Dish, fetchDish, fetchDishesByIds } from "../../services/dish/dishService";
+import { MenuData } from "../../services/menu/menuService";
 
 interface MenuParams {
     menu: MenuData

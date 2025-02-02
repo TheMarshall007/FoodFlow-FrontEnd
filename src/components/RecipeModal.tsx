@@ -1,6 +1,6 @@
 // src/components/RecipeModal.tsx
 import React, { useEffect, useState } from 'react';
-import { fetchIngredientsByIds } from '../services/ingredientsService';
+import { fetchIngredientsByIds } from '../services/ingredients/ingredientsService';
 import './RecipeModal.css';
 
 interface RecipeModalProps {

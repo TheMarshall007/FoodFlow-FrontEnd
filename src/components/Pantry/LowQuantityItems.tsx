@@ -1,7 +1,7 @@
 // src/components/Pantry/LowQuantityItems.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchLowQuantityItems } from '../../services/pantryService';
+import { fetchLowQuantityItems } from '../../services/pantry/pantryService';
 
 interface LowQuantityItemType {
     id: number;

@@ -1,5 +1,5 @@
-import User from '../context/UserContext';
-import { api } from './apiConfig';
+import User from '../../context/UserContext';
+import { api } from '../api/apiConfig';
 
 interface PantryInsertData {
     userId: number;

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchDailySuggestion } from '../../services/dailySuggestionService';
-import { fetchPantry, fetchLowQuantityItems, Pantry } from '../../services/pantryService';
 import  { useUser } from '../../context/UserContext';
 import PantryCard from '../../components/Pantry/PantryCard';
-import { Dish } from '../../services/dishService';
-import './Home.css';
+import { Dish } from '../../services/dish/dishService';
+import '../../styles/Home.css';
+import { fetchLowQuantityItems, fetchPantry, Pantry } from '../../services/pantry/pantryService';
+import { fetchDailySuggestion } from '../../services/suggestion/dailySuggestionService';
 
 const Home: React.FC = () => {
     const { user } = useUser();

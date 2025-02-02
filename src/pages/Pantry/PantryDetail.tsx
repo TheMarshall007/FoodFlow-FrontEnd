@@ -1,60 +1,71 @@
-import React, { useEffect, useState } from 'react';
-import { fetchLowQuantityItems, fetchPantry, Pantry } from '../../services/pantryService';
-import './PantryDetail.css';
-import { useUser } from '../../context/UserContext';
-import { useParams, useNavigate } from 'react-router-dom';
+import React from "react";
+import { usePantry } from "../../hooks/usePantry";
+// Componentes
+import ItemSelectionModal from "../../components/ShoppingListItem/ItemSelectionModal/ItemSelectionModal";
+import ShoppingListItemCard from "../../components/ShoppingListItem/ShoppingListItemCard";
+// Estilos
+import "../../styles/PantryDetail.css";
 
 const PantryDetail: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const { user } = useUser();
-    const navigate = useNavigate();
-    const [pantry, setPantry] = useState<Pantry>();
+    const { state, dispatch, handleAddItemsToShoppingList, handleUpdateQuantity, handleRemoveItem } = usePantry();
 
-    useEffect(() => {
-        async function fetchData() {
-            if (user && id) {
-                try {
-                    let pant = await fetchPantry({ pantryId: parseInt(id), page: 0 });
-                    pant = pant[0]
-                    if (pant) {
-                        const lowItems = await fetchLowQuantityItems(pant.id, 5);
-                        setPantry({
-                            ...pant,
-                            lowQuantityItems: lowItems
-                        });
-                    }
-                } catch (error) {
-                    console.error("Erro ao buscar a despensa:", error);
-                }
-            }
-        }
-        fetchData();
-    }, [user, id]);
-
-    if (!pantry) {
+    if (!state.pantry) {
         return <p>Carregando ou despensa não encontrada...</p>;
     }
 
     return (
         <div className="pantry-detail-container">
             <div className="pantry-header">
-                <img src={pantry?.image} alt={pantry?.propertyName} className="pantry-image" />
+                <img src={state.pantry?.image} alt={state.pantry?.propertyName} className="pantry-image" />
                 <div className="pantry-info">
-                    <h2>{pantry?.propertyName}</h2>
-                    <p>{pantry?.sharedWith?.length ?? 0} Menu vinculado</p>
-                    <p className="low-quantity">{pantry?.lowQuantityItems?.length} itens quase acabando</p>
+                    <h2>{state.pantry?.propertyName}</h2>
+                    <p>{state.pantry?.sharedWith?.length ?? 0} Menu vinculado</p>
+                    <p className="low-quantity">{state.pantry?.lowQuantityItems?.length} itens quase acabando</p>
                 </div>
             </div>
-            <div className="pantry-items">
-                {pantry?.items?.map((item, index) => (
-                    <div key={index} className={`pantry-item ${pantry?.lowQuantityItems.includes(item) ? 'low-stock' : ''}`}>
-                        <img src={item.image} alt={item.name} className="item-image" />
-                        <p>{item.name}</p>
-                        <p>{item.quantity}x</p>
-                    </div>
-                ))}
+
+            {/* Abas de navegação */}
+            <div className="pantry-tabs">
+                <button className={`tab-button ${state.activeTab === "items" ? "active" : ""}`} onClick={() => dispatch({ type: "SET_ACTIVE_TAB", payload: "items" })}>
+                    Itens na Dispensa
+                </button>
+                <button className={`tab-button ${state.activeTab === "shoppingList" ? "active" : ""}`} onClick={() => dispatch({ type: "SET_ACTIVE_TAB", payload: "shoppingList" })}>
+                    Lista de Compras
+                </button>
+                <button className={`tab-button ${state.activeTab === "history" ? "active" : ""}`} onClick={() => dispatch({ type: "SET_ACTIVE_TAB", payload: "history" })}>
+                    Histórico de Compras
+                </button>
             </div>
-            <button className="add-items-button" onClick={()=> navigate(`/pantry/${id}/add-items`)}>Adicionar Itens</button>
+
+            {/* Conteúdo das abas */}
+            <div className="tab-content">
+                {state.activeTab === "shoppingList" && (
+                    <div className="tab-shopping-list">
+                        <h3>Lista de Compras</h3>
+                        <button className="add-items-auto-button" onClick={() => dispatch({ type: "TOGGLE_MODAL" })}>
+                            Adicionar Itens
+                        </button>
+                        <div className="shopping-list">
+                            {state.shoppingList?.items
+                                .slice() // Creates a copy to avoid modifying state directly
+                                .sort((a, b) => a.ingredientId - b.ingredientId) // Sort by ingredientId
+                                .map((item) => (
+                                    <ShoppingListItemCard
+                                        key={item.id}
+                                        item={item}
+                                        onUpdateQuantity={handleUpdateQuantity}
+                                        onRemoveItem={handleRemoveItem}
+                                    />))}
+                        </div>
+
+                    </div>
+                )}
+            </div>
+
+            {/* Modal de Seleção de Itens */}
+            {state.isModalOpen && (
+                <ItemSelectionModal availableItems={state.availableItems} onClose={() => dispatch({ type: "TOGGLE_MODAL" })} onConfirm={handleAddItemsToShoppingList} />
+            )}
         </div>
     );
 };

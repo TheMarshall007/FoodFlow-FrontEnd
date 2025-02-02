@@ -1,8 +1,8 @@
 // PantryForm.tsx
 import React, { useState } from 'react';
-import './PantryForm.css';
+import '../../styles/PantryForm.css';
 import { useUser } from '../../context/UserContext';
-import { createPantry } from '../../services/pantryService';
+import { createPantry } from '../../services/pantry/pantryService';
 import { useNavigate } from 'react-router-dom';
 
 const PantryForm = () => {
