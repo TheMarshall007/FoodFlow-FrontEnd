@@ -1,7 +1,7 @@
 // Menus.tsx
 import React, { useEffect, useState } from 'react';
-import './Menus.css';
-import { fetchMenu, MenuData } from '../../services/menuService';
+import '../../styles/Menus.css';
+import { fetchMenu, MenuData } from '../../services/menu/menuService';
 import { useUser } from '../../context/UserContext';
 import Menu from '../../components/Menu/Menu';
 

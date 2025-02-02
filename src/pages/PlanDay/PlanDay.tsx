@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import './PlanDay.css';
+import '../../styles/PlanDay.css';
 
 interface MenuItem {
     id: number;

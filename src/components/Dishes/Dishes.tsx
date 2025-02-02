@@ -1,4 +1,4 @@
-import { Dish } from '../../services/dishService';
+import { Dish } from '../../services/dish/dishService';
 import './Dishes.css';
 
 const Dishes = (dishe: Dish) => {

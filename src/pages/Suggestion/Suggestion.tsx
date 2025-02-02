@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { fetchDailySuggestion } from '../../services/dailySuggestionService';
-import { fetchDishImage } from '../../services/dishImageService';
+import { fetchDishImage } from '../../services/dish/dishImageService';
 import './Suggestion.css';
+import { fetchDailySuggestion } from '../../services/suggestion/dailySuggestionService';
 
 interface Dish {
     id: number;
