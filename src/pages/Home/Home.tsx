@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import  { useUser } from '../../context/UserContext';
 import PantryCard from '../../components/Pantry/PantryCard';
 import { Dish } from '../../services/dish/dishService';
-import '../../styles/Home.css';
+import '../../styles/pages/Home/Home.css';
 import { fetchLowQuantityItems, fetchPantry, Pantry } from '../../services/pantry/pantryService';
 import { fetchDailySuggestion } from '../../services/suggestion/dailySuggestionService';
 

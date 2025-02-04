@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../../../styles/ItemSelectionModal.css'
+import '../../../styles/components/ItemSelection/ItemSelectionModal.css'
 import { ShoppingListItem } from '../../../services/shopping/shoppingListService';
 
 interface Item {

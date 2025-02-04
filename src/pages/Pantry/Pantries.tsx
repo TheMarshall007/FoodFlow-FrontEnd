@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PantryCard from '../../components/Pantry/PantryCard';
 import { useUser } from '../../context/UserContext';
 import { fetchPantry, fetchLowQuantityItems, Pantry } from '../../services/pantry/pantryService';
-import '../../styles/Pantries.css';
+import '../../styles/pages/Pantry/Pantries.css';
 import PantryForm from './PantryForm';
 
 const Pantries = () => {

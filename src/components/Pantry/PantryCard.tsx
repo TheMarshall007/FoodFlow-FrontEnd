@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pantry } from '../../services/pantry/pantryService';
-import '../../styles/PantryCard.css'
+import '../../styles/components/Pantry/PantryCard.css'
 interface PantryCardProps {
     pant: Pantry;
     onClick(): void

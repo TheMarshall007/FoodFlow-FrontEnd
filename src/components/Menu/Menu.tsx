@@ -12,9 +12,7 @@ const Menu = ({ menu }: MenuParams) => {
     useEffect(() => {
         async function fetchData() {
             if (menu?.dishesId?.length > 0) {
-                console.log("LOGG DISHES", menu?.dishesId)
                 const fetchedDishes = await fetchDishesByIds(menu.dishesId)
-                console.log("LOGG", fetchedDishes)
                 setDishes(fetchedDishes);
             }
         }

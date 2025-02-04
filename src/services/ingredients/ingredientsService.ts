@@ -17,6 +17,7 @@ export interface Items {
 export interface Ingredient {
     id: number;
     name: string;
+    image: string;
     category?: string;
     description: string;
 }

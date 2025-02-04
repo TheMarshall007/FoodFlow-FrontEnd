@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
-import '../../styles/Login.css';
+import '../../styles/pages/Login/Login.css';
 import { postLogin } from '../../services/auth/authService';
 
 const Login: React.FC = () => {

@@ -1,5 +1,6 @@
 import User from '../../context/UserContext';
 import { api } from '../api/apiConfig';
+import { Ingredient } from '../ingredients/ingredientsService';
 
 interface PantryInsertData {
     userId: number;
@@ -24,12 +25,8 @@ export interface Pantry {
 }
 
 export interface PantryItem {
-    name: string;
-    image: string;
-    ingredient: {
-        name: string;
-        status: string;
-    }
+    id: number;
+    ingredient: Ingredient;
     quantity: number;
 }
 
@@ -53,20 +50,9 @@ export async function fetchPantry(data: PantryData) {
     }
 }
 
-// export async function fetchPantryByUserId(userId: number) {
-//     try {
-//         const response = await api.post(`/pantry/userId=${userId}`);
-//         return response.data;
-//     } catch (error) {
-//         console.error('Erro ao buscar o inventário:', error);
-//         return [];
-//     }
-// }
-
 export async function fetchItemsByPantryId(pantryId: number) {
     try {
         const response = await api.get(`/pantry/${pantryId}/items`);
-        console.log("LOGG RESP", response)
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar o itens do inventário:', error);

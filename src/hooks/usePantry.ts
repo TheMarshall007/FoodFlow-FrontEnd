@@ -1,18 +1,61 @@
 import { useEffect, useReducer } from "react";
 import { useParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
-import { pantryReducer, initialState } from "../context/pantryReducer";
-import { fetchPantry } from "../services/pantry/pantryService";
+import { fetchItemsByPantryId, fetchPantry, Pantry, PantryItem } from "../services/pantry/pantryService";
 import {
     fetchShoppingList,
     addItemsToShoppingList,
     updateItemQuantityInShoppingList,
     ShoppingListItem,
     ShoppingListItemInsert,
-    removeItemFromShoppingList
+    removeItemFromShoppingList,
+    ShoppingList
 } from "../services/shopping/shoppingListService";
 import { fetchIngredients, fetchIngredientsByIds, Ingredient } from "../services/ingredients/ingredientsService";
 import { updateShoppingListWithIngredientNames } from "../utils/shoppingListUtils";
+
+// Define o estado inicial
+export const initialState = {
+    pantry: null as Pantry | null,
+    pantryItems: [] as PantryItem[],
+    shoppingList: null as ShoppingList | null,
+    availableItems: [] as ShoppingListItem[],
+    ingredientDetails: [] as Ingredient[],
+    isModalOpen: false,
+    activeTab: "items" as "items" | "shoppingList" | "history",
+};
+
+// Define as ações possíveis
+type Action =
+    | { type: "SET_PANTRY"; payload: Pantry }
+    | { type: "SET_PANTRY_ITEMS", payload: PantryItem[] }
+    | { type: "SET_SHOPPING_LIST"; payload: ShoppingList }
+    | { type: "SET_AVAILABLE_ITEMS"; payload: ShoppingListItem[] }
+    | { type: "SET_INGREDIENT_DETAILS"; payload: Ingredient[] }
+    | { type: "TOGGLE_MODAL" }
+    | { type: "SET_ACTIVE_TAB"; payload: "items" | "shoppingList" | "history" };
+
+// Função `reducer` para modificar o estado com base nas ações
+export function pantryReducer(state: typeof initialState, action: Action) {
+    switch (action.type) {
+        case "SET_PANTRY":
+            return { ...state, pantry: action.payload };
+        case "SET_PANTRY_ITEMS":
+            return { ...state, pantryItems: action.payload, };
+        case "SET_SHOPPING_LIST":
+            return { ...state, shoppingList: action.payload };
+        case "SET_AVAILABLE_ITEMS":
+            return { ...state, availableItems: action.payload };
+        case "SET_INGREDIENT_DETAILS":
+            return { ...state, ingredientDetails: action.payload };
+        case "TOGGLE_MODAL":
+            return { ...state, isModalOpen: !state.isModalOpen };
+        case "SET_ACTIVE_TAB":
+            return { ...state, activeTab: action.payload };
+        default:
+            return state;
+    }
+}
 
 export const usePantry = () => {
     const { id } = useParams<{ id: string }>();
@@ -25,6 +68,10 @@ export const usePantry = () => {
                 try {
                     const pantryData = await fetchPantry({ pantryId: parseInt(id), page: 0 });
                     dispatch({ type: "SET_PANTRY", payload: pantryData[0] });
+
+                    // Busca os itens da despensa usando o novo endpoint
+                    const pantryItems = await fetchItemsByPantryId(parseInt(id));
+                    dispatch({ type: "SET_PANTRY_ITEMS", payload: pantryItems });
 
                     const shoppingListData = await fetchShoppingList(parseInt(id));
                     const ingredientIds = shoppingListData.items.map((item) => item.ingredientId);

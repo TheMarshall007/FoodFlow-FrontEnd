@@ -36,7 +36,6 @@ export async function fetchDish(data: DishParams) {
 export async function fetchDishesByIds(data: number[]) {
   try {
     const response = await api.post('/dish/dishesByIds', data);
-    console.log("LOGG RESS", response)
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar os pratos:', error);

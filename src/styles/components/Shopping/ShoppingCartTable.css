@@ -1,0 +1,54 @@
+.shopping-cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.shopping-cart-table th,
+.shopping-cart-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.shopping-cart-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.shopping-cart-table input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.remove-button {
+    background: transparent;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.remove-button:hover {
+    color: #c0392b;
+}
+
+.add-items-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.add-items-button:hover {
+    background-color: #45a049;
+}
