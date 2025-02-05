@@ -8,7 +8,7 @@ import ShoppingListItemCard from "../../components/ShoppingListItem/ShoppingList
 import "../../styles/pages/Pantry/PantryDetail.css";
 
 const PantryDetail: React.FC = () => {
-    const { state, dispatch, handleAddItemsToShoppingList, handleUpdateQuantity, handleRemoveItem } = usePantry();
+    const { state, dispatch, handleAddItemsToShoppingList, handleUpdateQuantity, handleRemoveItem, handleReduceQuantity } = usePantry();
     const navigate = useNavigate(); // Hook para navegação
     if (!state.pantry) {
         return <p>Carregando ou despensa não encontrada...</p>;
@@ -21,7 +21,7 @@ const PantryDetail: React.FC = () => {
                 <div className="pantry-info">
                     <h2>{state.pantry?.propertyName}</h2>
                     <p>{state.pantry?.sharedWith?.length ?? 0} Menu vinculado</p>
-                    <p className="low-quantity">{state.pantry?.lowQuantityItems?.length} itens quase acabando</p>
+                    <p className="low-quantity-text">{state.pantry?.lowQuantityItems?.length} itens quase acabando</p>
                 </div>
             </div>
 
@@ -40,29 +40,58 @@ const PantryDetail: React.FC = () => {
 
             {/* Conteúdo das abas */}
             <div className="tab-content">
-                {state.activeTab === "items" && (
-                    <div className="tab-items">
-                        <h3>Itens na Dispensa</h3>
+                {/* Pantry Items */}
+                {state.activeTab === "items" &&
+                    < div className="tab-items">
                         <div className="items-grid">
-                            {state.pantryItems?.map((item) => (
-                                <div key={item.id} className="item-card">
-                                    <img
-                                        src={item.ingredient?.image || "/assets/fotos/default-item.png"}
-                                        alt={item.ingredient?.name}
-                                        className="item-card-image"
-                                    />
-                                    <div className="item-card-info">
-                                        <h4>{item.ingredient?.name}</h4>
-                                        <p>Quantidade: {item.quantity}</p>
-                                    </div>
-                                </div>
-                            ))}
+                            {state.pantry?.items?.slice()
+                                .sort((a, b) => a.id - b.id)
+                                .map((item) => {
+                                    const isLowQuantity = state.pantry.lowQuantityItems?.some(lowItem => lowItem.id === item.id);
+                                    return (
+                                        <div
+                                            key={item.id}
+                                            className={`item-card ${isLowQuantity ? "low-quantity" : ""}`} // Adiciona uma classe condicional
+                                        >
+                                            <img
+                                                src={item.ingredient?.image || "/assets/fotos/default-item.png"}
+                                                alt={item.ingredient?.name}
+                                                className="item-card-image"
+                                            />
+                                            <div className="item-card-info">
+                                                <h4>{item.ingredient?.name}</h4>
+                                                <p>Quantidade: {item.quantity}</p>
+                                                <div className="item-quantity-control">
+                                                    <button
+                                                        className="quantity-button"
+                                                        onClick={() => handleReduceQuantity(state.pantry.id, item.ingredient.id, 1)}
+                                                    >
+                                                        -1
+                                                    </button>
+                                                    <button
+                                                        className="quantity-button"
+                                                        onClick={() => handleReduceQuantity(state.pantry.id, item.ingredient.id, 2)}
+                                                    >
+                                                        -2
+                                                    </button>
+                                                    <button
+                                                        className="quantity-button"
+                                                        onClick={() => handleReduceQuantity(state.pantry.id, item.ingredient.id, 5)}
+                                                    >
+                                                        -5
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                         </div>
                     </div>
-                )}
+                }
+
+                {/* Shopping List */}
                 {state.activeTab === "shoppingList" && (
                     <div className="tab-shopping-list">
-                        <h3>Lista de Compras</h3>
                         <button className="add-items-auto-button" onClick={() => dispatch({ type: "TOGGLE_MODAL" })}>
                             Adicionar Itens
                         </button>
@@ -85,13 +114,50 @@ const PantryDetail: React.FC = () => {
                         </button>
                     </div>
                 )}
+
+                {/* Shopping History */}
+                {state.activeTab === "history" && (
+                    <div className="tab-shopping-list">
+                        {state.history.length > 0 ? (
+                            <div className="tab-history">
+                                <table className="history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>N°</th>
+                                            <th>Data da Compra</th>
+                                            <th>Valor Total (R$)</th>
+                                            <th>Ação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {state.history.map((item) => (
+                                            <tr key={item.id}>
+                                                <td>{item.id}</td>
+                                                <td>{new Date(item.purchaseDate.toString()).toLocaleDateString()}</td>
+                                                <td>{item.totalValue.toFixed(2)}</td>
+                                                <td className="table-action">
+                                                    <button onClick={() => { }}>Ver carrinho</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <p>Não há histórico de compras disponível.</p>
+                        )}
+                    </div>
+                )}
+
             </div>
 
             {/* Modal de Seleção de Itens */}
-            {state.isModalOpen && (
-                <ItemSelectionModal availableItems={state.availableItems} onClose={() => dispatch({ type: "TOGGLE_MODAL" })} onConfirm={handleAddItemsToShoppingList} />
-            )}
-        </div>
+            {
+                state.isModalOpen && (
+                    <ItemSelectionModal availableItems={state.availableItems} onClose={() => dispatch({ type: "TOGGLE_MODAL" })} onConfirm={handleAddItemsToShoppingList} />
+                )
+            }
+        </div >
     );
 };
 

@@ -25,15 +25,44 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement>,
         item: ShoppingCartItem,
-        field: "cartQuantity" | "price"
+        field: "cartQuantity" | "price" | "unityPrice"
     ) => {
-        const newValue =
-            field === "cartQuantity"
-                ? Math.max(0, parseInt(e.target.value) || 0)
-                : parseFloat(e.target.value) || 0;
-        const updatedItem = { ...item, [field]: newValue };
+        const newValue = parseFloat(e.target.value) || 0;
+        let updatedItem = { ...item };
+    
+        switch (field) {
+            case "cartQuantity":
+                updatedItem.cartQuantity = newValue;
+                if (updatedItem.unityPrice) {
+                    updatedItem.price = updatedItem.cartQuantity * updatedItem.unityPrice;
+                } else if (updatedItem.price) {
+                    updatedItem.unityPrice = updatedItem.price / updatedItem.cartQuantity;
+                }
+                break;
+    
+            case "unityPrice":
+                updatedItem.unityPrice = newValue;
+                if (updatedItem.cartQuantity) {
+                    updatedItem.price = updatedItem.cartQuantity * updatedItem.unityPrice;
+                }
+                break;
+    
+            case "price":
+                updatedItem.price = newValue;
+                if (updatedItem.cartQuantity) {
+                    updatedItem.unityPrice = updatedItem.price / updatedItem.cartQuantity;
+                }
+                break;
+    
+            default:
+                break;
+        }
+    
+        // Chama a função para atualizar o item com os novos valores calculados
         onUpdateItem(updatedItem);
     };
+    
+
 
     return (
         <div>
@@ -69,6 +98,16 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                 <td>
                                     <input
                                         type="number"
+                                        value={item.unityPrice}
+                                        onChange={(e) =>
+                                            handleInputChange(e, item, "unityPrice")
+                                        }
+                                        step="0.01"
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        type="number"
                                         value={item.price}
                                         onChange={(e) =>
                                             handleInputChange(e, item, "price")
@@ -76,7 +115,6 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                         step="0.01"
                                     />
                                 </td>
-                                <td>{(item.cartQuantity * item.price).toFixed(2)}</td>
                                 <td>
                                     <button
                                         className="remove-button"

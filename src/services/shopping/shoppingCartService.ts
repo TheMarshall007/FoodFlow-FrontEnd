@@ -13,6 +13,7 @@ export interface ShoppingCartItem {
     ingredient: Ingredient
     plannedQuantity?: number;
     cartQuantity: number;
+    unityPrice?: number;
     price: number;
 }
 

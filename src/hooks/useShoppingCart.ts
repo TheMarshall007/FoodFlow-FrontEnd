@@ -90,15 +90,28 @@ export const useShoppingCart = (pantryId: number) => {
 
   useEffect(() => {
     if (user && pantryId) {
-      dispatch({ type: "SET_LOADING", payload: true });
-      loadCartFromShoppingList(pantryId)
-        .then((cart) => dispatch({ type: "SET_CART", payload: cart }))
-        .catch((error: unknown) => {
-          const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-          dispatch({ type: "SET_ERROR", payload: errorMessage });
-        });
+        dispatch({ type: "SET_LOADING", payload: true });
+
+        loadCartFromShoppingList(pantryId)
+            .then((cart) => {
+                // Recalcula o valor unitário de todos os itens do carrinho antes de armazená-los no estado
+                const updatedCartWithUnitPrice = {
+                    ...cart,
+                    items: cart.items.map(item => ({
+                        ...item,
+                        unityPrice: item.cartQuantity > 0 ? item.price / item.cartQuantity : 0 // Evita divisão por zero
+                    }))
+                };
+
+                dispatch({ type: "SET_CART", payload: updatedCartWithUnitPrice });
+            })
+            .catch((error: unknown) => {
+                const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+                dispatch({ type: "SET_ERROR", payload: errorMessage });
+            });
     }
-  }, [user, pantryId]);
+}, [user, pantryId]);
+
 
   const handleAddToCart = async (data: ShoppingListItem[]) => {
     try {
@@ -121,16 +134,26 @@ export const useShoppingCart = (pantryId: number) => {
 };
 
 
-  const handleUpdateCartItem = async (data: ShoppingCartItem) => {
-    try {
+const handleUpdateCartItem = async (data: ShoppingCartItem) => {
+  try {
       const updatedCart = await updateShoppingCartItem(pantryId, data.id, data);
-      dispatch({ type: "SET_CART", payload: updatedCart });
-    } catch (error: unknown) {
+
+      const updatedCartWithUnitPrice = {
+          ...updatedCart,
+          items: updatedCart.items.map(item => ({
+              ...item,
+              unityPrice: item.cartQuantity > 0 ? item.price / item.cartQuantity : 0 // Evita divisão por zero
+          }))
+      };
+
+      dispatch({ type: "SET_CART", payload: updatedCartWithUnitPrice });
+  } catch (error: unknown) {
       console.error("Erro ao atualizar item:", error);
       const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
       dispatch({ type: "SET_ERROR", payload: errorMessage });
-    }
-  };
+  }
+};
+
 
   const handleRemoveCartItem = async (cartItemId: number) => {
     try {
