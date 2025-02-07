@@ -8,7 +8,7 @@ export interface Dish {
   name: string;
   description: string;
   type: string;
-  image: number;
+  image: { id: number, image: string, type: string };
   ingredientsId: number[];
   price: number;
 }

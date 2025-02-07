@@ -1,7 +1,8 @@
 import { useEffect, useReducer, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { addDishesToMenu, getMenuById, Menu } from "../../services/menu/menuService";
-import { fetchDishesByIds } from "../../services/dish/dishService";
+import { Dish, fetchDishesByIds } from "../../services/dish/dishService";
+import { fetchDishImage, Image } from "../../services/dish/dishImageService";
 
 export const initialState = {
     menu: {} as Menu,
@@ -35,8 +36,19 @@ export const useMenuDetail = () => {
                 hasFetched.current = true; // Marca como executado
                 try {
                     const menu = await getMenuById(parseInt(id));
-                    menu.dishes = await fetchDishesByIds( menu.dishesId);
-                    dispatch({ type: "SET_MENU", payload: menu  });
+                    const dishes = await fetchDishesByIds(menu.dishesId);
+                    const dishesImagesIds = dishes.map((dish: Dish) => dish.image.id);
+                    const images = await fetchDishImage(dishesImagesIds);
+                    console.log(images)
+                    // Cria um dicionário para acessar as imagens rapidamente
+                    const imagesMap = new Map(images.map((image: Image) => [image.id, image]));
+                    const updatedDishes = dishes.map((dish: Dish) => ({
+                        ...dish,
+                        image: imagesMap.get(dish.image?.id) || dish.image // Mantém a imagem original se não for encontrada
+                    }))
+
+                    menu.dishes = updatedDishes;
+                    dispatch({ type: "SET_MENU", payload: menu });
                 } catch (error) {
                     console.error("Erro ao buscar o menu:", error);
                 }
@@ -50,8 +62,8 @@ export const useMenuDetail = () => {
         if (id) {
             dispatch({ type: "SET_LOADING", payload: true });
             try {
-                const updatedMenu = await addDishesToMenu(parseInt(id), dishIds);                
-                updatedMenu.dishes = await fetchDishesByIds( updatedMenu.dishesId);
+                const updatedMenu = await addDishesToMenu(parseInt(id), dishIds);
+                updatedMenu.dishes = await fetchDishesByIds(updatedMenu.dishesId);
                 dispatch({ type: "SET_MENU", payload: updatedMenu });
             } catch (error) {
                 console.error("Erro ao adicionar pratos ao menu:", error);

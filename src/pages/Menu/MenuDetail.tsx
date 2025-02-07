@@ -45,11 +45,11 @@ const MenuDetail: React.FC = () => {
                 <div className="dishes-grid">
                     {state.menu?.dishes?.map((dish) => (
                         <div key={dish.id} className="dish-card" onClick={() => handleOpenRecipeModal(dish)}>
-                            {/* <img 
-                                src={dish.image || "/assets/fotos/default-item.png"} 
-                                alt={dish.name} 
-                                className="dish-card-image" 
-                            /> */}
+                            <img
+                                src={`data:image/${dish.image.type};base64,${dish.image.image}`}
+                                alt={dish.name}
+                                className="dish-card-image"
+                            />
                             <div className="dish-card-info">
                                 <h4>{dish.name}</h4>
                                 <p>{dish.description}</p>

@@ -20,7 +20,7 @@ const Suggestion: React.FC = () => {
       const daily = await fetchDailySuggestion(1);
       const suggestedWithImages = await Promise.all(daily?.map(async (item: Dish) => {
         if (typeof item.image === 'object' && item.image.id) {
-            const imageResponse = await fetchDishImage(item.image.id);
+            const imageResponse = await fetchDishImage([item.image.id]);
             return {
                 ...item,
                 image: `data:image/${imageResponse.type};base64,${imageResponse.image}`,
