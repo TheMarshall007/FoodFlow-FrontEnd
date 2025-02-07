@@ -19,6 +19,7 @@ import Menus from './pages/Menu/Menus';
 import PantryDetail from './pages/Pantry/PantryDetail';
 import Navbar from './layouts/Navbar/Navbar';
 import ShoppingCart from './pages/Pantry/ShoppingCart/ShoppingCart';
+import MenuDetail from './components/Menu/MenuDetail';
 
 // Componente que gerencia a imagem de fundo
 function AppContent() {
@@ -57,14 +58,14 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/Home" element={<Home />} />
-          <Route path="/menu" element={<Menus />} />
+          <Route path="/menus" element={<Menus />} />
+          {/* <Route path="/menu/:id" element={<Menu />} /> */}
           <Route path="/plan-day/:pantryId" element={<PlanDay />} />
           <Route path="/suggestion" element={<Suggestion />} />
           <Route path="/pantries" element={<PantryPage />} />
           <Route path="/pantry/:id" element={<PantryDetail />} />
           <Route path="/pantry/:pantryId/low-quantity" element={<LowQuantityItems />} />
           <Route path="/shopping-cart/:id" element={<ShoppingCart />} />
-
         </Routes>
       </div>
     </div>

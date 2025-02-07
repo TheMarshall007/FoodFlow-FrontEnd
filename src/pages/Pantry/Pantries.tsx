@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PantryCard from '../../components/Pantry/PantryCard';
 import { useUser } from '../../context/UserContext';
@@ -11,10 +11,12 @@ const Pantries = () => {
     const { user } = useUser();
     const [pantries, setPantries] = useState<Pantry[]>([]);
     const [selectNewPantry, setSelectNewPantry] = useState<Boolean>(false);
+    const hasFetched = useRef(false); // Controle de execução
 
     useEffect(() => {
         async function fetchData() {
-            if (user) {
+            if (!hasFetched.current && user) {
+                hasFetched.current = true; // Marca como executado
                 const pant = await fetchPantry({ userId: user.id, page: 0 });
                 const pantryWithLowItem = await Promise.all(pant?.map(async (invent: Pantry) => {
                     const lowItem = await fetchLowQuantityItems(invent?.id, 5);
@@ -24,9 +26,6 @@ const Pantries = () => {
                     }
                 }))
                 setPantries(pantryWithLowItem)
-            } else {
-                navigate('/');
-                return;
             }
         }
         fetchData()

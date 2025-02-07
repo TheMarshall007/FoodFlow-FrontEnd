@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { fetchItemsByPantryId, fetchLowQuantityItems, fetchPantry, Pantry, PantryItem, reduceItemQuantity } from "../services/pantry/pantryService";
@@ -48,8 +48,7 @@ export function pantryReducer(state: typeof initialState, action: Action) {
         case "TOGGLE_MODAL": return { ...state, isModalOpen: !state.isModalOpen };
         case "SET_ACTIVE_TAB": return { ...state, activeTab: action.payload };
         case "UPDATE_PANTRY_ITEMS": return { ...state, pantry: { ...state.pantry, items: action.payload, }, };
-        default:
-            return state;
+        default: return state;
     }
 }
 
@@ -57,10 +56,12 @@ export const usePantry = () => {
     const { id } = useParams<{ id: string }>();
     const { user } = useUser();
     const [state, dispatch] = useReducer(pantryReducer, initialState);
+    const hasFetched = useRef(false); // Controle de execução
 
     useEffect(() => {
         async function fetchData() {
-            if (user && id) {
+            if (!hasFetched.current && user && id) {
+                hasFetched.current = true; // Marca como executado
                 try {
                     const pantryData = await fetchPantry({ pantryId: parseInt(id), page: 0 });
                     pantryData[0].lowQuantityItems = await fetchLowQuantityItems(parseInt(id))
@@ -88,14 +89,15 @@ export const usePantry = () => {
 
                     const shoppingHistory = await fetchShoppingCartHistory(parseInt(id));
                     dispatch({ type: "SET_HISTORY", payload: shoppingHistory })
-                    
+
                 } catch (error) {
                     console.error("Erro ao buscar a despensa:", error);
                 }
             }
         }
+
         fetchData();
-    }, [user, id]);
+    }, [user, id, dispatch]);
 
     /**
      * Adiciona itens à lista de compras.
@@ -210,5 +212,3 @@ export const usePantry = () => {
 
     return { state, dispatch, handleAddItemsToShoppingList, handleUpdateQuantity, handleRemoveItem, handleReduceQuantity };
 };
-
-

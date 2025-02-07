@@ -1,12 +1,4 @@
 /* Pantries.css */
-.pantry-page {
-    z-index: 1;
-    padding: 20px;
-    background-color: #f5f5f5;
-    position: relative;
-    overflow: hidden;
-}
-
 .pantry-section {
     position: relative;
     z-index: 1;

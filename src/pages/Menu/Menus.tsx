@@ -1,60 +1,54 @@
-// Menus.tsx
-import React, { useEffect, useState } from 'react';
-import '../../styles/pages/Menu/Menus.css';
-import { fetchMenu, MenuData } from '../../services/menu/menuService';
-import { useUser } from '../../context/UserContext';
-import Menu from '../../components/Menu/Menu';
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
+import "../../styles/pages/Menu/Menus.css";
+import { getMenusPaginated, Menu } from "../../services/menu/menuService";
 
 const Menus = () => {
+    const navigate = useNavigate();
     const { user } = useUser();
-    const [menuData, setMenuData] = useState<MenuData[]>([]);
-    const [selectedMenu, setSelectedMenu] = useState<MenuData | null>(null);
+    const [menus, setMenus] = useState<Menu[]>([]);
+    const [loading, setLoading] = useState(true);
+    const hasFetched = useRef(false);
 
     useEffect(() => {
         async function fetchData() {
-            if (user) {
-                const menuData = await fetchMenu({ userId: user.id, page: 0 });
-                setMenuData(menuData);
+            if (!hasFetched.current && user) {
+                hasFetched.current = true;
+                try {
+                    const response = await getMenusPaginated({ userId: user.id, page: 0 });
+                    console.log("LOGG RE", response)
+                    setMenus(response || []);
+                } catch (error) {
+                    console.error("Erro ao buscar menus:", error);
+                } finally {
+                    setLoading(false);
+                }
             }
         }
         fetchData();
     }, [user]);
 
-    const openMenu = (menu: MenuData) => {
-        setSelectedMenu(menu);
-    };
-
-    const closeMenu = () => {
-        setSelectedMenu(null);
-    };
-
     return (
         <div className="menu-section">
-            {selectedMenu ? (
-                <div className="selected-menu">
-                    <button className="back-button" onClick={closeMenu}>Voltar</button>
-                    <Menu menu={selectedMenu} />
-                </div>
+            <h2>Meus Menus</h2>
+            <h4 className="add-button" onClick={() => navigate("/menu/create")}>
+                Adicionar
+            </h4>
+
+            {loading ? (
+                <p>Carregando menus...</p>
+            ) : menus.length === 0 ? (
+                <p>Nenhum menu encontrado.</p>
             ) : (
-                <>
-                    <h2>Menus</h2>
-                    <div className="menu-cards">
-                        {menuData?.map((menu, index) => (
-                            <div className="menu-card" key={index}>
-                                <h3 className="menu-name">{menu.name}</h3>
-                                <p className="menu-info">{menu.dishesId.length} Receitas</p>
-                                <p className="menu-info">
-                                    {menu?.sharedWithId?.length > 0
-                                        ? `${menu.sharedWithId.length} dispensa vinculada`
-                                        : 'nenhuma dispensa vinculada'}
-                                </p>
-                                <button className="menu-button" onClick={() => openMenu(menu)}>
-                                    Ver mais
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </>
+                <div className="menu-cards">
+                    {menus.map((menu) => (
+                        <div key={menu.id} className="menu-card" onClick={() => navigate(`/menu/${menu.id}`)}>
+                            <h3>{menu.name}</h3>
+                            <p>{menu.description}</p>
+                        </div>
+                    ))}
+                </div>
             )}
         </div>
     );

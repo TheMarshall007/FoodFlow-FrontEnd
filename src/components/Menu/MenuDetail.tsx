@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Dish, fetchDish, fetchDishesByIds } from "../../services/dish/dishService";
-import { MenuData } from "../../services/menu/menuService";
+import { Menu } from "../../services/menu/menuService";
 
 interface MenuParams {
-    menu: MenuData
+    menu: Menu
 }
 
-const Menu = ({ menu }: MenuParams) => {
+const MenuDetail = ({ menu }: MenuParams) => {
     const [dishes, setDishes] = useState<Dish[]>([])
 
     useEffect(() => {
@@ -39,4 +39,4 @@ const Menu = ({ menu }: MenuParams) => {
     )
 }
 
-export default Menu;
+export default MenuDetail;

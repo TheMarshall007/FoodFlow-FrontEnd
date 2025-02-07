@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import  { useUser } from '../../context/UserContext';
 import PantryCard from '../../components/Pantry/PantryCard';
@@ -6,12 +6,14 @@ import { Dish } from '../../services/dish/dishService';
 import '../../styles/pages/Home/Home.css';
 import { fetchLowQuantityItems, fetchPantry, Pantry } from '../../services/pantry/pantryService';
 import { fetchDailySuggestion } from '../../services/suggestion/dailySuggestionService';
+import { fetchDishImage } from '../../services/dish/dishImageService';
 
 const Home: React.FC = () => {
     const { user } = useUser();
     const navigate = useNavigate();
     const [dailySuggestion, setDailySuggestion] = useState<Dish>();
     const [pantry, setPantry] = useState<Pantry[]>([]);
+    const hasFetched = useRef(false); // Controle de execução
 
     useEffect(() => {
         if (!user) {
@@ -20,7 +22,9 @@ const Home: React.FC = () => {
         }
 
         async function fetchData() {
-            if (user) {
+            if (!hasFetched.current && user) {
+                hasFetched.current = true; // Marca como executado
+
                 const pant = await fetchPantry({ userId: user.id, page: 0 });
                 if (pant) {
                     const pantryWithLowItem = await Promise.all(pant?.map(async (invent: Pantry) => {
@@ -37,21 +41,22 @@ const Home: React.FC = () => {
             }
 
             const daily = await fetchDailySuggestion(1);
-            if (daily) {
-                // const dailyWithImages = await Promise.any(daily?.map(async (dish: Dish) => {
-                //     if (typeof dish.image === 'object' && dish.image.id) {
-                //         const imageResponse = await fetchDishImage(dish.image.id);
-                //         if (imageResponse) {
-                //             return {
-                //                 ...dish,
-                //                 image: imageResponse.image
-                //             };
-                //         }
-                //     }
-                //     return dish;
-                // }));
-                // setDailySuggestion(dailyWithImages);
-            }
+            // if (daily) {
+            //     const dailyWithImages = await Promise.any(daily?.map(async (dish: Dish) => {
+            //         if (typeof dish.image === 'object' && dish.image.id) {
+            //             const imageResponse = await fetchDishImage(dish.image.id);
+            //             if (imageResponse) {
+            //                 return {
+            //                     ...dish,
+            //                     image: imageResponse.image
+            //                 };
+            //             }
+            //         }
+            //         return dish;
+            //     }));
+            //     setDailySuggestion(dailyWithImages);
+            // }
+            // setDailySuggestion(daily)
         }
         fetchData();
     }, [user, navigate]);
