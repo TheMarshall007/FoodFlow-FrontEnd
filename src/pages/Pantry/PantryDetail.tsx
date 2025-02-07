@@ -23,6 +23,8 @@ const PantryDetail: React.FC = () => {
                     <p>{state.pantry?.sharedWith?.length ?? 0} Menu vinculado</p>
                     <p className="low-quantity-text">{state.pantry?.lowQuantityItems?.length} itens quase acabando</p>
                 </div>
+                <button className="back-button" onClick={() => navigate("/pantries")}>Voltar</button>
+
             </div>
 
             {/* Abas de navegação */}

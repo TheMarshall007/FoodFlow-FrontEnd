@@ -11,7 +11,6 @@ const PantryForm = () => {
     const [propertyName, setPropertyName] = useState('');
     const [selectedImage, setSelectedImage] = useState('');
     const [error, setError] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const availableImages = [
         require('../../assets/fotos/summer-beach-house.png'),
@@ -23,12 +22,10 @@ const PantryForm = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
         if (!user) {
             setError('Usuário não autenticado.');
             return;
         }
-
         try {
             await createPantry({
                 userId: user.id,

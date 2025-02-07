@@ -19,7 +19,7 @@ import Menus from './pages/Menu/Menus';
 import PantryDetail from './pages/Pantry/PantryDetail';
 import Navbar from './layouts/Navbar/Navbar';
 import ShoppingCart from './pages/Pantry/ShoppingCart/ShoppingCart';
-import MenuDetail from './components/Menu/MenuDetail';
+import MenuDetail from './pages/Menu/MenuDetail';
 
 // Componente que gerencia a imagem de fundo
 function AppContent() {
@@ -59,7 +59,7 @@ function AppContent() {
           <Route path="/" element={<Login />} />
           <Route path="/Home" element={<Home />} />
           <Route path="/menus" element={<Menus />} />
-          {/* <Route path="/menu/:id" element={<Menu />} /> */}
+          <Route path="/menu/:id" element={<MenuDetail />} />
           <Route path="/plan-day/:pantryId" element={<PlanDay />} />
           <Route path="/suggestion" element={<Suggestion />} />
           <Route path="/pantries" element={<PantryPage />} />

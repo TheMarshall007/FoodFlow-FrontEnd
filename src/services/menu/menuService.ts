@@ -1,4 +1,5 @@
 import { api } from "../../services/api/apiConfig";
+import { Dish } from "../dish/dishService";
 
 export interface MenuInsertData {
     userId: number;
@@ -15,6 +16,7 @@ export interface Menu {
     name: string;
     description: string;
     dishesId: [];
+    dishes?: Dish[];
 }
 
 export async function createMenu(menuData: MenuInsertData) {

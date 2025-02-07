@@ -1,48 +1,27 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../context/UserContext";
 import "../../styles/pages/Menu/Menus.css";
-import { getMenusPaginated, Menu } from "../../services/menu/menuService";
+import { useMenu } from "../../hooks/Menu/useMenu";
+import MenuForm from "./MenuForm";
 
 const Menus = () => {
+    const { state } = useMenu();
     const navigate = useNavigate();
-    const { user } = useUser();
-    const [menus, setMenus] = useState<Menu[]>([]);
-    const [loading, setLoading] = useState(true);
-    const hasFetched = useRef(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        async function fetchData() {
-            if (!hasFetched.current && user) {
-                hasFetched.current = true;
-                try {
-                    const response = await getMenusPaginated({ userId: user.id, page: 0 });
-                    console.log("LOGG RE", response)
-                    setMenus(response || []);
-                } catch (error) {
-                    console.error("Erro ao buscar menus:", error);
-                } finally {
-                    setLoading(false);
-                }
-            }
-        }
-        fetchData();
-    }, [user]);
-
+    if (!state.menus) {
+        return <p>Carregando ou despensa não encontrada...</p>;
+    }
     return (
         <div className="menu-section">
             <h2>Meus Menus</h2>
-            <h4 className="add-button" onClick={() => navigate("/menu/create")}>
-                Adicionar
-            </h4>
+            <h4 className="add-button" onClick={() => setIsModalOpen(true)}>Adicionar</h4>
 
-            {loading ? (
-                <p>Carregando menus...</p>
-            ) : menus.length === 0 ? (
+            {state.menus.length === 0 ? (
                 <p>Nenhum menu encontrado.</p>
             ) : (
                 <div className="menu-cards">
-                    {menus.map((menu) => (
+                    {state.menus.map((menu) => (
                         <div key={menu.id} className="menu-card" onClick={() => navigate(`/menu/${menu.id}`)}>
                             <h3>{menu.name}</h3>
                             <p>{menu.description}</p>
@@ -50,7 +29,11 @@ const Menus = () => {
                     ))}
                 </div>
             )}
+            {/* Modal para adicionar novo menu */}
+            <MenuForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
         </div>
+
     );
 };
 
