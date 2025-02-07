@@ -1,15 +1,13 @@
 // src/components/RecipeModal.tsx
 import React, { useEffect, useState } from 'react';
-import { fetchIngredientsByIds } from '../services/ingredients/ingredientsService';
-import './RecipeModal.css';
+import { fetchIngredientsByIds } from '../../services/ingredients/ingredientsService';
+import '../../styles/components/Menu/Recipe/RecipeModal.css';
+import { Dish } from '../../services/dish/dishService';
 
 interface RecipeModalProps {
     show: boolean;
     onClose: () => void;
-    name: string;
-    description: string;
-    ingredientsId: number[];
-    steps: string[];
+    dish: Dish
 }
 
 interface Ingredient {
@@ -18,16 +16,16 @@ interface Ingredient {
     description: string;
 }
 
-const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, name, description, ingredientsId, steps }) => {
+const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish }) => {
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
     useEffect(() => {
         async function fetchData() {
-            const ing = await fetchIngredientsByIds(ingredientsId);
+            const ing = await fetchIngredientsByIds(dish.ingredientsId);
             setIngredients(ing);
         }
         fetchData();
-    }, [ingredientsId]);
+    }, [dish]);
 
     if (!show) return null;
 
@@ -35,8 +33,8 @@ const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, name, descript
         <div className="modal-overlay">
             <div className="modal-content">
                 <button className="modal-close" onClick={onClose}>X</button>
-                <h2>{name}</h2>
-                <p>{description}</p>
+                <h2>{dish.name}</h2>
+                <p>{dish.description}</p>
                 <h3>Ingredientes</h3>
                 <ul>
                     {ingredients?.map((ingredient) => (
@@ -44,11 +42,11 @@ const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, name, descript
                     ))}
                 </ul>
                 <h3>Passo a Passo</h3>
-                <ol>
-                    {steps?.map((step, index) => (
+                {/* <ol>
+                    {dish.steps?.map((step, index) => (
                         <li key={index}>{step}</li>
                     ))}
-                </ol>
+                </ol> */}
             </div>
         </div>
     );

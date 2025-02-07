@@ -6,7 +6,7 @@ export interface MenuInsertData {
     pantryId?: number;
     name: string;
     description: string;
-    dishesId?: [];
+    dishesIds?: [];
 }
 
 export interface Menu {
@@ -15,7 +15,7 @@ export interface Menu {
     pantryId?: number;
     name: string;
     description: string;
-    dishesId: [];
+    dishesIds: [];
     dishes?: Dish[];
 }
 

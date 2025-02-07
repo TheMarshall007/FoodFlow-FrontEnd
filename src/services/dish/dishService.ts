@@ -1,6 +1,6 @@
 import { api } from '../api/apiConfig';
 interface DishParams {
-  dishId: number;
+  dishId?: number;
   page: number;
 }
 export interface Dish {
@@ -33,9 +33,9 @@ export async function fetchDish(data: DishParams) {
   }
 }
 
-export async function fetchDishesByIds(data: number[]) {
+export async function fetchDishesByIds(ids: number[]) {
   try {
-    const response = await api.post('/dish/dishesByIds', data);
+    const response = await api.post('/dish/dishesByIds', ids);
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar os pratos:', error);

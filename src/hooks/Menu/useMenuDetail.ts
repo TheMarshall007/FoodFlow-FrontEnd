@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { addDishesToMenu, getMenuById, Menu } from "../../services/menu/menuService";
+import { fetchDishesByIds } from "../../services/dish/dishService";
 
 export const initialState = {
     menu: {} as Menu,
@@ -12,6 +13,7 @@ type Action =
     | { type: "SET_LOADING"; payload: boolean }
     | { type: "SET_MENU"; payload: Menu }
     | { type: "SET_SELECTED_MENU"; payload: Menu }
+
 
 export function menuReducer(state: typeof initialState, action: Action) {
     switch (action.type) {
@@ -32,8 +34,9 @@ export const useMenuDetail = () => {
             if (!hasFetched.current && id) {
                 hasFetched.current = true; // Marca como executado
                 try {
-                    const response = await getMenuById(parseInt(id));
-                    dispatch({ type: "SET_MENU", payload: response || {} });
+                    const menu = await getMenuById(parseInt(id));
+                    menu.dishes = await fetchDishesByIds( menu.dishesId);
+                    dispatch({ type: "SET_MENU", payload: menu  });
                 } catch (error) {
                     console.error("Erro ao buscar o menu:", error);
                 }
@@ -41,14 +44,15 @@ export const useMenuDetail = () => {
         };
 
         fetchData();
-    }, [ id, dispatch]);
+    }, [id, dispatch]);
 
     const handleAddDishes = async (dishIds: number[]) => {
         if (id) {
             dispatch({ type: "SET_LOADING", payload: true });
             try {
-                const updatedMenu = await addDishesToMenu(parseInt(id), dishIds);
-                dispatch({ type: "SET_SELECTED_MENU", payload: updatedMenu });
+                const updatedMenu = await addDishesToMenu(parseInt(id), dishIds);                
+                updatedMenu.dishes = await fetchDishesByIds( updatedMenu.dishesId);
+                dispatch({ type: "SET_MENU", payload: updatedMenu });
             } catch (error) {
                 console.error("Erro ao adicionar pratos ao menu:", error);
             }
