@@ -9,7 +9,7 @@ import SelectDishesModal from "../../components/Menu/SelectDishesModal";
 const MenuDetail: React.FC = () => {
     const { state, dispatch, handleAddDishes } = useMenuDetail();
     const navigate = useNavigate();
-
+console.log("LOGG STATEMENU", state)
     const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
     const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
     const [isSelectDishesModalOpen, setIsSelectDishesModalOpen] = useState(false);
@@ -45,11 +45,11 @@ const MenuDetail: React.FC = () => {
                 <div className="dishes-grid">
                     {state.menu?.dishes?.map((dish) => (
                         <div key={dish.id} className="dish-card" onClick={() => handleOpenRecipeModal(dish)}>
-                            <img
+                            {dish.image && <img
                                 src={`data:image/${dish.image.type};base64,${dish.image.image}`}
                                 alt={dish.name}
                                 className="dish-card-image"
-                            />
+                            />}
                             <div className="dish-card-info">
                                 <h4>{dish.name}</h4>
                                 <p>{dish.description}</p>

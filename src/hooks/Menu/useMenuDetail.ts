@@ -37,9 +37,11 @@ export const useMenuDetail = () => {
                 try {
                     const menu = await getMenuById(parseInt(id));
                     const dishes = await fetchDishesByIds(menu.dishesId);
-                    const dishesImagesIds = dishes.map((dish: Dish) => dish.image.id);
+                    const dishesImagesIds = dishes
+                        .filter((dish: Dish) => dish.image?.id)
+                        .map((dish: Dish) => dish.image!.id); 
+
                     const images = await fetchDishImage(dishesImagesIds);
-                    console.log(images)
                     // Cria um dicionário para acessar as imagens rapidamente
                     const imagesMap = new Map(images.map((image: Image) => [image.id, image]));
                     const updatedDishes = dishes.map((dish: Dish) => ({
