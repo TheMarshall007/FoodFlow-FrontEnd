@@ -14,6 +14,7 @@ import {
 import { fetchIngredients, fetchIngredientsByIds, Ingredient } from "../services/ingredients/ingredientsService";
 import { updateShoppingListWithIngredientNames } from "../utils/shoppingListUtils";
 import { fetchShoppingCartHistory, ShoppingCartHistory } from "../services/shopping/shoppingCartHistoryService";
+import { fetchMenusCountByPantry } from "../services/menu/menuService";
 
 // Define o estado inicial
 export const initialState = {

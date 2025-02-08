@@ -42,3 +42,17 @@ export async function fetchDishesByIds(ids: number[]) {
     return [];
   }
 }
+
+export const markDishAsDone = async (dishId: number) => {
+  const response = await fetch(`/api/dishes/${dishId}/mark-as-done`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+  });
+
+  if (!response.ok) {
+      throw new Error("Erro ao marcar prato como feito");
+  }
+
+  return response.json();
+};
+

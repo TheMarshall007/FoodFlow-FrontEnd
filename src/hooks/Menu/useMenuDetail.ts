@@ -1,8 +1,9 @@
 import { useEffect, useReducer, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { addDishesToMenu, getMenuById, Menu } from "../../services/menu/menuService";
+import { addDishesToMenu, getMenuById, Menu, updateMenuPantry } from "../../services/menu/menuService";
 import { Dish, fetchDishesByIds } from "../../services/dish/dishService";
 import { fetchDishImage, Image } from "../../services/dish/dishImageService";
+import { fetchPantry, Pantry } from "../../services/pantry/pantryService";
 
 export const initialState = {
     menu: {} as Menu,
@@ -39,7 +40,7 @@ export const useMenuDetail = () => {
                     const dishes = await fetchDishesByIds(menu.dishesId);
                     const dishesImagesIds = dishes
                         .filter((dish: Dish) => dish.image?.id)
-                        .map((dish: Dish) => dish.image!.id); 
+                        .map((dish: Dish) => dish.image!.id);
 
                     const images = await fetchDishImage(dishesImagesIds);
                     // Cria um dicionário para acessar as imagens rapidamente
@@ -49,6 +50,8 @@ export const useMenuDetail = () => {
                         image: imagesMap.get(dish.image?.id) || dish.image // Mantém a imagem original se não for encontrada
                     }))
 
+                    const pantry: Pantry[] = await fetchPantry({ pantryId: menu.pantryId, page: 0 })
+                    menu.pantry = pantry?.[0]
                     menu.dishes = updatedDishes;
                     dispatch({ type: "SET_MENU", payload: menu });
                 } catch (error) {
@@ -65,7 +68,20 @@ export const useMenuDetail = () => {
             dispatch({ type: "SET_LOADING", payload: true });
             try {
                 const updatedMenu = await addDishesToMenu(parseInt(id), dishIds);
-                updatedMenu.dishes = await fetchDishesByIds(updatedMenu.dishesId);
+                const dishes = await fetchDishesByIds(updatedMenu.dishesId);
+                const dishesImagesIds = dishes
+                    .filter((dish: Dish) => dish.image?.id)
+                    .map((dish: Dish) => dish.image!.id);
+
+                const images = await fetchDishImage(dishesImagesIds);
+                // Cria um dicionário para acessar as imagens rapidamente
+                const imagesMap = new Map(images.map((image: Image) => [image.id, image]));
+                const updatedDishes = dishes.map((dish: Dish) => ({
+                    ...dish,
+                    image: imagesMap.get(dish.image?.id) || dish.image // Mantém a imagem original se não for encontrada
+                }))
+
+                updatedMenu.dishes = updatedDishes;
                 dispatch({ type: "SET_MENU", payload: updatedMenu });
             } catch (error) {
                 console.error("Erro ao adicionar pratos ao menu:", error);
@@ -73,5 +89,18 @@ export const useMenuDetail = () => {
         }
     };
 
-    return { state, dispatch, handleAddDishes };
+    const handleUpdatePantry = async (menuId: number, pantryId: number) => {
+        try {
+            const updatedMenu = await updateMenuPantry(menuId, pantryId);
+            const newMenu = { ...state.menu }
+            newMenu.pantryId = updatedMenu.pantryId
+            const pantry: Pantry[] = await fetchPantry({ pantryId, page: 0 })
+            newMenu.pantry = pantry?.[0]
+            dispatch({ type: "SET_MENU", payload: newMenu });
+        } catch (error) {
+            console.error("Erro ao atualizar a despensa do menu:", error);
+        }
+    };
+
+    return { state, dispatch, handleAddDishes, handleUpdatePantry };
 };

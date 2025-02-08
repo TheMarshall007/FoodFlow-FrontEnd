@@ -19,6 +19,7 @@ export interface Pantry {
     propertyName: string;
     items: PantryItem[];
     sharedWith: User[];
+    menuCount?: number
     lastUpdated: string;
     lowQuantityItems: PantryItem[];
     image: string;

@@ -1,5 +1,6 @@
 import { api } from "../../services/api/apiConfig";
 import { Dish } from "../dish/dishService";
+import { Pantry } from "../pantry/pantryService";
 
 export interface MenuInsertData {
     userId: number;
@@ -13,6 +14,7 @@ export interface Menu {
     id: number
     userId: number;
     pantryId?: number;
+    pantry?: Pantry;
     name: string;
     description: string;
     dishesIds: [];
@@ -42,3 +44,18 @@ export async function getMenusPaginated(filters: {
     const response = await api.post(`/menu/pagination`, filters);
     return response.data.content;
 };
+
+export const updateMenuPantry = async (menuId: number, pantryId: number) => {
+    const response = await api.patch(`/menu/${menuId}/update-pantry`, pantryId);
+    return response.data;
+};
+
+export async function fetchMenusCountByPantry(pantryId: number): Promise<number> {
+    try {
+        const response = await api.get(`/menu/count-by-pantry/${pantryId}`);    
+        return await response.data;
+    } catch (error) {
+        console.error("Erro ao buscar número de menus vinculados:", error);
+        return 0;
+    }
+}

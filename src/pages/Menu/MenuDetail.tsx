@@ -5,18 +5,24 @@ import { useMenuDetail } from "../../hooks/Menu/useMenuDetail";
 import { Dish } from "../../services/dish/dishService";
 import RecipeModal from "../../components/Menu/RecipeModal";
 import SelectDishesModal from "../../components/Menu/SelectDishesModal";
+import SelectPantryModal from "../../components/Menu/SelectPantryModal";
 
 const MenuDetail: React.FC = () => {
-    const { state, dispatch, handleAddDishes } = useMenuDetail();
+    const { state, handleAddDishes, handleUpdatePantry } = useMenuDetail();
     const navigate = useNavigate();
-console.log("LOGG STATEMENU", state)
+
     const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
     const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
     const [isSelectDishesModalOpen, setIsSelectDishesModalOpen] = useState(false);
+    const [isSelectPantryModalOpen, setIsSelectPantryModalOpen] = useState(false);
 
     const handleOpenRecipeModal = (dish: Dish) => {
         setSelectedDish(dish);
         setIsRecipeModalOpen(true);
+    };
+
+    const handleConfirmPantry = (pantryId: number) => {
+        handleUpdatePantry(state.menu.id, pantryId);
     };
 
     if (!state.menu) {
@@ -30,8 +36,11 @@ console.log("LOGG STATEMENU", state)
                     <h2>{state.menu.name}</h2>
                     <p>{state.menu.description}</p>
                     <p>
-                        {state.menu?.pantryId ? `Vinculado à despensa ${state.menu?.pantryId}` : "Nenhuma despensa vinculada"}
+                        {state.menu?.pantryId ? `Vinculado à despensa ${state.menu?.pantry?.propertyName}` : "Nenhuma despensa vinculada"}
                     </p>
+                    <button className="link-pantry-button" onClick={() => setIsSelectPantryModalOpen(true)}>
+                        Vincular a uma Despensa
+                    </button>
                 </div>
             </div>
 
@@ -77,6 +86,13 @@ console.log("LOGG STATEMENU", state)
                 onClose={() => setIsSelectDishesModalOpen(false)}
                 onConfirm={handleAddDishes}
                 existingDishes={state.menu.dishes}
+            />
+
+            {/* Modal de Seleção de Despensa */}
+            <SelectPantryModal
+                show={isSelectPantryModalOpen}
+                onClose={() => setIsSelectPantryModalOpen(false)}
+                onConfirm={handleConfirmPantry}
             />
         </div>
     );

@@ -2,12 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import { fetchIngredientsByIds } from '../../services/ingredients/ingredientsService';
 import '../../styles/components/Menu/Recipe/RecipeModal.css';
-import { Dish } from '../../services/dish/dishService';
+import { Dish, markDishAsDone } from '../../services/dish/dishService';
 
 interface RecipeModalProps {
     show: boolean;
     onClose: () => void;
-    dish: Dish
+    dish: Dish;
 }
 
 interface Ingredient {
@@ -18,6 +18,7 @@ interface Ingredient {
 
 const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish }) => {
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         async function fetchData() {
@@ -26,6 +27,19 @@ const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish }) => {
         }
         fetchData();
     }, [dish]);
+
+    const handleMarkAsDone = async () => {
+        setLoading(true);
+        try {
+            await markDishAsDone(dish.id);
+            alert("Prato marcado como feito! Ingredientes foram reduzidos.");
+            onClose();
+        } catch (error) {
+            console.error("Erro ao marcar prato como feito:", error);
+            alert("Erro ao atualizar os ingredientes.");
+        }
+        setLoading(false);
+    };
 
     if (!show) return null;
 
@@ -45,8 +59,16 @@ const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish }) => {
                 {/* <ol>
                     {dish.steps?.map((step, index) => (
                         <li key={index}>{step}</li>
-                    ))}
-                </ol> */}
+                    ))} */}
+                {/* </ol> */}
+                
+                <button 
+                    className="mark-done-button" 
+                    onClick={handleMarkAsDone} 
+                    disabled={loading}
+                >
+                    {loading ? "Processando..." : "Marcar como feito"}
+                </button>
             </div>
         </div>
     );

@@ -30,10 +30,10 @@ const PantryCard: React.FC<PantryCardProps> = ({ pant, onClick }) => {
                 ) : (
                     <p>Dispensa cheia</p>
                 )}
-            {pant?.sharedWith !== undefined ?
-                pant?.sharedWith?.length >= 1 ?
-                    `${pant?.sharedWith?.length} menu vinculado` :
-                    `${pant?.sharedWith?.length} menus vinculados` :
+            {pant?.menuCount !== undefined ?
+                pant?.menuCount >= 1 ?
+                    `${pant?.menuCount} menu vinculado` :
+                    `${pant?.menuCount} menus vinculados` :
                 "0 menus vinculados"
             }
             <button className="pantry-card-button">&rarr;</button>
