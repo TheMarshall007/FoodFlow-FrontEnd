@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './pages/Home/Home';
 import Login from './pages/Login/Login';
@@ -20,6 +20,8 @@ import PantryDetail from './pages/Pantry/PantryDetail';
 import Navbar from './layouts/Navbar/Navbar';
 import ShoppingCart from './pages/Pantry/ShoppingCart/ShoppingCart';
 import MenuDetail from './pages/Menu/MenuDetail';
+import ProtectedRoute from './Router/ProtectedRoute';
+import AdminDishes from './pages/Dish/AdminDishes';
 
 // Componente que gerencia a imagem de fundo
 function AppContent() {
@@ -66,6 +68,9 @@ function AppContent() {
           <Route path="/pantry/:id" element={<PantryDetail />} />
           <Route path="/pantry/:pantryId/low-quantity" element={<LowQuantityItems />} />
           <Route path="/shopping-cart/:id" element={<ShoppingCart />} />
+          <Route element={<ProtectedRoute />}>
+                    <Route path="/admin/dishes" element={<AdminDishes />} />
+                </Route>
         </Routes>
       </div>
     </div>

@@ -7,10 +7,16 @@ export interface Dish {
   id: number;
   name: string;
   description: string;
-  type: string;
+  category: Category;
   image: { id: number, image: string, type: string };
   ingredientsId: number[];
   price: number;
+}
+
+interface Category {
+  id: number;
+  category: string;
+  displayName: string;
 }
 
 export async function insertDish() {
@@ -23,7 +29,7 @@ export async function insertDish() {
   }
 }
 
-export async function fetchDish(data: DishParams) {
+export async function fetchDishes(data: DishParams) {
   try {
     const response = await api.post('/dish/pagination', data);
     return response.data.content;
@@ -44,15 +50,15 @@ export async function fetchDishesByIds(ids: number[]) {
 }
 
 export const markDishAsDone = async (dishId: number) => {
-  const response = await fetch(`/api/dishes/${dishId}/mark-as-done`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" }
-  });
-
-  if (!response.ok) {
-      throw new Error("Erro ao marcar prato como feito");
-  }
-
-  return response.json();
+  const response = await api.post(`/api/dishes/${dishId}/mark-as-done`,);
+  return response.data;
 };
 
+export async function createDish(formData: FormData) {
+  const response = await api.post("/dishes", formData);
+  return response.data;
+}
+export async function updateDish(formData: FormData) {
+  const response = await api.post("/dishes/update", formData);
+  return response.data;
+}

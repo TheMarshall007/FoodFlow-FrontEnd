@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchDish, fetchDishesByIds } from "../../services/dish/dishService"; // Ajuste para seu serviço real
+import { fetchDishes } from "../../services/dish/dishService"; // Ajuste para seu serviço real
 import { Dish } from "../../services/dish/dishService";
 import "../../styles/components/Menu/SelectDishesModal.css";
 
@@ -16,7 +16,7 @@ const SelectDishesModal: React.FC<SelectDishesModalProps> = ({ show, onClose, on
 
     useEffect(() => {
         async function loadDishes() {
-            const allDishes = await fetchDish({ page: 0 });
+            const allDishes = await fetchDishes({ page: 0 });
             setDishes(allDishes);
         }
         if (show) {
