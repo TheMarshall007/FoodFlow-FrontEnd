@@ -3,11 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { fetchIngredientsByIds } from '../../services/ingredients/ingredientsService';
 import '../../styles/components/Menu/Recipe/RecipeModal.css';
 import { Dish, markDishAsDone } from '../../services/dish/dishService';
+import { insertConsumption } from '../../services/consumption/consumptionService';
+import { useUser } from '../../context/UserContext';
 
 interface RecipeModalProps {
     show: boolean;
     onClose: () => void;
     dish: Dish;
+    pantryId?: number,
 }
 
 interface Ingredient {
@@ -16,10 +19,10 @@ interface Ingredient {
     description: string;
 }
 
-const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish }) => {
+const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish, pantryId }) => {
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [loading, setLoading] = useState(false);
-
+    const { user } = useUser()
     useEffect(() => {
         async function fetchData() {
             const ing = await fetchIngredientsByIds(dish.ingredientsId);
@@ -29,16 +32,25 @@ const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish }) => {
     }, [dish]);
 
     const handleMarkAsDone = async () => {
-        setLoading(true);
-        try {
-            await markDishAsDone(dish.id);
-            alert("Prato marcado como feito! Ingredientes foram reduzidos.");
-            onClose();
-        } catch (error) {
-            console.error("Erro ao marcar prato como feito:", error);
-            alert("Erro ao atualizar os ingredientes.");
+        if (user && pantryId) {
+            setLoading(true);
+            try {
+                await insertConsumption({
+                    userId: user.id,
+                    dishId: dish.id,
+                    pantryId: pantryId,
+                    quantity: 1,
+                });
+                alert('Consumo registrado com sucesso!');
+                onClose();
+            } catch (error: any) {
+              alert(`Erro: ${error.message}`);
+            }
+            setLoading(false);
+        }else{
+            alert("Você precisa ter uma dispensa vinculada ao menu para marcar os pratos como consumido");
+
         }
-        setLoading(false);
     };
 
     if (!show) return null;
@@ -48,6 +60,11 @@ const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish }) => {
             <div className="modal-content">
                 <button className="modal-close" onClick={onClose}>X</button>
                 <h2>{dish.name}</h2>
+                {dish.image && <img
+                                src={`data:image/${dish.image.type};base64,${dish.image.image}`}
+                                alt={dish.name}
+                                className="dish-card-image"
+                            />}
                 <p>{dish.description}</p>
                 <h3>Ingredientes</h3>
                 <ul>
@@ -61,10 +78,10 @@ const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish }) => {
                         <li key={index}>{step}</li>
                     ))} */}
                 {/* </ol> */}
-                
-                <button 
-                    className="mark-done-button" 
-                    onClick={handleMarkAsDone} 
+
+                <button
+                    className="mark-done-button"
+                    onClick={handleMarkAsDone}
                     disabled={loading}
                 >
                     {loading ? "Processando..." : "Marcar como feito"}

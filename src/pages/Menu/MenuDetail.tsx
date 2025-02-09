@@ -77,6 +77,7 @@ const MenuDetail: React.FC = () => {
                     show={isRecipeModalOpen}
                     onClose={() => setIsRecipeModalOpen(false)}
                     dish={selectedDish}
+                    pantryId={state.menu.pantryId}
                 />
             )}
 
