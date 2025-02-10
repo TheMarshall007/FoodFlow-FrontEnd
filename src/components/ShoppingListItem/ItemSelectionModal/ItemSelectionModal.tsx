@@ -24,7 +24,7 @@ const ItemSelectionModal: React.FC<ItemSelectionModalProps> = ({
         setSelectedItems((prev) =>
             prev.some((selected) => selected.id === item.id)
                 ? prev.filter((selected) => selected.id !== item.id)
-                : [...prev, { ...item, quantity: 1, ingredientId: item.id, category: 'Outros' }]
+                : [...prev, { ...item, quantity: 1, productId: item.id, category: 'Outros' }]
         );
         
         

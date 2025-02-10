@@ -1,62 +1,37 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PantryCard from '../../components/Pantry/PantryCard';
-import { useUser } from '../../context/UserContext';
-import { fetchPantry, fetchLowQuantityItems, Pantry } from '../../services/pantry/pantryService';
 import '../../styles/pages/Pantry/Pantries.css';
-import PantryForm from './PantryForm';
-import { fetchMenusCountByPantry } from '../../services/menu/menuService';
+import PantryForm from '../../components/Pantry/PantryForm';
+import { usePantry } from '../../hooks/pentry/usePentry';
 
 const Pantries = () => {
     const navigate = useNavigate();
-    const { user } = useUser();
-    const [pantries, setPantries] = useState<Pantry[]>([]);
-    const [selectNewPantry, setSelectNewPantry] = useState<Boolean>(false);
-    const hasFetched = useRef(false); // Controle de execução
+    const { state } = usePantry();
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        async function fetchData() {
-            if (!hasFetched.current && user) {
-                hasFetched.current = true; // Marca como executado
-                const pant = await fetchPantry({ userId: user.id, page: 0 });
-                const pantryWithLowItem = await Promise.all(pant?.map(async (invent: Pantry) => {
-                    const lowItem = await fetchLowQuantityItems(invent?.id, 5);
-                    const menuCount = await fetchMenusCountByPantry(invent.id)
-
-                    return {
-                        ...invent,
-                        lowQuantityItems: lowItem,
-                        menuCount
-                    }
-                }))
-                setPantries(pantryWithLowItem)
-            }
-        }
-        fetchData()
-    }, [user, navigate])
-
-    const closeModal = () => {
-        setSelectNewPantry(false);
-    };
+    if (state.loading) return <p>Carregando despensas...</p>;
+    if (!state.pantries) {
+        return <p>Despensa não encontrada...</p>;
+    }
 
     return (
-        <>
-            {selectNewPantry && (
-                <>
-                    <div className="modal-backdrop" onClick={closeModal}></div>
-                    <PantryForm />
-                </>
-            )}
-            <div className="pantry-section">
-                <h2>Despensas</h2>
-                <h4 className='add-button' onClick={() => setSelectNewPantry(true)}>Adicionar</h4>
+        <div className="pantry-section">
+            <h2>Despensas</h2>
+            <h4 className="add-button" onClick={() => setIsModalOpen(true)}>Adicionar</h4>
+
+            {state.pantries.length === 0 ? (
+                <p>Nenhuma despensa encontrada.</p>
+            ) : (
                 <div className="pantry-cards">
-                    {pantries?.map((pant) => (
-                        <PantryCard key={pant.id} pant={pant} onClick={() => { navigate(`/pantry/${pant.id}`) }} />
+                    {state.pantries.map((pant) => (
+                        <PantryCard key={pant.id} pant={pant} onClick={() => navigate(`/pantry/${pant.id}`)} />
                     ))}
                 </div>
-            </div>
-        </>
+            )}
+
+            <PantryForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        </div>
     );
 };
 

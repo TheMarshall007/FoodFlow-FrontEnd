@@ -15,18 +15,18 @@ const ShoppingCartItemCard: React.FC<ShoppingCartItemCardProps> = ({ item, onUpd
     const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
         setCartQuantity(newQuantity);
-        onUpdateQuantity({ id: item.id, ingredient: item.ingredient, cartQuantity: newQuantity, price });
+        onUpdateQuantity({ id: item.id, product: item.product, cartQuantity: newQuantity, price });
     };
 
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newPrice = parseFloat(e.target.value) || 0;
         setPrice(newPrice);
-        onUpdateQuantity({ id: item.id, ingredient: item.ingredient, cartQuantity, price: newPrice });
+        onUpdateQuantity({ id: item.id, product: item.product, cartQuantity, price: newPrice });
     };
 
     return (
         <div className="shopping-cart-item-card">
-            <p className="item-name">{item.ingredient.name}</p>
+            <p className="item-name">{item.product.brand}</p>
 
             <div className="item-controls">
                 <label>Quantidade:</label>

@@ -7,19 +7,23 @@ export interface ShoppingList {
 
 export interface ShoppingListItem {
     id: number;
-    ingredientId: number;
+    productId: number;
     name: string;
     quantity: number;
-    category: string;
 }
 
-export interface ShoppingListInsert {
+export interface ShoppingListInsertList {
     pantryId: number;
     items: ShoppingListItemInsert[];
 }
 
+export interface ShoppingListInsert {
+    pantryId: number;
+    item: ShoppingListItemInsert;
+}
+
 export interface ShoppingListItemInsert {
-    ingredientId: number;
+    productId: number;
     quantity: number;
 }
 
@@ -33,7 +37,7 @@ export const fetchShoppingList = async (pantryId: number): Promise<ShoppingList>
     }
 };
 
-export const addItemsToShoppingList = async (data: ShoppingListInsert) => {
+export const addProductToShoppingList = async (data: ShoppingListInsert) => {
     try {
         const response = await api.post(`/shopping_list/insert`, data);
         return response.data;
@@ -43,14 +47,24 @@ export const addItemsToShoppingList = async (data: ShoppingListInsert) => {
     }
 };
 
+export const addProductsToShoppingList = async (data: ShoppingListInsertList) => {
+    try {
+        const response = await api.post(`/shopping_list/insertList`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao adicionar itens à lista de compras:', error);
+        throw error;
+    }
+};
+
 export const updateItemQuantityInShoppingList = async (
     pantryId: number,
-    ingredientId: number,
+    productId: number,
     quantity: number
 ) => {
     try {
         const response = await api.put(
-            `/shopping_list/${pantryId}/items/${ingredientId}`,
+            `/shopping_list/${pantryId}/items/${productId}`,
             null, // Corpo da requisição vazio, pois estamos usando parâmetros
             {
                 params: { quantity },
@@ -63,9 +77,9 @@ export const updateItemQuantityInShoppingList = async (
     }
 };
 
-export const removeItemFromShoppingList = async (pantryId: number, ingredientId: number) => {
+export const removeItemFromShoppingList = async (pantryId: number, productId: number) => {
     try {
-        const response = await api.delete(`/shopping_list/${pantryId}/items/${ingredientId}`);
+        const response = await api.delete(`/shopping_list/${pantryId}/items/${productId}`);
         return response.data;
     } catch (error) {
         console.error('Erro ao remover item da lista de compras:', error);

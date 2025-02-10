@@ -4,8 +4,8 @@ import { FaTrash } from "react-icons/fa";
 
 const ShoppingListItemCard: React.FC<{
     item: ShoppingListItem;
-    onUpdateQuantity: (ingredientId: number, newQuantity: number) => void;
-    onRemoveItem: (ingredientId: number) => void;
+    onUpdateQuantity: (productId: number, newQuantity: number) => void;
+    onRemoveItem: (productId: number) => void;
 }> = ({ item, onUpdateQuantity, onRemoveItem }) => {
     const [inputValue, setInputValue] = useState(item.quantity);
 
@@ -17,7 +17,7 @@ const ShoppingListItemCard: React.FC<{
                 if (value === 0) {
                     onRemoveItem(item.id);
                 } else {
-                    onUpdateQuantity(item.ingredientId, value);
+                    onUpdateQuantity(item.productId, value);
                 }
             }, 500); // Tempo de debounce (500ms)
         };
@@ -29,14 +29,14 @@ const ShoppingListItemCard: React.FC<{
         if (newQuantity === 0) {
             onRemoveItem(item.id);
         } else {
-            onUpdateQuantity(item.ingredientId, newQuantity);
+            onUpdateQuantity(item.productId, newQuantity);
         }
     };
 
     const handleIncrement = () => {
         const newQuantity = inputValue + 1;
         setInputValue(newQuantity);
-        onUpdateQuantity(item.ingredientId, newQuantity);
+        onUpdateQuantity(item.productId, newQuantity);
     };
 
     return (

@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import "../../../styles/pages/Shopping/ShoppingCart.css";
 import { useShoppingCart } from "../../../hooks/useShoppingCart";
 import ShoppingCartTable from "../../../components/Pantry/ShoppingCart/ShoppingCartTable";
-import { usePantry } from "../../../hooks/usePantry";
+import { usePantryDetail } from "../../../hooks/pentry/usePantryDetail";
 import { FaPlus } from "react-icons/fa";
 import ItemSelectionModal from "../../../components/ShoppingListItem/ItemSelectionModal/ItemSelectionModal";
 
@@ -11,7 +11,7 @@ const ShoppingCart: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const pantryId = id ? parseInt(id) : 0;
     const { cart, loading, error, handleUpdateCartItem, handleRemoveCartItem, handleFinalizePurchase, handleAddToCart } = useShoppingCart(pantryId);
-    const { state } = usePantry()
+    const { state } = usePantryDetail()
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     if (loading) {

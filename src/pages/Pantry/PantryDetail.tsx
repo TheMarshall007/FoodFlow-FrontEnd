@@ -1,19 +1,17 @@
 import React from "react";
-import { usePantry } from "../../hooks/usePantry";
+import { usePantryDetail } from "../../hooks/pentry/usePantryDetail";
 import { useNavigate } from "react-router-dom";
-// Componentes
 import ItemSelectionModal from "../../components/ShoppingListItem/ItemSelectionModal/ItemSelectionModal";
 import ShoppingListItemCard from "../../components/ShoppingListItem/ShoppingListItemCard";
-// Estilos
 import "../../styles/pages/Pantry/PantryDetail.css";
 
 const PantryDetail: React.FC = () => {
-    const { state, dispatch, handleAddItemsToShoppingList, handleUpdateQuantity, handleRemoveItem, handleReduceQuantity } = usePantry();
+    const { state, dispatch, handleUpdateQuantity, handleRemoveItem, handleReduceQuantity } = usePantryDetail();
     const navigate = useNavigate(); // Hook para navegação
     if (!state.pantry) {
         return <p>Carregando ou despensa não encontrada...</p>;
     }
-
+    
     return (
         <div className="pantry-detail-container">
             <div className="pantry-header">
@@ -94,13 +92,17 @@ const PantryDetail: React.FC = () => {
                 {/* Shopping List */}
                 {state.activeTab === "shoppingList" && (
                     <div className="tab-shopping-list">
-                        <button className="add-items-auto-button" onClick={() => dispatch({ type: "TOGGLE_MODAL" })}>
+                        <button className="add-items-auto-button" onClick={() => navigate(`/products/${state.pantry.id}`)}>
                             Adicionar Itens
+                        </button>
+                        {/* Botão para abrir o Carrinho de Compras */}
+                        <button className="view-cart-button" onClick={() => navigate(`/shopping-cart/${state?.pantry?.id}`)}>
+                            Ver Carrinho
                         </button>
                         <div className="shopping-list">
                             {state.shoppingList?.items
                                 .slice()
-                                .sort((a, b) => a.ingredientId - b.ingredientId)
+                                .sort((a, b) => a.productId - b.productId)
                                 .map((item) => (
                                     <ShoppingListItemCard
                                         key={item.id}
@@ -110,10 +112,7 @@ const PantryDetail: React.FC = () => {
                                     />))}
                         </div>
 
-                        {/* Botão para abrir o Carrinho de Compras */}
-                        <button className="view-cart-button" onClick={() => navigate(`/shopping-cart/${state?.pantry?.id}`)}>
-                            Ver Carrinho
-                        </button>
+                        
                     </div>
                 )}
 
@@ -153,12 +152,6 @@ const PantryDetail: React.FC = () => {
 
             </div>
 
-            {/* Modal de Seleção de Itens */}
-            {
-                state.isModalOpen && (
-                    <ItemSelectionModal availableItems={state.availableItems} onClose={() => dispatch({ type: "TOGGLE_MODAL" })} onConfirm={handleAddItemsToShoppingList} />
-                )
-            }
         </div >
     );
 };

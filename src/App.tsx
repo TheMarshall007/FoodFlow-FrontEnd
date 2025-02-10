@@ -22,6 +22,7 @@ import ShoppingCart from './pages/Pantry/ShoppingCart/ShoppingCart';
 import MenuDetail from './pages/Menu/MenuDetail';
 import ProtectedRoute from './Router/ProtectedRoute';
 import AdminDishes from './pages/Dish/AdminDishes';
+import Products from './pages/Products/Products';
 
 // Componente que gerencia a imagem de fundo
 function AppContent() {
@@ -68,6 +69,8 @@ function AppContent() {
           <Route path="/pantry/:id" element={<PantryDetail />} />
           <Route path="/pantry/:pantryId/low-quantity" element={<LowQuantityItems />} />
           <Route path="/shopping-cart/:id" element={<ShoppingCart />} />
+          <Route path="/products/:id?" element={<Products />} /> {/* Suporta pantryId opcional */}
+
           <Route element={<ProtectedRoute />}>
                     <Route path="/admin/dishes" element={<AdminDishes />} />
                 </Route>

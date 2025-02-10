@@ -1,8 +1,9 @@
 import { api } from "../api/apiConfig";
 import { Ingredient } from "../ingredients/ingredientsService";
+import { Product } from "../product/productService";
 
 export interface ShoppingCartItemInsert {
-    ingredientId: number
+    productId: number
     plannedQuantity?: number;
     cartQuantity: number;
     price: number;
@@ -10,7 +11,7 @@ export interface ShoppingCartItemInsert {
 
 export interface ShoppingCartItem {
     id: number;
-    ingredient: Ingredient
+    product: Product
     plannedQuantity?: number;
     cartQuantity: number;
     unityPrice?: number;

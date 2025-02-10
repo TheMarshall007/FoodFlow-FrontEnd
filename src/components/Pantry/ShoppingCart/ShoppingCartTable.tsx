@@ -83,7 +83,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                         .sort((a, b) => a.id - b.id) // Ensure items are ordered by ID
                         .map((item) => (
                             <tr key={item.id}>
-                                <td>{item.ingredient.name}</td>
+                                <td>{item.product.brand}</td>
                                 <td>{item.plannedQuantity}</td>
                                 <td>
                                     <input

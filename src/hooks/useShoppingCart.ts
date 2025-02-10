@@ -55,7 +55,7 @@ const shoppingCartReducer = (
           cart: {
             ...state.cart,
             items: state.cart.items.map((item) =>
-              item.ingredient.id === action.payload.ingredient.id ? action.payload : item
+              item.product.id === action.payload.product.id ? action.payload : item
             ),
           },
         }
@@ -64,7 +64,7 @@ const shoppingCartReducer = (
       return state.cart
         ? {
           ...state,
-          cart: { ...state.cart, items: state.cart.items.filter((item) => item.ingredient.id !== action.payload) },
+          cart: { ...state.cart, items: state.cart.items.filter((item) => item.product.id !== action.payload) },
         }
         : state;
     case "FINALIZE_PURCHASE":
@@ -125,7 +125,7 @@ export const useShoppingCart = (pantryId: number) => {
     try {
       // Converte ShoppingListItem[] para ShoppingCartItem[]
       const cartItems: ShoppingCartItemInsert[] = data.map((item) => ({
-        ingredientId: item.ingredientId,
+        productId: item.productId,
         plannedQuantity: 0,
         cartQuantity: item.quantity,
         price: 0
