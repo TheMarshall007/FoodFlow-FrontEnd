@@ -10,7 +10,8 @@ export interface ShoppingCartProductInsert {
 
 export interface ShoppingCartProduct {
     id: number;
-    product: Product
+    productId: number;
+    product?: Product
     plannedQuantity?: number;
     cartQuantity: number;
     unityPrice?: number;

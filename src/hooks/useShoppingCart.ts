@@ -12,6 +12,9 @@ import {
 } from "../services/shopping/shoppingCartService";
 import { useUser } from "../context/UserContext";
 import { ShoppingListProduct } from "../services/shopping/shoppingListService";
+import { fetchProductsByIds, Product } from "../services/product/productService";
+import { fetchVarietyByIds, Variety } from "../services/variety/varietyService";
+import { updateShoppingListWithProductNames } from "../utils/shoppingListUtils";
 
 // 1. Definindo o tipo do estado
 type ShoppingCartState = {
@@ -64,7 +67,7 @@ const shoppingCartReducer = (
       return state.cart
         ? {
           ...state,
-          cart: { ...state.cart, products: state.cart.products.filter((product) => product.product.id !== action.payload) },
+          cart: { ...state.cart, products: state.cart.products.filter((product) => product?.product?.id !== action.payload) },
         }
         : state;
     case "FINALIZE_PURCHASE":
@@ -89,34 +92,65 @@ export const useShoppingCart = (pantryId: number) => {
   );
   const hasFetched = useRef(false); // Controle de execução
 
+  const fetchProductsAndVarietiesByIds = async (productIds: number[]) => {
+    let products: Product[] = [];
+    let varieties: Variety[] = [];
+
+    if (productIds.length > 0) {
+      products = await fetchProductsByIds(productIds);
+
+      const varietyIds = products.map((product) => product.varietyId).filter((id) => id !== null);
+      if (varietyIds.length > 0) {
+        varieties = await fetchVarietyByIds(varietyIds);
+      }
+    }
+
+    return { products, varieties };
+  };
+
   useEffect(() => {
+    const fetchData = async () => {
+      if (!hasFetched.current && user && pantryId) {
+        hasFetched.current = true; // Marca como executado
+        try {
+          const cart = await loadCartFromShoppingList(pantryId)
+          const productIds = cart.products.map((item) => item.productId);
+          let products: Product[] = [];
+          let varieties: Variety[] = [];
 
-    if (!hasFetched.current && user && pantryId) {
-      hasFetched.current = true; // Marca como executado
+          if (productIds.length > 0) {
+            ({ products, varieties } = await fetchProductsAndVarietiesByIds(productIds));
+          }          // Recalcula o valor unitário de todos os itens do carrinho antes de armazená-los no estado
 
-      dispatch({ type: "SET_LOADING", payload: true });
-
-      loadCartFromShoppingList(pantryId)
-        .then((cart) => {
-          // Recalcula o valor unitário de todos os itens do carrinho antes de armazená-los no estado
-          const updatedCartWithUnitPrice = {
+          const updatedProducts = cart.products.map((item) => {
+            // Buscar o produto correspondente
+            const product = products.find((product) => product.id === item.productId);
+        
+            // Buscar a variedade correspondente ao produto
+            const variety = varieties.find((variety) => variety.id === product?.varietyId);
+        
+            return {
+                ...item,
+                name: product ? `${variety?.name} (${product.brand || "Variedade Desconhecida"})` : "Produto Desconhecido",
+                unityPrice: item.cartQuantity > 0 ? item.price / item.cartQuantity : 0 // Evita divisão por zero
+            };
+        });
+        
+        const updatedCartWithUnitPrice = {
             ...cart,
-            products: cart.products.map((product) => ({
-              ...product,
-              unityPrice: product.cartQuantity > 0 ? product.price / product.cartQuantity : 0 // Evita divisão por zero
-            }))
-          };
-
+            products: updatedProducts
+        };
+        
           dispatch({ type: "SET_CART", payload: updatedCartWithUnitPrice });
-        })
-        .catch((error: unknown) => {
+        }
+        catch (error) {
           const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
           dispatch({ type: "SET_ERROR", payload: errorMessage });
-        })
-        .finally(() => {
-          dispatch({ type: "SET_LOADING", payload: false });
-        });
+        }
+      }
     }
+
+    fetchData();
   }, [user, pantryId, dispatch]);
 
 
