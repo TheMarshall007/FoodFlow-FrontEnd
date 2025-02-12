@@ -40,8 +40,7 @@ export function pantryReducer(state: typeof initialState, action: Action) {
     }
 }
 
-export const usePantryDetail = () => {
-    const { id } = useParams<{ id: string }>();
+export const usePantryDetail = (id: number) => {
     const { user } = useUser();
     const [state, dispatch] = useReducer(pantryReducer, initialState);
     const hasFetched = useRef(false); // Controle de execução
@@ -68,13 +67,13 @@ export const usePantryDetail = () => {
                 hasFetched.current = true; // Marca como executado
                 try {
                     // Buscar dados da despensa
-                    const pantryData = await fetchPantry({ pantryId: parseInt(id), page: 0 });
-                    pantryData[0].lowQuantityProducts = await fetchLowQuantityProducts(parseInt(id));
-                    pantryData[0].items = await fetchProductsByPantryId(parseInt(id));
+                    const pantryData = await fetchPantry({ pantryId: id, page: 0 });
+                    pantryData[0].lowQuantityProducts = await fetchLowQuantityProducts(id);
+                    pantryData[0].items = await fetchProductsByPantryId(id);
                     dispatch({ type: "SET_PANTRY", payload: pantryData[0] });
 
                     // Buscar lista de compras
-                    const shoppingListData = await fetchShoppingList(parseInt(id));
+                    const shoppingListData = await fetchShoppingList(id);
                     const productIds = shoppingListData.products.map((item) => item.systemProductId);
                     const productsWithDetails = await fetchProductsWithDetailsByIds(productIds);
                     const updatedShoppingList = shoppingListData.products.map((item) => ({
@@ -86,7 +85,7 @@ export const usePantryDetail = () => {
                     dispatch({ type: "SET_SHOPPING_LIST", payload: updatedCartWithUnitPrice });
 
                     // Buscar histórico de compras
-                    const shoppingHistory = await fetchShoppingCartHistory(parseInt(id));
+                    const shoppingHistory = await fetchShoppingCartHistory(id);
                     dispatch({ type: "SET_HISTORY", payload: shoppingHistory });
 
                 } catch (error) {
@@ -101,35 +100,84 @@ export const usePantryDetail = () => {
     const handleUpdateQuantity = async (productId: number, newQuantity: number) => {
         if (id && user) {
             try {
-                const updatedShoppingList = await updateProductQuantityInShoppingList(parseInt(id), productId, newQuantity);
-                dispatch({ type: "SET_SHOPPING_LIST", payload: updatedShoppingList });
+                const updatedShoppingList = await updateProductQuantityInShoppingList(id, productId, newQuantity);
+    
+                if (!state.shoppingList) return; // Evita erro de acesso a `null`
+    
+                // Atualiza apenas os produtos modificados sem perder as outras informações
+                const updatedProducts = state.shoppingList.products.map((item) =>
+                    item.systemProductId === productId
+                        ? { ...item, plannedQuantity: newQuantity } // Atualiza apenas a quantidade
+                        : item
+                );
+    
+                dispatch({
+                    type: "SET_SHOPPING_LIST",
+                    payload: {
+                        ...state.shoppingList,
+                        pantryId: state.shoppingList.pantryId ?? 0, // Garante que pantryId não seja undefined
+                        products: updatedProducts,
+                    },
+                });
+    
             } catch (error) {
-                console.error("Erro ao atualizar a quantidade do product:", error);
+                console.error("Erro ao atualizar a quantidade do produto:", error);
                 alert("Erro ao atualizar a quantidade. Tente novamente.");
             }
         }
     };
-
+    
     const handleReduceQuantity = async (pantryId: number, productId: number, quantityToReduce: number) => {
         try {
             const updatedProducts = await reduceProductQuantity(pantryId, productId, quantityToReduce);
-            dispatch({ type: "UPDATE_PANTRY_ITEMS", payload: updatedProducts.items, });
+    
+            // Se `state.pantry.items` não existir, não tenta mapear
+            if (!state.pantry.items) return;
+    
+            // Atualiza apenas os produtos modificados na despensa sem perder os dados existentes
+            const updatedPantryItems = state.pantry.items.map((item) =>
+                item.id === productId // Corrigindo a comparação, pois `systemProductId` não existe
+                    ? { ...item, quantity: (item.quantity ?? 0) - quantityToReduce } // Usando `quantity` no lugar de `plannedQuantity`
+                    : item
+            );
+    
+            dispatch({
+                type: "UPDATE_PANTRY_ITEMS",
+                payload: updatedPantryItems,
+            });
+    
         } catch (error) {
-            console.error("Erro ao reduzir a quantidade do product:", error);
+            console.error("Erro ao reduzir a quantidade do produto:", error);
         }
     };
-
+    
     const handleRemoveProduct = async (itemId: number) => {
         if (id && user) {
             try {
-                const updatedShoppingList = await removeProductFromShoppingList(parseInt(id), itemId);
-                dispatch({ type: 'SET_SHOPPING_LIST', payload: updatedShoppingList });
+                await removeProductFromShoppingList(id, itemId);
+    
+                if (!state.shoppingList) return; // Evita erro de acesso a `null`
+    
+                // Remove apenas o produto correspondente da lista
+                const updatedProducts = state.shoppingList.products.filter((item) => item.id !== itemId);
+    
+                dispatch({
+                    type: "SET_SHOPPING_LIST",
+                    payload: {
+                        ...state.shoppingList,
+                        pantryId: state.shoppingList.pantryId ?? 0, // Garante que pantryId não seja undefined
+                        products: updatedProducts,
+                    },
+                });
+    
             } catch (error) {
-                console.error('Erro ao remover item da lista de compras:', error);
-                alert('Erro ao remover item. Tente novamente.');
+                console.error("Erro ao remover item da lista de compras:", error);
+                alert("Erro ao remover item. Tente novamente.");
             }
         }
     };
+    
+    
 
 
 

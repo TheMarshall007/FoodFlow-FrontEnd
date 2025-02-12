@@ -1,11 +1,13 @@
 import React from "react";
 import { usePantryDetail } from "../../hooks/pentry/usePantryDetail";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ShoppingListProductCard from "../../components/ShoppingListProduct/ShoppingListProductCard";
 import "../../styles/pages/Pantry/PantryDetail.css";
 
 const PantryDetail: React.FC = () => {
-    const { state, dispatch, handleUpdateQuantity, handleRemoveProduct, handleReduceQuantity } = usePantryDetail();
+    const { id } = useParams<{ id: string }>();
+    const pantryId = id ? parseInt(id) : 0;
+    const { state, dispatch, handleUpdateQuantity, handleRemoveProduct, handleReduceQuantity } = usePantryDetail(pantryId);
     const navigate = useNavigate(); // Hook para navegação
     if (!state.pantry) {
         return <p>Carregando ou despensa não encontrada...</p>;
@@ -111,7 +113,7 @@ const PantryDetail: React.FC = () => {
                                     />))}
                         </div>
 
-                        
+
                     </div>
                 )}
 

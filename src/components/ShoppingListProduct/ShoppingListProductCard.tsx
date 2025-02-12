@@ -17,7 +17,7 @@ const ShoppingListProductCard: React.FC<{
                 if (value === 0) {
                     onRemoveProduct(product.id);
                 } else {
-                    onUpdateQuantity(product.systemProduct.id, value);
+                    onUpdateQuantity(product.id, value);
                 }
             }, 500);
         };
@@ -29,14 +29,14 @@ const ShoppingListProductCard: React.FC<{
         if (newQuantity === 0) {
             onRemoveProduct(product.id);
         } else {
-            onUpdateQuantity(product.systemProduct.id, newQuantity);
+            onUpdateQuantity(product.id, newQuantity);
         }
     };
 
     const handleIncrement = () => {
         const newQuantity = inputValue + 1;
         setInputValue(newQuantity);
-        onUpdateQuantity(product.systemProduct.id, newQuantity);
+        onUpdateQuantity(product.id, newQuantity);
     };
 
     return (

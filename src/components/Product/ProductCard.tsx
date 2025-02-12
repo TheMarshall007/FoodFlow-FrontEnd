@@ -5,12 +5,12 @@ import { ShoppingListProductInsert } from "../../services/shopping/shoppingListS
 
 const ProductCard: React.FC<{
     product: Product;
+    initialQuantity: number;
+    shoppingListProductId: number;
     handleAddProductToShoppingList: (product: ShoppingListProductInsert) => void;
     onUpdateQuantity: (productId: number, newQuantity: number) => void;
     onRemoveProduct: (productId: number) => void;
-    initialQuantity: number;
-    shoppingListProductId: number;
-}> = ({ product, handleAddProductToShoppingList, initialQuantity, shoppingListProductId, onUpdateQuantity, onRemoveProduct }) => {
+}> = ({ product, initialQuantity, shoppingListProductId, handleAddProductToShoppingList, onUpdateQuantity, onRemoveProduct }) => {
     const [quantity, setQuantity] = useState(initialQuantity);
 
 

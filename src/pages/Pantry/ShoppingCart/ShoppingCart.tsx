@@ -11,7 +11,7 @@ const ShoppingCart: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const pantryId = id ? parseInt(id) : 0;
     const { cart, loading, error, handleUpdateCartProduct, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart(pantryId);
-    const { state } = usePantryDetail()
+    const { state } = usePantryDetail(pantryId)
     const [isModalOpen, setIsModalOpen] = useState(false);
     console.log("LOGG cart", cart)
     if (loading) {
