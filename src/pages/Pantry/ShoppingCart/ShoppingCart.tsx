@@ -34,7 +34,6 @@ const ShoppingCart: React.FC = () => {
                         onUpdateProduct={handleUpdateCartProduct}
                         onRemoveProduct={handleRemoveCartProduct}
                         onAddProducts={handleAddToCart}
-                        availableProducts={state.availableProducts}
                     />
                 </div>
             ) : (
@@ -46,15 +45,6 @@ const ShoppingCart: React.FC = () => {
                 </>
             )
             }
-
-            {isModalOpen && (
-                <ProductSelectionModal
-                    availableProducts={state.availableProducts}
-                    onClose={() => setIsModalOpen(false)}
-                    onConfirm={handleAddToCart}
-                />
-            )}
-
             {
                 (cart?.cartProducts?.length ?? 0) > 0 && (
                     <button className="finalize-button" onClick={handleFinalizePurchase}>

@@ -13,7 +13,7 @@ const ProductCard: React.FC<{
 }> = ({ product, handleAddProductToShoppingList, initialQuantity, shoppingListProductId, onUpdateQuantity, onRemoveProduct }) => {
     const [quantity, setQuantity] = useState(initialQuantity);
 
-    
+
     useEffect(() => {
         setQuantity(initialQuantity);
     }, [initialQuantity]);
@@ -26,7 +26,7 @@ const ProductCard: React.FC<{
     const handleIncrease = () => {
         const newQuantity = quantity + 1;
         setQuantity(newQuantity);
-        onUpdateQuantity(product.id, newQuantity);
+        onUpdateQuantity(shoppingListProductId, newQuantity);
     };
 
     const handleDecrease = () => {
@@ -36,7 +36,7 @@ const ProductCard: React.FC<{
         if (newQuantity === 0) {
             onRemoveProduct(shoppingListProductId);
         } else {
-            onUpdateQuantity(product.id, newQuantity);
+            onUpdateQuantity(shoppingListProductId, newQuantity);
         }
     };
 
@@ -62,10 +62,8 @@ const ProductCard: React.FC<{
 
     return (
         <div className={`product-card ${quantity > 0 ? "added" : ""}`}>
-            <h3>{product.brand}</h3>
-            <p>Variedade: {product.variety?.name || "Sem variedade"}</p>
-            <p>Quantidade: {product.quantityPerUnit} {product.unit}</p>
-
+            <h3>{product.variety?.ingredient?.name ?? "Produto Desconhecido"} - {product.variety?.name ?? "Sem Variedade"} ({product.brand})</h3>
+            <p>{product.quantityPerUnit} {product.unit}</p>
             {quantity === 0 ? (
                 <button className="add-to-list-btn" onClick={handleAddProduct}>
                     Adicionar à Lista

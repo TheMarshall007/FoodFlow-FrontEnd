@@ -1,20 +1,21 @@
 import { api } from '../api/apiConfig';
+import { Product } from '../product/productService';
 
 export interface ShoppingList {
-    items: ShoppingListProduct[];
+    products: ShoppingListProduct[];
     pantryId: number;
 }
 
 export interface ShoppingListProduct {
     id: number;
-    productId: number;
-    name: string;
-    quantity: number;
+    systemProductId: number;
+    systemProduct: Product;
+    plannedQuantity: number;
 }
 
 export interface ShoppingListInsertList {
     pantryId: number;
-    items: ShoppingListProductInsert[];
+    products: ShoppingListProductInsert[];
 }
 
 export interface ShoppingListInsert {
@@ -64,7 +65,7 @@ export const updateProductQuantityInShoppingList = async (
 ) => {
     try {
         const response = await api.put(
-            `/shopping_list/${pantryId}/items/${productId}`,
+            `/shopping_list/${pantryId}/products/${productId}`,
             null, // Corpo da requisição vazio, pois estamos usando parâmetros
             {
                 params: { quantity },
@@ -79,7 +80,7 @@ export const updateProductQuantityInShoppingList = async (
 
 export const removeProductFromShoppingList = async (pantryId: number, productId: number) => {
     try {
-        const response = await api.delete(`/shopping_list/${pantryId}/items/${productId}`);
+        const response = await api.delete(`/shopping_list/${pantryId}/products/${productId}`);
         return response.data;
     } catch (error) {
         console.error('Erro ao remover item da lista de compras:', error);

@@ -10,7 +10,7 @@ const PantryDetail: React.FC = () => {
     if (!state.pantry) {
         return <p>Carregando ou despensa não encontrada...</p>;
     }
-    
+    console.log("LOGG STATE DETAIL", state)
     return (
         <div className="pantry-detail-container">
             <div className="pantry-header">
@@ -99,13 +99,13 @@ const PantryDetail: React.FC = () => {
                             Ver Carrinho
                         </button>
                         <div className="shopping-list">
-                            {state.shoppingList?.items
+                            {state.shoppingList?.products
                                 .slice()
-                                .sort((a, b) => a.productId - b.productId)
-                                .map((item) => (
+                                .sort((a, b) => a.systemProductId - b.systemProductId)
+                                .map((product) => (
                                     <ShoppingListProductCard
-                                        key={item.id}
-                                        product={item}
+                                        key={product.id}
+                                        product={product}
                                         onUpdateQuantity={handleUpdateQuantity}
                                         onRemoveProduct={handleRemoveProduct}
                                     />))}

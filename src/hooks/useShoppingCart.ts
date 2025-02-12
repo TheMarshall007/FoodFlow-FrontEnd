@@ -11,9 +11,7 @@ import {
 } from "../services/shopping/shoppingCartService";
 import { useUser } from "../context/UserContext";
 import { ShoppingListProduct } from "../services/shopping/shoppingListService";
-import { fetchProductsByIds, Product } from "../services/product/productService";
-import { fetchVarietyByIds, Variety } from "../services/variety/varietyService";
-import { fetchIngredientsByIds, Ingredient } from "../services/ingredients/ingredientsService";
+import { fetchProductsWithDetailsByIds, Product } from "../services/product/productService";
 
 // 1. Definindo o tipo do estado
 type ShoppingCartState = {
@@ -91,51 +89,12 @@ export const useShoppingCart = (pantryId: number) => {
   );
   const hasFetched = useRef(false); // Controle de execução
 
-  const fetchProductsWithDetailsByIds = async (productIds: number[]) => {
-    let products: Product[] = [];
-    let varieties: Variety[] = [];
-    let ingredients: Ingredient[] = [];
-
-    if (productIds.length > 0) {
-        products = await fetchProductsByIds(productIds);
-
-        // Buscar as variedades associadas aos produtos
-        const varietyIds = products.map((product) => product.varietyId).filter((id): id is number => id !== null);
-        if (varietyIds.length > 0) {
-            varieties = await fetchVarietyByIds(varietyIds);
-
-            // Buscar os ingredientes associados às variedades
-            const ingredientIds = varieties.map((variety) => variety.ingredientId);
-            if (ingredientIds.length > 0) {
-                ingredients = await fetchIngredientsByIds(ingredientIds);
-            }
-
-            // Mapear variedades e associar ingredientes corretamente
-            varieties = varieties.map((variety) => ({
-                ...variety,
-                ingredient: ingredients.find((ingredient) => ingredient.id === variety.ingredientId) ?? {} as Ingredient
-            }));
-        }
-
-        // Mapear produtos e associar variedades corretamente
-        products = products.map((product) => ({
-            ...product,
-            variety: varieties.find((variety) => variety.id === product.varietyId) ?? {} as Variety
-        }));
-    }
-
-    return products; // Agora já retorna os produtos prontos com variedades e ingredientes
-};
-
-
-
   useEffect(() => {
     const fetchData = async () => {
       if (!hasFetched.current && user && pantryId) {
         hasFetched.current = true; // Marca como executado
         try {
           const cart = await loadCartFromShoppingList(pantryId)
-          console.log("LOGG cart", cart)
           const productIds: number[] = cart.cartProducts.map((item) => item.systemProductId ?? 0);
           const productsWithDetails = await fetchProductsWithDetailsByIds(productIds);
 
@@ -168,9 +127,9 @@ export const useShoppingCart = (pantryId: number) => {
     try {
       // Converte ShoppingListProduct[] para ShoppingCartProduct[]
       const cartProducts: ShoppingCartProductInsert[] = data.map((product) => ({
-        productId: product.productId,
+        productId: product.systemProductId,
         plannedQuantity: 0,
-        cartQuantity: product.quantity,
+        cartQuantity: product.plannedQuantity,
         price: 0
       }));
 

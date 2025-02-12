@@ -7,7 +7,6 @@ import { ShoppingListProduct } from "../../../services/shopping/shoppingListServ
 
 interface ShoppingCartTableProps {
     products: ShoppingCartProduct[];
-    availableProducts: { id: number; name: string }[];
     onUpdateProduct: (product: ShoppingCartProduct) => void;
     onRemoveProduct: (productId: number) => void;
     onAddProducts: (selectedProducts: ShoppingListProduct[]) => void;
@@ -15,7 +14,6 @@ interface ShoppingCartTableProps {
 
 const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
     products,
-    availableProducts,
     onUpdateProduct,
     onRemoveProduct,
     onAddProducts,
@@ -84,7 +82,8 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                         .map((product) => (
                             <tr key={product.id}>
                                 <td>
-                                    {product?.systemProduct?.variety?.name ?? "Produto Desconhecido"}
+                                    {product?.systemProduct?.variety?.ingredient?.name ?? "Produto Desconhecido"} -
+                                    {product?.systemProduct?.variety?.name ?? "Variedade Desconhecida"}
                                     ({product?.systemProduct?.brand ?? "Marca Desconhecida"})
                                 </td>
                                 <td>{product.plannedQuantity}</td>
@@ -138,13 +137,6 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                 </tbody>
             </table>
 
-            {isModalOpen && (
-                <ProductSelectionModal
-                    availableProducts={availableProducts}
-                    onClose={() => setIsModalOpen(false)}
-                    onConfirm={onAddProducts}
-                />
-            )}
         </div>
     );
 };

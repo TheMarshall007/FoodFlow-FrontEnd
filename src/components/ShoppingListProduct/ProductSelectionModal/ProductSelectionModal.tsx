@@ -4,7 +4,6 @@ import { ShoppingListProduct } from '../../../services/shopping/shoppingListServ
 
 interface Product {
     id: number;
-    name: string;
 }
 
 interface ProductSelectionModalProps {
@@ -21,11 +20,11 @@ const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
     const [selectedProducts, setSelectedProducts] = useState<ShoppingListProduct[]>([]);
 
     const toggleProductSelection = (product: Product) => {
-        setSelectedProducts((prev) =>
-            prev.some((selected) => selected.id === product.id)
-                ? prev.filter((selected) => selected.id !== product.id)
-                : [...prev, { ...product, quantity: 1, productId: product.id, category: 'Outros' }]
-        );
+        // setSelectedProducts((prev) =>
+        //     prev.some((selected) => selected.id === product.id)
+        //         ? prev.filter((selected) => selected.id !== product.id)
+        //         : [...prev, { ...product, quantity: 1, productId: product.id, category: 'Outros' }]
+        // );
         
         
     };
@@ -52,7 +51,7 @@ const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                             }`}
                             onClick={() => toggleProductSelection(product)}
                         >
-                            {product.name}
+                            {product.id}
                         </div>
                     ))}
                 </div>

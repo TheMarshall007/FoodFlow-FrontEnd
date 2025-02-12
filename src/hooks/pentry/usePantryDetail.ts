@@ -4,17 +4,15 @@ import { useUser } from "../../context/UserContext";
 import { fetchLowQuantityProducts, fetchPantry, fetchProductsByPantryId, Pantry, PantryProduct, reduceProductQuantity } from "../../services/pantry/pantryService";
 import { fetchShoppingList, updateProductQuantityInShoppingList, ShoppingListProduct, removeProductFromShoppingList, ShoppingList, } from "../../services/shopping/shoppingListService";
 import { fetchShoppingCartHistory, ShoppingCartHistory } from "../../services/shopping/shoppingCartHistoryService";
-import { fetchProducts, fetchProductsByIds, Product } from "../../services/product/productService";
+import { fetchProducts, fetchProductsByIds, fetchProductsWithDetailsByIds, fetchVarietiesWithDetailsByIds, Product } from "../../services/product/productService";
 import { updateShoppingListWithProductNames } from "../../utils/shoppingListUtils";
 import { fetchVarietyByIds, Variety } from "../../services/variety/varietyService";
+import { ShoppingCart } from "../../services/shopping/shoppingCartService";
 
 // Define o estado inicial
 export const initialState = {
     pantry: {} as Pantry,
     shoppingList: null as ShoppingList | null,
-    availableProducts: [] as ShoppingListProduct[],
-    productDetails: [] as Product[],
-    varietyDetails: [] as Variety[],
     history: [] as ShoppingCartHistory[],
     isModalOpen: false,
     activeTab: "items" as "items" | "shoppingList" | "history",
@@ -24,8 +22,6 @@ export const initialState = {
 type Action =
     | { type: "SET_PANTRY"; payload: Pantry }
     | { type: "SET_SHOPPING_LIST"; payload: ShoppingList }
-    | { type: "SET_PRODUCT_DETAILS"; payload: Product[] }
-    | { type: "SET_VARIETY_DETAILS"; payload: Variety[] }
     | { type: "SET_HISTORY"; payload: ShoppingCartHistory[] }
     | { type: "UPDATE_PANTRY_ITEMS"; payload: PantryProduct[] }
     | { type: "TOGGLE_MODAL" }
@@ -36,8 +32,6 @@ export function pantryReducer(state: typeof initialState, action: Action) {
     switch (action.type) {
         case "SET_PANTRY": return { ...state, pantry: action.payload };
         case "SET_SHOPPING_LIST": return { ...state, shoppingList: action.payload };
-        case "SET_PRODUCT_DETAILS": return { ...state, productDetails: action.payload };
-        case "SET_VARIETY_DETAILS": return { ...state, varietyDetails: action.payload };
         case "SET_HISTORY": return { ...state, history: action.payload, };
         case "TOGGLE_MODAL": return { ...state, isModalOpen: !state.isModalOpen };
         case "SET_ACTIVE_TAB": return { ...state, activeTab: action.payload };
@@ -81,20 +75,15 @@ export const usePantryDetail = () => {
 
                     // Buscar lista de compras
                     const shoppingListData = await fetchShoppingList(parseInt(id));
-                    const productIds = shoppingListData.items.map((item) => item.productId);
-
-                    let products: Product[] = [];
-                    let varieties: Variety[] = [];
-
-                    if (productIds.length > 0) {
-                        ({ products, varieties } = await fetchProductsAndVarietiesByIds(productIds));
-                        dispatch({ type: "SET_PRODUCT_DETAILS", payload: products });
-                        dispatch({ type: "SET_VARIETY_DETAILS", payload: varieties });
-                    }
-
+                    const productIds = shoppingListData.products.map((item) => item.systemProductId);
+                    const productsWithDetails = await fetchProductsWithDetailsByIds(productIds);
+                    const updatedShoppingList = shoppingListData.products.map((item) => ({
+                        ...item,
+                        systemProduct: productsWithDetails.find((product) => product.id === item.systemProductId) || {} as Product
+                    }));
+                    const updatedCartWithUnitPrice = { ...shoppingListData, products: updatedShoppingList };
                     // Atualizar lista de compras com produtos e variedades
-                    const updatedShoppingList = updateShoppingListWithProductNames(shoppingListData, products, varieties);
-                    dispatch({ type: "SET_SHOPPING_LIST", payload: updatedShoppingList });
+                    dispatch({ type: "SET_SHOPPING_LIST", payload: updatedCartWithUnitPrice });
 
                     // Buscar histórico de compras
                     const shoppingHistory = await fetchShoppingCartHistory(parseInt(id));
@@ -113,24 +102,10 @@ export const usePantryDetail = () => {
         if (id && user) {
             try {
                 const updatedShoppingList = await updateProductQuantityInShoppingList(parseInt(id), productId, newQuantity);
-                const updatedShoppingListWithNames = updateShoppingListWithProductNames(updatedShoppingList, state.productDetails, state.varietyDetails);
-                dispatch({ type: "SET_SHOPPING_LIST", payload: updatedShoppingListWithNames });
+                dispatch({ type: "SET_SHOPPING_LIST", payload: updatedShoppingList });
             } catch (error) {
                 console.error("Erro ao atualizar a quantidade do product:", error);
                 alert("Erro ao atualizar a quantidade. Tente novamente.");
-            }
-        }
-    };
-
-    const handleRemoveProduct = async (itemId: number) => {
-        if (id && user) {
-            try {
-                const updatedShoppingList = await removeProductFromShoppingList(parseInt(id), itemId);
-                const updatedShoppingListWithNames = updateShoppingListWithProductNames(updatedShoppingList, state.productDetails, state.varietyDetails);
-                dispatch({ type: 'SET_SHOPPING_LIST', payload: updatedShoppingListWithNames });
-            } catch (error) {
-                console.error('Erro ao remover item da lista de compras:', error);
-                alert('Erro ao remover item. Tente novamente.');
             }
         }
     };
@@ -143,6 +118,19 @@ export const usePantryDetail = () => {
             console.error("Erro ao reduzir a quantidade do product:", error);
         }
     };
+
+    const handleRemoveProduct = async (itemId: number) => {
+        if (id && user) {
+            try {
+                const updatedShoppingList = await removeProductFromShoppingList(parseInt(id), itemId);
+                dispatch({ type: 'SET_SHOPPING_LIST', payload: updatedShoppingList });
+            } catch (error) {
+                console.error('Erro ao remover item da lista de compras:', error);
+                alert('Erro ao remover item. Tente novamente.');
+            }
+        }
+    };
+
 
 
     return { state, dispatch, handleUpdateQuantity, handleRemoveProduct, handleReduceQuantity };

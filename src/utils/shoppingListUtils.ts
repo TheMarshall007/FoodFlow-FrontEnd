@@ -10,9 +10,9 @@ export const updateShoppingListWithProductNames = (
     products: Product[],
     varieties: Variety[]
 ): ShoppingList => {
-    const updatedProducts = shoppingList.items.map((item) => {
+    const updatedProducts = shoppingList.products.map((item) => {
         // Buscar o produto correspondente
-        const product = products.find((product) => product.id === item.productId);
+        const product = products.find((product) => product.id === item.systemProductId);
 
         // Buscar a variedade correspondente ao produto
         const variety = varieties.find((variety) => variety.id === product?.varietyId);
@@ -23,6 +23,6 @@ export const updateShoppingListWithProductNames = (
         };
     });
 
-    return { ...shoppingList, items: updatedProducts };
+    return { ...shoppingList, products: updatedProducts };
 };
 

@@ -5,22 +5,27 @@ import { useUser } from "../../context/UserContext";
 import { useProduct } from "../../hooks/useProduct";
 import ProductForm from "../../components/Product/ProductForm";
 import "../../styles/pages/Product/Products.css";
+import { Product } from "../../services/product/productService";
 
 const Products = () => {
-    const { id } = useParams(); // Verifica se há um pantryId na URL
-    const { state, handleSearch, handleAddProductToShoppingList,handleUpdateQuantity, handleRemoveProduct } = useProduct();
+    const { id } = useParams<{ id: string }>();
+    const pantryId = id ? parseInt(id) : 0;
+    const { state, handleSearch, handleAddProductToShoppingList, handleUpdateQuantity, handleRemoveProduct } = useProduct(pantryId);
     const { user } = useUser();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate(); // Hook para navegação
-
-    const shoppingListProducts = state.shoppingList.items.reduce((map, item) => {
-        map[item.productId] = {
-            quantity: item.quantity,
-            shoppingListProductId: item.id, // ID do item dentro da lista de compras
+    console.log("LOGG state", state)
+    const shoppingListProducts = state.shoppingList?.products.reduce((map, product) => {
+        console.log("LOGG PROD", product)
+        map[product.systemProductId] = {
+            plannedQuantity: product.plannedQuantity,
+            shoppingListProductId: product.id, // ID do item dentro da lista de compras
         };
         return map;
-    }, {} as Record<number, { quantity: number; shoppingListProductId: number }>);
-console.log("shoppingListProducts", shoppingListProducts)
+    }, {} as Record<number, { plannedQuantity: number; shoppingListProductId: number }>);
+
+    console.log("shoppingListProducts", shoppingListProducts)
+
     return (
         <div className="products-page">
             <button onClick={() => navigate(`/pantry/${id}`)}>Voltar</button>
@@ -49,11 +54,11 @@ console.log("shoppingListProducts", shoppingListProducts)
                     <p>Carregando produtos...</p>
                 ) : state.error ? (
                     <p>{state.error}</p>
-                ) : state.products.length === 0 ? (
+                ) : state.systemProduct.length === 0 ? (
                     <p>Nenhum produto encontrado.</p>
                 ) : (
-                    state.products.map((product) => {
-                        const productData = shoppingListProducts[product.id] || { quantity: 0, shoppingListProductId: null };
+                    state.systemProduct.map((product: Product) => {
+                        const productData = shoppingListProducts[product.id] || { plannedQuantity: 0, shoppingListProductId: null };
 
                         return (
                             <ProductCard
@@ -62,7 +67,7 @@ console.log("shoppingListProducts", shoppingListProducts)
                                 handleAddProductToShoppingList={handleAddProductToShoppingList}
                                 onUpdateQuantity={handleUpdateQuantity}
                                 onRemoveProduct={handleRemoveProduct}
-                                initialQuantity={productData.quantity}
+                                initialQuantity={productData.plannedQuantity}
                                 shoppingListProductId={productData.shoppingListProductId} // Passamos o ID do item na lista
                             />
                         );

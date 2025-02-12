@@ -7,7 +7,7 @@ const ShoppingListProductCard: React.FC<{
     onUpdateQuantity: (productId: number, newQuantity: number) => void;
     onRemoveProduct: (productId: number) => void;
 }> = ({ product, onUpdateQuantity, onRemoveProduct }) => {
-    const [inputValue, setInputValue] = useState(product.quantity);
+    const [inputValue, setInputValue] = useState(product.plannedQuantity);
 
     const handleDebouncedChange = (() => {
         let timeout: NodeJS.Timeout;
@@ -17,9 +17,9 @@ const ShoppingListProductCard: React.FC<{
                 if (value === 0) {
                     onRemoveProduct(product.id);
                 } else {
-                    onUpdateQuantity(product.productId, value);
+                    onUpdateQuantity(product.systemProduct.id, value);
                 }
-            }, 500); // Tempo de debounce (500ms)
+            }, 500);
         };
     })();
 
@@ -29,19 +29,25 @@ const ShoppingListProductCard: React.FC<{
         if (newQuantity === 0) {
             onRemoveProduct(product.id);
         } else {
-            onUpdateQuantity(product.productId, newQuantity);
+            onUpdateQuantity(product.systemProduct.id, newQuantity);
         }
     };
 
     const handleIncrement = () => {
         const newQuantity = inputValue + 1;
         setInputValue(newQuantity);
-        onUpdateQuantity(product.productId, newQuantity);
+        onUpdateQuantity(product.systemProduct.id, newQuantity);
     };
 
     return (
         <div className="shopping-list-product-card">
-            <p className="product-name">{product.name || "Desconhecido"}</p>
+            <p className="product-name">
+                {product.systemProduct.variety?.ingredient?.name ?? "Produto"} -{" "}
+                {product.systemProduct.variety?.name ?? "Variedade Desconhecida"} ({product.systemProduct.brand})
+            </p>
+            <p className="product-details">
+                Quantidade por unidade: {product.systemProduct.quantityPerUnit} {product.systemProduct.unit}
+            </p>
             <div className="product-quantity-control">
                 <button onClick={handleDecrement} disabled={inputValue <= 0}>
                     -
