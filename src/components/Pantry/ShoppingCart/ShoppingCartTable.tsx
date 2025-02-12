@@ -1,56 +1,56 @@
 import React, { useState } from "react";
 import { FaTrash, FaPlus } from "react-icons/fa";
 import "../../../styles/components/Shopping/ShoppingCartTable.css";
-import { ShoppingCartItem } from "../../../services/shopping/shoppingCartService";
-import ItemSelectionModal from "../../ShoppingListItem/ItemSelectionModal/ItemSelectionModal";
-import { ShoppingListItem } from "../../../services/shopping/shoppingListService";
+import { ShoppingCartProduct } from "../../../services/shopping/shoppingCartService";
+import ProductSelectionModal from "../../ShoppingListProduct/ProductSelectionModal/ProductSelectionModal";
+import { ShoppingListProduct } from "../../../services/shopping/shoppingListService";
 
 interface ShoppingCartTableProps {
-    items: ShoppingCartItem[];
-    availableItems: { id: number; name: string }[];
-    onUpdateItem: (item: ShoppingCartItem) => void;
-    onRemoveItem: (itemId: number) => void;
-    onAddItems: (selectedItems: ShoppingListItem[]) => void;
+    products: ShoppingCartProduct[];
+    availableProducts: { id: number; name: string }[];
+    onUpdateProduct: (product: ShoppingCartProduct) => void;
+    onRemoveProduct: (productId: number) => void;
+    onAddProducts: (selectedProducts: ShoppingListProduct[]) => void;
 }
 
 const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
-    items,
-    availableItems,
-    onUpdateItem,
-    onRemoveItem,
-    onAddItems,
+    products,
+    availableProducts,
+    onUpdateProduct,
+    onRemoveProduct,
+    onAddProducts,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement>,
-        item: ShoppingCartItem,
+        product: ShoppingCartProduct,
         field: "cartQuantity" | "price" | "unityPrice"
     ) => {
         const newValue = parseFloat(e.target.value) || 0;
-        let updatedItem = { ...item };
+        let updatedProduct = { ...product };
     
         switch (field) {
             case "cartQuantity":
-                updatedItem.cartQuantity = newValue;
-                if (updatedItem.unityPrice) {
-                    updatedItem.price = updatedItem.cartQuantity * updatedItem.unityPrice;
-                } else if (updatedItem.price) {
-                    updatedItem.unityPrice = updatedItem.price / updatedItem.cartQuantity;
+                updatedProduct.cartQuantity = newValue;
+                if (updatedProduct.unityPrice) {
+                    updatedProduct.price = updatedProduct.cartQuantity * updatedProduct.unityPrice;
+                } else if (updatedProduct.price) {
+                    updatedProduct.unityPrice = updatedProduct.price / updatedProduct.cartQuantity;
                 }
                 break;
     
             case "unityPrice":
-                updatedItem.unityPrice = newValue;
-                if (updatedItem.cartQuantity) {
-                    updatedItem.price = updatedItem.cartQuantity * updatedItem.unityPrice;
+                updatedProduct.unityPrice = newValue;
+                if (updatedProduct.cartQuantity) {
+                    updatedProduct.price = updatedProduct.cartQuantity * updatedProduct.unityPrice;
                 }
                 break;
     
             case "price":
-                updatedItem.price = newValue;
-                if (updatedItem.cartQuantity) {
-                    updatedItem.unityPrice = updatedItem.price / updatedItem.cartQuantity;
+                updatedProduct.price = newValue;
+                if (updatedProduct.cartQuantity) {
+                    updatedProduct.unityPrice = updatedProduct.price / updatedProduct.cartQuantity;
                 }
                 break;
     
@@ -59,7 +59,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
         }
     
         // Chama a função para atualizar o item com os novos valores calculados
-        onUpdateItem(updatedItem);
+        onUpdateProduct(updatedProduct);
     };
     
 
@@ -78,19 +78,19 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                     </tr>
                 </thead>
                 <tbody>
-                    {items
+                    {products
                         .slice()
                         .sort((a, b) => a.id - b.id) // Ensure items are ordered by ID
-                        .map((item) => (
-                            <tr key={item.id}>
-                                <td>{item.product.brand}</td>
-                                <td>{item.plannedQuantity}</td>
+                        .map((product) => (
+                            <tr key={product.id}>
+                                <td>{product.product.brand}</td>
+                                <td>{product.plannedQuantity}</td>
                                 <td>
                                     <input
                                         type="number"
-                                        value={item.cartQuantity}
+                                        value={product.cartQuantity}
                                         onChange={(e) =>
-                                            handleInputChange(e, item, "cartQuantity")
+                                            handleInputChange(e, product, "cartQuantity")
                                         }
                                         min="0"
                                     />
@@ -98,9 +98,9 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                 <td>
                                     <input
                                         type="number"
-                                        value={item.unityPrice}
+                                        value={product.unityPrice}
                                         onChange={(e) =>
-                                            handleInputChange(e, item, "unityPrice")
+                                            handleInputChange(e, product, "unityPrice")
                                         }
                                         step="0.01"
                                     />
@@ -108,9 +108,9 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                 <td>
                                     <input
                                         type="number"
-                                        value={item.price}
+                                        value={product.price}
                                         onChange={(e) =>
-                                            handleInputChange(e, item, "price")
+                                            handleInputChange(e, product, "price")
                                         }
                                         step="0.01"
                                     />
@@ -118,7 +118,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                 <td>
                                     <button
                                         className="remove-button"
-                                        onClick={() => onRemoveItem(item.id)}
+                                        onClick={() => onRemoveProduct(product.id)}
                                     >
                                         <FaTrash />
                                     </button>
@@ -127,7 +127,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                         ))}
                     <tr>
                         <td colSpan={6} style={{ textAlign: "center", padding: "10px" }}>
-                            <button className="add-items-button" onClick={() => setIsModalOpen(true)}>
+                            <button className="add-products-button" onClick={() => setIsModalOpen(true)}>
                                 <FaPlus /> Adicionar Itens
                             </button>
                         </td>
@@ -136,10 +136,10 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
             </table>
 
             {isModalOpen && (
-                <ItemSelectionModal
-                    availableItems={availableItems}
+                <ProductSelectionModal
+                    availableProducts={availableProducts}
                     onClose={() => setIsModalOpen(false)}
-                    onConfirm={onAddItems}
+                    onConfirm={onAddProducts}
                 />
             )}
         </div>

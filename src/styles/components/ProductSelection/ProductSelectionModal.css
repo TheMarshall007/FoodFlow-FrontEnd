@@ -21,7 +21,7 @@
     text-align: center;
 }
 
-.item-cards {
+.product-cards {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -29,7 +29,7 @@
     margin-top: 20px;
 }
 
-.item-card {
+.product-card {
     background: #f9f9f9;
     padding: 10px 15px;
     border-radius: 5px;
@@ -37,12 +37,12 @@
     transition: transform 0.3s, background-color 0.3s;
 }
 
-.item-card.selected {
+.product-card.selected {
     background: #67cf89;
     color: #fff;
 }
 
-.item-card:hover {
+.product-card:hover {
     transform: translateY(-5px);
 }
 

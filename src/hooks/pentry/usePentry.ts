@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef } from "react";
-import { fetchPantry, fetchLowQuantityItems, PantryItem, Pantry, PantryInsertData, createPantry } from "../../services/pantry/pantryService";
+import { fetchPantry, fetchLowQuantityProducts, PantryProduct, Pantry, PantryInsertData, createPantry } from "../../services/pantry/pantryService";
 import { fetchMenusCountByPantry } from "../../services/menu/menuService";
 import { useUser } from "../../context/UserContext";
 
@@ -35,10 +35,10 @@ export const usePantry = () => {
                 hasFetched.current = true; // Marca como executado
                 try {
                     const pant = await fetchPantry({ userId: user.id, page: 0 });
-                    const pantryWithDetails = await Promise.all(pant.map(async (invent: PantryItem) => {
-                        const lowItem = await fetchLowQuantityItems(invent.id, 5);
+                    const pantryWithDetails = await Promise.all(pant.map(async (invent: PantryProduct) => {
+                        const lowProduct = await fetchLowQuantityProducts(invent.id, 5);
                         const menuCount = await fetchMenusCountByPantry(invent.id);
-                        return { ...invent, lowQuantityItems: lowItem, menuCount };
+                        return { ...invent, lowQuantityProducts: lowProduct, menuCount };
                     }));
 
                     dispatch({ type: "SET_PANTRIES", payload: pantryWithDetails });
@@ -56,9 +56,9 @@ export const usePantry = () => {
         dispatch({ type: "SET_LOADING", payload: true });
         try {
             let newPantry = await createPantry(pantryData);
-            const lowItem: [] = []
+            const lowProduct: [] = []
             const menuCount = 0        
-            newPantry = { ...newPantry, lowQuantityItems: lowItem, menuCount };
+            newPantry = { ...newPantry, lowQuantityProducts: lowProduct, menuCount };
             dispatch({ type: "SET_PANTRIES", payload: [...state.pantries, newPantry] });
         } catch (error) {
             console.error("Erro ao criar a despensa:", error);

@@ -1,11 +1,11 @@
 import { api } from '../api/apiConfig';
 
 export interface ShoppingList {
-    items: ShoppingListItem[];
+    items: ShoppingListProduct[];
     pantryId: number;
 }
 
-export interface ShoppingListItem {
+export interface ShoppingListProduct {
     id: number;
     productId: number;
     name: string;
@@ -14,15 +14,15 @@ export interface ShoppingListItem {
 
 export interface ShoppingListInsertList {
     pantryId: number;
-    items: ShoppingListItemInsert[];
+    items: ShoppingListProductInsert[];
 }
 
 export interface ShoppingListInsert {
     pantryId: number;
-    item: ShoppingListItemInsert;
+    product: ShoppingListProductInsert;
 }
 
-export interface ShoppingListItemInsert {
+export interface ShoppingListProductInsert {
     productId: number;
     quantity: number;
 }
@@ -57,7 +57,7 @@ export const addProductsToShoppingList = async (data: ShoppingListInsertList) =>
     }
 };
 
-export const updateItemQuantityInShoppingList = async (
+export const updateProductQuantityInShoppingList = async (
     pantryId: number,
     productId: number,
     quantity: number
@@ -77,7 +77,7 @@ export const updateItemQuantityInShoppingList = async (
     }
 };
 
-export const removeItemFromShoppingList = async (pantryId: number, productId: number) => {
+export const removeProductFromShoppingList = async (pantryId: number, productId: number) => {
     try {
         const response = await api.delete(`/shopping_list/${pantryId}/items/${productId}`);
         return response.data;

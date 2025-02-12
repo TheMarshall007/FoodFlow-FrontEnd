@@ -8,19 +8,20 @@ import "../../styles/pages/Product/Products.css";
 
 const Products = () => {
     const { id } = useParams(); // Verifica se há um pantryId na URL
-    const { state, handleSearch, handleAddItemToShoppingList,handleUpdateQuantity, handleRemoveItem } = useProduct();
+    const { state, handleSearch, handleAddProductToShoppingList,handleUpdateQuantity, handleRemoveProduct } = useProduct();
     const { user } = useUser();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate(); // Hook para navegação
+console.log("LOGG", state)
 
     const shoppingListProducts = state.shoppingList.items.reduce((map, item) => {
         map[item.productId] = {
             quantity: item.quantity,
-            shoppingListItemId: item.id, // ID do item dentro da lista de compras
+            shoppingListProductId: item.id, // ID do item dentro da lista de compras
         };
         return map;
-    }, {} as Record<number, { quantity: number; shoppingListItemId: number }>);
-
+    }, {} as Record<number, { quantity: number; shoppingListProductId: number }>);
+console.log("shoppingListProducts", shoppingListProducts)
     return (
         <div className="products-page">
             <button onClick={() => navigate(`/pantry/${id}`)}>Voltar</button>
@@ -53,17 +54,17 @@ const Products = () => {
                     <p>Nenhum produto encontrado.</p>
                 ) : (
                     state.products.map((product) => {
-                        const productData = shoppingListProducts[product.id] || { quantity: 0, shoppingListItemId: null };
+                        const productData = shoppingListProducts[product.id] || { quantity: 0, shoppingListProductId: null };
 
                         return (
                             <ProductCard
                                 key={product.id}
                                 product={product}
-                                handleAddItemToShoppingList={handleAddItemToShoppingList}
+                                handleAddProductToShoppingList={handleAddProductToShoppingList}
                                 onUpdateQuantity={handleUpdateQuantity}
-                                onRemoveItem={handleRemoveItem}
+                                onRemoveProduct={handleRemoveProduct}
                                 initialQuantity={productData.quantity}
-                                shoppingListItemId={productData.shoppingListItemId} // Passamos o ID do item na lista
+                                shoppingListProductId={productData.shoppingListProductId} // Passamos o ID do item na lista
                             />
                         );
                     })

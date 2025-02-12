@@ -17,15 +17,15 @@ interface PantryData {
 export interface Pantry {
     id: number;
     propertyName: string;
-    items: PantryItem[];
+    items: PantryProduct[];
     sharedWith: User[];
     menuCount?: number
     lastUpdated: string;
-    lowQuantityItems: PantryItem[];
+    lowQuantityProducts: PantryProduct[];
     image: string;
 }
 
-export interface PantryItem {
+export interface PantryProduct {
     id: number;
     ingredient: Ingredient;
     quantity: number;
@@ -61,7 +61,7 @@ export async function fetchProductsByPantryId(pantryId: number) {
     }
 }
 
-export async function reduceItemQuantity(pantryId: number, ingredientId: number, quantityToReduce: number) {
+export async function reduceProductQuantity(pantryId: number, ingredientId: number, quantityToReduce: number) {
     try {
         const response = await api.post(`/pantry/${pantryId}/reduce-quantity`, null, {
             params: { ingredientId, quantityToReduce },
@@ -73,7 +73,7 @@ export async function reduceItemQuantity(pantryId: number, ingredientId: number,
     }
 }
 
-export const fetchLowQuantityItems = async (pantryId: number, threshold: number = 5) => {
+export const fetchLowQuantityProducts = async (pantryId: number, threshold: number = 5) => {
     try {
         const response = await api.get(`/pantry/${pantryId}/low-quantity`, {
             params: { threshold },

@@ -1,15 +1,14 @@
 import { api } from "../api/apiConfig";
-import { Ingredient } from "../ingredients/ingredientsService";
 import { Product } from "../product/productService";
 
-export interface ShoppingCartItemInsert {
+export interface ShoppingCartProductInsert {
     productId: number
     plannedQuantity?: number;
     cartQuantity: number;
     price: number;
 }
 
-export interface ShoppingCartItem {
+export interface ShoppingCartProduct {
     id: number;
     product: Product
     plannedQuantity?: number;
@@ -21,7 +20,7 @@ export interface ShoppingCartItem {
 export interface ShoppingCart {
     id?: number;
     pantryId?: number;
-    items: ShoppingCartItem[];
+    products: ShoppingCartProduct[];
     createdAt?: string;
 }
 
@@ -52,40 +51,40 @@ export const loadCartFromShoppingList = async (pantryId: number): Promise<Shoppi
 };
 
 /**
- * Adiciona um item ao carrinho de compras.
+ * Adiciona um product ao carrinho de compras.
  */
-export const addItemToShoppingCart = async (pantryId: number, items: ShoppingCartItemInsert[]): Promise<ShoppingCart> => {
+export const addProductToShoppingCart = async (pantryId: number, products: ShoppingCartProductInsert[]): Promise<ShoppingCart> => {
     try {
-        const response = await api.post(`/pantries/${pantryId}/shopping-cart/items`, items);
+        const response = await api.post(`/pantries/${pantryId}/shopping-cart/products`, products);
         return response.data;
     } catch (error) {
-        console.error('Erro ao adicionar item ao carrinho:', error);
+        console.error('Erro ao adicionar product ao carrinho:', error);
         throw error;
     }
 };
 
 /**
- * Atualiza um item do carrinho de compras.
+ * Atualiza um product do carrinho de compras.
  */
-export const updateShoppingCartItem = async (pantryId: number, itemId: number, item: ShoppingCartItem): Promise<ShoppingCart> => {
+export const updateShoppingCartProduct = async (pantryId: number, productId: number, product: ShoppingCartProduct): Promise<ShoppingCart> => {
     try {
-        const response = await api.put(`/pantries/${pantryId}/shopping-cart/items/${itemId}`, item);
+        const response = await api.put(`/pantries/${pantryId}/shopping-cart/products/${productId}`, product);
         return response.data;
     } catch (error) {
-        console.error('Erro ao atualizar item do carrinho:', error);
+        console.error('Erro ao atualizar product do carrinho:', error);
         throw error;
     }
 };
 
 /**
- * Remove um item do carrinho de compras.
+ * Remove um product do carrinho de compras.
  */
-export const removeShoppingCartItem = async (pantryId: number, itemId: number): Promise<ShoppingCart> => {
+export const removeShoppingCartProduct = async (pantryId: number, productId: number): Promise<ShoppingCart> => {
     try {
-        const response = await api.delete(`/pantries/${pantryId}/shopping-cart/items/${itemId}`);
+        const response = await api.delete(`/pantries/${pantryId}/shopping-cart/products/${productId}`);
         return response.data;
     } catch (error) {
-        console.error('Erro ao remover item do carrinho:', error);
+        console.error('Erro ao remover product do carrinho:', error);
         throw error;
     }
 };

@@ -5,12 +5,12 @@ import { useShoppingCart } from "../../../hooks/useShoppingCart";
 import ShoppingCartTable from "../../../components/Pantry/ShoppingCart/ShoppingCartTable";
 import { usePantryDetail } from "../../../hooks/pentry/usePantryDetail";
 import { FaPlus } from "react-icons/fa";
-import ItemSelectionModal from "../../../components/ShoppingListItem/ItemSelectionModal/ItemSelectionModal";
+import ProductSelectionModal from "../../../components/ShoppingListProduct/ProductSelectionModal/ProductSelectionModal";
 
 const ShoppingCart: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const pantryId = id ? parseInt(id) : 0;
-    const { cart, loading, error, handleUpdateCartItem, handleRemoveCartItem, handleFinalizePurchase, handleAddToCart } = useShoppingCart(pantryId);
+    const { cart, loading, error, handleUpdateCartProduct, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart(pantryId);
     const { state } = usePantryDetail()
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -27,20 +27,20 @@ const ShoppingCart: React.FC = () => {
         <div className="shopping-cart-container">
             <h2>Carrinho de Compras</h2>
 
-            {cart?.items?.length ? (
-                <div className="shopping-cart-items">
+            {cart?.products?.length ? (
+                <div className="shopping-cart-products">
                     <ShoppingCartTable
-                        items={cart?.items}
-                        onUpdateItem={handleUpdateCartItem}
-                        onRemoveItem={handleRemoveCartItem}
-                        onAddItems={handleAddToCart}
-                        availableItems={state.availableItems}
+                        products={cart?.products}
+                        onUpdateProduct={handleUpdateCartProduct}
+                        onRemoveProduct={handleRemoveCartProduct}
+                        onAddProducts={handleAddToCart}
+                        availableProducts={state.availableProducts}
                     />
                 </div>
             ) : (
                 <>
                     <p className="empty-cart">O carrinho está vazio. Adicione itens abaixo:</p>
-                    <button className="add-items-button" onClick={() => setIsModalOpen(true)}>
+                    <button className="add-products-button" onClick={() => setIsModalOpen(true)}>
                         <FaPlus /> Adicionar Itens
                     </button>
                 </>
@@ -48,15 +48,15 @@ const ShoppingCart: React.FC = () => {
             }
 
             {isModalOpen && (
-                <ItemSelectionModal
-                    availableItems={state.availableItems}
+                <ProductSelectionModal
+                    availableProducts={state.availableProducts}
                     onClose={() => setIsModalOpen(false)}
                     onConfirm={handleAddToCart}
                 />
             )}
 
             {
-                (cart?.items?.length ?? 0) > 0 && (
+                (cart?.products?.length ?? 0) > 0 && (
                     <button className="finalize-button" onClick={handleFinalizePurchase}>
                         Finalizar Compra
                     </button>

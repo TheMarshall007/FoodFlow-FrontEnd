@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { Product } from "../../services/product/productService";
 import "../../styles/components/Product/ProductCard.css";
-import { ShoppingListItemInsert } from "../../services/shopping/shoppingListService";
+import { ShoppingListProductInsert } from "../../services/shopping/shoppingListService";
 
 const ProductCard: React.FC<{
     product: Product;
-    handleAddItemToShoppingList: (item: ShoppingListItemInsert) => void;
+    handleAddProductToShoppingList: (product: ShoppingListProductInsert) => void;
     onUpdateQuantity: (productId: number, newQuantity: number) => void;
-    onRemoveItem: (productId: number) => void;
+    onRemoveProduct: (productId: number) => void;
     initialQuantity: number;
-    shoppingListItemId: number;
-}> = ({ product, handleAddItemToShoppingList, initialQuantity, shoppingListItemId, onUpdateQuantity, onRemoveItem }) => {
+    shoppingListProductId: number;
+}> = ({ product, handleAddProductToShoppingList, initialQuantity, shoppingListProductId, onUpdateQuantity, onRemoveProduct }) => {
     const [quantity, setQuantity] = useState(initialQuantity);
 
     
@@ -20,13 +20,13 @@ const ProductCard: React.FC<{
 
     const handleAddProduct = () => {
         setQuantity(1);
-        handleAddItemToShoppingList({ productId: product.id, quantity: 1 });
+        handleAddProductToShoppingList({ productId: product.id, quantity: 1 });
     };
 
     const handleIncrease = () => {
         const newQuantity = quantity + 1;
         setQuantity(newQuantity);
-        onUpdateQuantity(shoppingListItemId, newQuantity);
+        onUpdateQuantity(product.id, newQuantity);
     };
 
     const handleDecrease = () => {
@@ -34,7 +34,7 @@ const ProductCard: React.FC<{
         const newQuantity = Math.max(quantity - 1, 0);
         setQuantity(newQuantity);
         if (newQuantity === 0) {
-            onRemoveItem(shoppingListItemId);
+            onRemoveProduct(shoppingListProductId);
         } else {
             onUpdateQuantity(product.id, newQuantity);
         }
@@ -52,7 +52,7 @@ const ProductCard: React.FC<{
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 if (value === 0) {
-                    onRemoveItem(shoppingListItemId);
+                    onRemoveProduct(shoppingListProductId);
                 } else {
                     onUpdateQuantity(product.id, value);
                 }

@@ -22,7 +22,7 @@
     transition: color 0.3s;
 }
 
-.navbar-item:hover {
+.navbar-product:hover {
     color: #ffd700;
 }
 

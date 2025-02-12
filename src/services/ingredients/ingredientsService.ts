@@ -6,10 +6,10 @@ interface IngredientSearchProps {
 
 export interface IngredientInsertProps {
     pantryId: number;
-    items: Items[];
+    items: Products[];
 }
 
-export interface Items {
+export interface Products {
     id: number;
     quantity: number;
 }

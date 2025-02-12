@@ -1,17 +1,17 @@
 import { useEffect, useReducer, useRef } from "react";
 import {
   fetchShoppingCart,
-  updateShoppingCartItem,
-  removeShoppingCartItem,
+  updateShoppingCartProduct,
+  removeShoppingCartProduct,
   finalizePurchase,
   ShoppingCart,
-  ShoppingCartItem,
-  addItemToShoppingCart,
+  ShoppingCartProduct,
+  addProductToShoppingCart,
   loadCartFromShoppingList,
-  ShoppingCartItemInsert,
+  ShoppingCartProductInsert,
 } from "../services/shopping/shoppingCartService";
 import { useUser } from "../context/UserContext";
-import { ShoppingListItem } from "../services/shopping/shoppingListService";
+import { ShoppingListProduct } from "../services/shopping/shoppingListService";
 
 // 1. Definindo o tipo do estado
 type ShoppingCartState = {
@@ -29,8 +29,8 @@ const initialState: ShoppingCartState = {
 // 2. Definindo o tipo de ação do reducer
 type ShoppingCartAction =
   | { type: "SET_CART"; payload: ShoppingCart }
-  | { type: "ADD_ITEM"; payload: ShoppingCartItem }
-  | { type: "UPDATE_ITEM"; payload: ShoppingCartItem }
+  | { type: "ADD_ITEM"; payload: ShoppingCartProduct }
+  | { type: "UPDATE_ITEM"; payload: ShoppingCartProduct }
   | { type: "REMOVE_ITEM"; payload: number }
   | { type: "FINALIZE_PURCHASE" }
   | { type: "SET_LOADING"; payload: boolean }
@@ -46,7 +46,7 @@ const shoppingCartReducer = (
       return { ...state, cart: action.payload, loading: false, error: null };
     case "ADD_ITEM":
       return state.cart
-        ? { ...state, cart: { ...state.cart, items: [...state.cart.items, action.payload] } }
+        ? { ...state, cart: { ...state.cart, products: [...state.cart.products, action.payload] } }
         : state;
     case "UPDATE_ITEM":
       return state.cart
@@ -54,8 +54,8 @@ const shoppingCartReducer = (
           ...state,
           cart: {
             ...state.cart,
-            items: state.cart.items.map((item) =>
-              item.product.id === action.payload.product.id ? action.payload : item
+            products: state.cart.products.map((product) =>
+              product.product.id === action.payload.product.id ? action.payload : product
             ),
           },
         }
@@ -64,12 +64,12 @@ const shoppingCartReducer = (
       return state.cart
         ? {
           ...state,
-          cart: { ...state.cart, items: state.cart.items.filter((item) => item.product.id !== action.payload) },
+          cart: { ...state.cart, products: state.cart.products.filter((product) => product.product.id !== action.payload) },
         }
         : state;
     case "FINALIZE_PURCHASE":
       return state.cart
-        ? { ...state, cart: { ...state.cart, items: [] } }
+        ? { ...state, cart: { ...state.cart, products: [] } }
         : state;
     case "SET_LOADING":
       return { ...state, loading: action.payload };
@@ -101,9 +101,9 @@ export const useShoppingCart = (pantryId: number) => {
           // Recalcula o valor unitário de todos os itens do carrinho antes de armazená-los no estado
           const updatedCartWithUnitPrice = {
             ...cart,
-            items: cart.items.map((item) => ({
-              ...item,
-              unityPrice: item.cartQuantity > 0 ? item.price / item.cartQuantity : 0 // Evita divisão por zero
+            products: cart.products.map((product) => ({
+              ...product,
+              unityPrice: product.cartQuantity > 0 ? product.price / product.cartQuantity : 0 // Evita divisão por zero
             }))
           };
 
@@ -121,18 +121,18 @@ export const useShoppingCart = (pantryId: number) => {
 
 
 
-  const handleAddToCart = async (data: ShoppingListItem[]) => {
+  const handleAddToCart = async (data: ShoppingListProduct[]) => {
     try {
-      // Converte ShoppingListItem[] para ShoppingCartItem[]
-      const cartItems: ShoppingCartItemInsert[] = data.map((item) => ({
-        productId: item.productId,
+      // Converte ShoppingListProduct[] para ShoppingCartProduct[]
+      const cartProducts: ShoppingCartProductInsert[] = data.map((product) => ({
+        productId: product.productId,
         plannedQuantity: 0,
-        cartQuantity: item.quantity,
+        cartQuantity: product.quantity,
         price: 0
       }));
 
       // Envia os itens convertidos para o backend
-      const updatedCart = await addItemToShoppingCart(pantryId, cartItems);
+      const updatedCart = await addProductToShoppingCart(pantryId, cartProducts);
       dispatch({ type: "SET_CART", payload: updatedCart });
     } catch (error: unknown) {
       console.error("Erro ao adicionar itens ao carrinho:", error);
@@ -142,33 +142,33 @@ export const useShoppingCart = (pantryId: number) => {
   };
 
 
-  const handleUpdateCartItem = async (data: ShoppingCartItem) => {
+  const handleUpdateCartProduct = async (data: ShoppingCartProduct) => {
     try {
-      const updatedCart = await updateShoppingCartItem(pantryId, data.id, data);
+      const updatedCart = await updateShoppingCartProduct(pantryId, data.id, data);
 
       const updatedCartWithUnitPrice = {
         ...updatedCart,
-        items: updatedCart.items.map(item => ({
-          ...item,
-          unityPrice: item.cartQuantity > 0 ? item.price / item.cartQuantity : 0 // Evita divisão por zero
+        products: updatedCart.products.map(product => ({
+          ...product,
+          unityPrice: product.cartQuantity > 0 ? product.price / product.cartQuantity : 0 // Evita divisão por zero
         }))
       };
 
       dispatch({ type: "SET_CART", payload: updatedCartWithUnitPrice });
     } catch (error: unknown) {
-      console.error("Erro ao atualizar item:", error);
+      console.error("Erro ao atualizar product:", error);
       const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
       dispatch({ type: "SET_ERROR", payload: errorMessage });
     }
   };
 
 
-  const handleRemoveCartItem = async (cartItemId: number) => {
+  const handleRemoveCartProduct = async (cartProductId: number) => {
     try {
-      await removeShoppingCartItem(pantryId, cartItemId);
-      dispatch({ type: "REMOVE_ITEM", payload: cartItemId });
+      await removeShoppingCartProduct(pantryId, cartProductId);
+      dispatch({ type: "REMOVE_ITEM", payload: cartProductId });
     } catch (error: unknown) {
-      console.error("Erro ao remover item:", error);
+      console.error("Erro ao remover product:", error);
       const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
       dispatch({ type: "SET_ERROR", payload: errorMessage });
     }
@@ -190,8 +190,8 @@ export const useShoppingCart = (pantryId: number) => {
     loading: state.loading,
     error: state.error,
     handleAddToCart,
-    handleUpdateCartItem,
-    handleRemoveCartItem,
+    handleUpdateCartProduct,
+    handleRemoveCartProduct,
     handleFinalizePurchase,
   };
 };

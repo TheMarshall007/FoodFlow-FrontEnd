@@ -11,7 +11,7 @@ import loginBackground from './assets/fotos/food-background.jpg';
 import suggestionBackground from './assets/fotos/food-background.jpg';
 import pantryBackground from './assets/fotos/food-background.jpg';
 
-import LowQuantityItems from './components/Pantry/LowQuantityItems';
+import LowQuantityProducts from './components/Pantry/LowQuantityProducts';
 import { UserProvider } from './context/UserContext';
 import PantryPage from './pages/Pantry/Pantries';
 import PlanDay from './pages/PlanDay/PlanDay';
@@ -24,7 +24,6 @@ import ProtectedRoute from './Router/ProtectedRoute';
 import AdminDishes from './pages/Dish/AdminDishes';
 import Products from './pages/Products/Products';
 
-// Componente que gerencia a imagem de fundo
 function AppContent() {
   const location = useLocation();
   const [backgroundImage, setBackgroundImage] = useState(homeBackground);
@@ -56,7 +55,10 @@ function AppContent() {
         className="background-blur"
         style={{ backgroundImage: `url(${backgroundImage})` }}
       />
-      <Navbar />
+      
+      {/* 🔥 Esconde a Navbar na tela de Login */}
+      {location.pathname !== '/' && <Navbar />}
+
       <div className="content">
         <Routes>
           <Route path="/" element={<Login />} />
@@ -67,18 +69,19 @@ function AppContent() {
           <Route path="/suggestion" element={<Suggestion />} />
           <Route path="/pantries" element={<PantryPage />} />
           <Route path="/pantry/:id" element={<PantryDetail />} />
-          <Route path="/pantry/:pantryId/low-quantity" element={<LowQuantityItems />} />
+          <Route path="/pantry/:pantryId/low-quantity" element={<LowQuantityProducts />} />
           <Route path="/shopping-cart/:id" element={<ShoppingCart />} />
-          <Route path="/products/:id?" element={<Products />} /> {/* Suporta pantryId opcional */}
+          <Route path="/products/:id?" element={<Products />} />
 
           <Route element={<ProtectedRoute />}>
-                    <Route path="/admin/dishes" element={<AdminDishes />} />
-                </Route>
+            <Route path="/admin/dishes" element={<AdminDishes />} />
+          </Route>
         </Routes>
       </div>
     </div>
   );
 }
+
 
 function App() {
   return (

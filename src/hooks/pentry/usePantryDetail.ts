@@ -1,8 +1,8 @@
 import { useEffect, useReducer, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
-import { fetchLowQuantityItems, fetchPantry, fetchProductsByPantryId, Pantry, PantryItem, reduceItemQuantity } from "../../services/pantry/pantryService";
-import { fetchShoppingList, updateItemQuantityInShoppingList, ShoppingListItem, removeItemFromShoppingList, ShoppingList, } from "../../services/shopping/shoppingListService";
+import { fetchLowQuantityProducts, fetchPantry, fetchProductsByPantryId, Pantry, PantryProduct, reduceProductQuantity } from "../../services/pantry/pantryService";
+import { fetchShoppingList, updateProductQuantityInShoppingList, ShoppingListProduct, removeProductFromShoppingList, ShoppingList, } from "../../services/shopping/shoppingListService";
 import { fetchShoppingCartHistory, ShoppingCartHistory } from "../../services/shopping/shoppingCartHistoryService";
 import { fetchProducts, fetchProductsByIds, Product } from "../../services/product/productService";
 import { updateShoppingListWithProductNames } from "../../utils/shoppingListUtils";
@@ -12,7 +12,7 @@ import { fetchVarietyByIds, Variety } from "../../services/variety/varietyServic
 export const initialState = {
     pantry: {} as Pantry,
     shoppingList: null as ShoppingList | null,
-    availableItems: [] as ShoppingListItem[],
+    availableProducts: [] as ShoppingListProduct[],
     productDetails: [] as Product[],
     varietyDetails: [] as Variety[],
     history: [] as ShoppingCartHistory[],
@@ -27,7 +27,7 @@ type Action =
     | { type: "SET_PRODUCT_DETAILS"; payload: Product[] }
     | { type: "SET_VARIETY_DETAILS"; payload: Variety[] }
     | { type: "SET_HISTORY"; payload: ShoppingCartHistory[] }
-    | { type: "UPDATE_PANTRY_ITEMS"; payload: PantryItem[] }
+    | { type: "UPDATE_PANTRY_ITEMS"; payload: PantryProduct[] }
     | { type: "TOGGLE_MODAL" }
     | { type: "SET_ACTIVE_TAB"; payload: "items" | "shoppingList" | "history" };
 
@@ -75,7 +75,7 @@ export const usePantryDetail = () => {
                 try {
                     // Buscar dados da despensa
                     const pantryData = await fetchPantry({ pantryId: parseInt(id), page: 0 });
-                    pantryData[0].lowQuantityItems = await fetchLowQuantityItems(parseInt(id));
+                    pantryData[0].lowQuantityProducts = await fetchLowQuantityProducts(parseInt(id));
                     pantryData[0].items = await fetchProductsByPantryId(parseInt(id));
                     dispatch({ type: "SET_PANTRY", payload: pantryData[0] });
 
@@ -112,20 +112,20 @@ export const usePantryDetail = () => {
     const handleUpdateQuantity = async (productId: number, newQuantity: number) => {
         if (id && user) {
             try {
-                const updatedShoppingList = await updateItemQuantityInShoppingList(parseInt(id), productId, newQuantity);
+                const updatedShoppingList = await updateProductQuantityInShoppingList(parseInt(id), productId, newQuantity);
                 const updatedShoppingListWithNames = updateShoppingListWithProductNames(updatedShoppingList, state.productDetails, state.varietyDetails);
                 dispatch({ type: "SET_SHOPPING_LIST", payload: updatedShoppingListWithNames });
             } catch (error) {
-                console.error("Erro ao atualizar a quantidade do item:", error);
+                console.error("Erro ao atualizar a quantidade do product:", error);
                 alert("Erro ao atualizar a quantidade. Tente novamente.");
             }
         }
     };
 
-    const handleRemoveItem = async (itemId: number) => {
+    const handleRemoveProduct = async (itemId: number) => {
         if (id && user) {
             try {
-                const updatedShoppingList = await removeItemFromShoppingList(parseInt(id), itemId);
+                const updatedShoppingList = await removeProductFromShoppingList(parseInt(id), itemId);
                 const updatedShoppingListWithNames = updateShoppingListWithProductNames(updatedShoppingList, state.productDetails, state.varietyDetails);
                 dispatch({ type: 'SET_SHOPPING_LIST', payload: updatedShoppingListWithNames });
             } catch (error) {
@@ -137,13 +137,13 @@ export const usePantryDetail = () => {
 
     const handleReduceQuantity = async (pantryId: number, productId: number, quantityToReduce: number) => {
         try {
-            const updatedItems = await reduceItemQuantity(pantryId, productId, quantityToReduce);
-            dispatch({ type: "UPDATE_PANTRY_ITEMS", payload: updatedItems.items, });
+            const updatedProducts = await reduceProductQuantity(pantryId, productId, quantityToReduce);
+            dispatch({ type: "UPDATE_PANTRY_ITEMS", payload: updatedProducts.items, });
         } catch (error) {
-            console.error("Erro ao reduzir a quantidade do item:", error);
+            console.error("Erro ao reduzir a quantidade do product:", error);
         }
     };
 
 
-    return { state, dispatch, handleUpdateQuantity, handleRemoveItem, handleReduceQuantity };
+    return { state, dispatch, handleUpdateQuantity, handleRemoveProduct, handleReduceQuantity };
 };

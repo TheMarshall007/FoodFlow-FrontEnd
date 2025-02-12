@@ -1,4 +1,4 @@
-.shopping-cart-item-card {
+.shopping-cart-product-card {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -10,31 +10,31 @@
     transition: transform 0.2s;
 }
 
-.shopping-cart-item-card:hover {
+.shopping-cart-product-card:hover {
     transform: translateY(-5px);
 }
 
-.item-name {
+.product-name {
     font-size: 1.2rem;
     font-weight: bold;
     color: #495057;
     margin-bottom: 10px;
 }
 
-.item-controls {
+.product-controls {
     display: flex;
     flex-direction: column;
     margin-bottom: 10px;
     width: 100%;
 }
 
-.item-controls label {
+.product-controls label {
     font-size: 0.9rem;
     color: #6c757d;
     margin-bottom: 5px;
 }
 
-.item-controls input {
+.product-controls input {
     width: 100%;
     padding: 5px;
     font-size: 1rem;
@@ -44,7 +44,7 @@
     transition: border-color 0.3s;
 }
 
-.item-controls input:focus {
+.product-controls input:focus {
     border-color: #80bdff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }

@@ -10,7 +10,7 @@ export const updateShoppingListWithProductNames = (
     products: Product[],
     varieties: Variety[]
 ): ShoppingList => {
-    const updatedItems = shoppingList.items.map((item) => {
+    const updatedProducts = shoppingList.items.map((item) => {
         // Buscar o produto correspondente
         const product = products.find((product) => product.id === item.productId);
 
@@ -23,6 +23,6 @@ export const updateShoppingListWithProductNames = (
         };
     });
 
-    return { ...shoppingList, items: updatedItems };
+    return { ...shoppingList, items: updatedProducts };
 };
 

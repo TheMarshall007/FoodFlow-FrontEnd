@@ -1,12 +1,11 @@
 import React from "react";
 import { usePantryDetail } from "../../hooks/pentry/usePantryDetail";
 import { useNavigate } from "react-router-dom";
-import ItemSelectionModal from "../../components/ShoppingListItem/ItemSelectionModal/ItemSelectionModal";
-import ShoppingListItemCard from "../../components/ShoppingListItem/ShoppingListItemCard";
+import ShoppingListProductCard from "../../components/ShoppingListProduct/ShoppingListProductCard";
 import "../../styles/pages/Pantry/PantryDetail.css";
 
 const PantryDetail: React.FC = () => {
-    const { state, dispatch, handleUpdateQuantity, handleRemoveItem, handleReduceQuantity } = usePantryDetail();
+    const { state, dispatch, handleUpdateQuantity, handleRemoveProduct, handleReduceQuantity } = usePantryDetail();
     const navigate = useNavigate(); // Hook para navegação
     if (!state.pantry) {
         return <p>Carregando ou despensa não encontrada...</p>;
@@ -19,7 +18,7 @@ const PantryDetail: React.FC = () => {
                 <div className="pantry-info">
                     <h2>{state.pantry?.propertyName}</h2>
                     <p>{state.pantry?.sharedWith?.length ?? 0} Menu vinculado</p>
-                    <p className="low-quantity-text">{state.pantry?.lowQuantityItems?.length} itens quase acabando</p>
+                    <p className="low-quantity-text">{state.pantry?.lowQuantityProducts?.length} itens quase acabando</p>
                 </div>
                 <button className="back-button" onClick={() => navigate("/pantries")}>Voltar</button>
 
@@ -40,28 +39,28 @@ const PantryDetail: React.FC = () => {
 
             {/* Conteúdo das abas */}
             <div className="tab-content">
-                {/* Pantry Items */}
+                {/* Pantry Products */}
                 {state.activeTab === "items" &&
                     < div className="tab-items">
                         <div className="items-grid">
                             {state.pantry?.items?.slice()
                                 .sort((a, b) => a.id - b.id)
                                 .map((item) => {
-                                    const isLowQuantity = state.pantry.lowQuantityItems?.some(lowItem => lowItem.id === item.id);
+                                    const isLowQuantity = state.pantry.lowQuantityProducts?.some(lowProduct => lowProduct.id === item.id);
                                     return (
                                         <div
                                             key={item.id}
-                                            className={`item-card ${isLowQuantity ? "low-quantity" : ""}`} // Adiciona uma classe condicional
+                                            className={`product-card ${isLowQuantity ? "low-quantity" : ""}`} // Adiciona uma classe condicional
                                         >
                                             <img
                                                 src={item.ingredient?.image || "/assets/fotos/default-item.png"}
                                                 alt={item.ingredient?.name}
-                                                className="item-card-image"
+                                                className="product-card-image"
                                             />
-                                            <div className="item-card-info">
+                                            <div className="product-card-info">
                                                 <h4>{item.ingredient?.name}</h4>
                                                 <p>Quantidade: {item.quantity}</p>
-                                                <div className="item-quantity-control">
+                                                <div className="product-quantity-control">
                                                     <button
                                                         className="quantity-button"
                                                         onClick={() => handleReduceQuantity(state.pantry.id, item.ingredient.id, 1)}
@@ -104,11 +103,11 @@ const PantryDetail: React.FC = () => {
                                 .slice()
                                 .sort((a, b) => a.productId - b.productId)
                                 .map((item) => (
-                                    <ShoppingListItemCard
+                                    <ShoppingListProductCard
                                         key={item.id}
-                                        item={item}
+                                        product={item}
                                         onUpdateQuantity={handleUpdateQuantity}
-                                        onRemoveItem={handleRemoveItem}
+                                        onRemoveProduct={handleRemoveProduct}
                                     />))}
                         </div>
 

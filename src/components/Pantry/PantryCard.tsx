@@ -20,12 +20,12 @@ const PantryCard: React.FC<PantryCardProps> = ({ pant, onClick }) => {
                     return <img className='property-profile-image' src={user?.picture || require('../../assets/fotos/user-icon.png')} />
                 })}
             </div>
-            {pant?.lowQuantityItems?.length === 0 ?
+            {pant?.lowQuantityProducts?.length === 0 ?
                 <p>Dispensa vazia</p>
                 :
-                pant?.lowQuantityItems?.length > 0 ? (
+                pant?.lowQuantityProducts?.length > 0 ? (
                     <p>
-                        <span className="low-items-count">{pant?.lowQuantityItems?.length}</span> itens quase acabando
+                        <span className="low-items-count">{pant?.lowQuantityProducts?.length}</span> itens quase acabando
                     </p>
                 ) : (
                     <p>Dispensa cheia</p>

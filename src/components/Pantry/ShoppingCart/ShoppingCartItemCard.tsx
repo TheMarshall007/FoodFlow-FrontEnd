@@ -1,34 +1,34 @@
 import React, { useState } from "react";
 import { FaTrash } from "react-icons/fa";
-import "../../../styles/components/Shopping/ShoppingCartItemCard.css"
-import { ShoppingCartItem } from "../../../services/shopping/shoppingCartService";
-interface ShoppingCartItemCardProps {
-    item: ShoppingCartItem;
-    onUpdateQuantity: (data: ShoppingCartItem) => void;
-    onRemoveItem: (itemId: number) => void;
+import "../../../styles/components/Shopping/ShoppingCartProductCard.css"
+import { ShoppingCartProduct } from "../../../services/shopping/shoppingCartService";
+interface ShoppingCartProductCardProps {
+    product: ShoppingCartProduct;
+    onUpdateQuantity: (data: ShoppingCartProduct) => void;
+    onRemoveProduct: (productId: number) => void;
 }
 
-const ShoppingCartItemCard: React.FC<ShoppingCartItemCardProps> = ({ item, onUpdateQuantity, onRemoveItem }) => {
-    const [cartQuantity, setCartQuantity] = useState(item.cartQuantity);
-    const [price, setPrice] = useState(item.price);
+const ShoppingCartProductCard: React.FC<ShoppingCartProductCardProps> = ({ product, onUpdateQuantity, onRemoveProduct }) => {
+    const [cartQuantity, setCartQuantity] = useState(product.cartQuantity);
+    const [price, setPrice] = useState(product.price);
 
     const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
         setCartQuantity(newQuantity);
-        onUpdateQuantity({ id: item.id, product: item.product, cartQuantity: newQuantity, price });
+        onUpdateQuantity({ id: product.id, product: product.product, cartQuantity: newQuantity, price });
     };
 
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newPrice = parseFloat(e.target.value) || 0;
         setPrice(newPrice);
-        onUpdateQuantity({ id: item.id, product: item.product, cartQuantity, price: newPrice });
+        onUpdateQuantity({ id: product.id, product: product.product, cartQuantity, price: newPrice });
     };
 
     return (
-        <div className="shopping-cart-item-card">
-            <p className="item-name">{item.product.brand}</p>
+        <div className="shopping-cart-product-card">
+            <p className="product-name">{product.product.brand}</p>
 
-            <div className="item-controls">
+            <div className="product-controls">
                 <label>Quantidade:</label>
                 <input
                     type="number"
@@ -38,7 +38,7 @@ const ShoppingCartItemCard: React.FC<ShoppingCartItemCardProps> = ({ item, onUpd
                 />
             </div>
 
-            <div className="item-controls">
+            <div className="product-controls">
                 <label>Preço:</label>
                 <input
                     type="number"
@@ -48,11 +48,11 @@ const ShoppingCartItemCard: React.FC<ShoppingCartItemCardProps> = ({ item, onUpd
                 />
             </div>
 
-            <button className="remove-button" onClick={() => onRemoveItem(item.id)}>
+            <button className="remove-button" onClick={() => onRemoveProduct(product.id)}>
                 <FaTrash />
             </button>
         </div>
     );
 };
 
-export default ShoppingCartItemCard;
+export default ShoppingCartProductCard;
