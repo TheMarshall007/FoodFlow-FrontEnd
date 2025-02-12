@@ -13,7 +13,8 @@ export interface Product{
 interface Variety{
     id: number;
     name: string;
-    ingredient: Ingredient;
+    ingredientId:number;
+    ingredient?: Ingredient;
 }
 
 interface ProductDTOSearch{

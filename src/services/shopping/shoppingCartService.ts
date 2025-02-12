@@ -10,18 +10,20 @@ export interface ShoppingCartProductInsert {
 
 export interface ShoppingCartProduct {
     id: number;
-    productId: number;
-    product?: Product
-    plannedQuantity?: number;
-    cartQuantity: number;
-    unityPrice?: number;
-    price: number;
+    systemProductId?: number;
+    systemProduct: Product
+    plannedQuantity: number;
+    plannedUnit: String;
+    purchasedQuantity: number;
+    purchasedUnit: String;
+    unityPrice: number;
+    totalPrice: number;
 }
 
 export interface ShoppingCart {
     id?: number;
     pantryId?: number;
-    products: ShoppingCartProduct[];
+    cartProducts: ShoppingCartProduct[];
     createdAt?: string;
 }
 

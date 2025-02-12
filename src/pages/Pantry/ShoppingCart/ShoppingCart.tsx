@@ -13,7 +13,7 @@ const ShoppingCart: React.FC = () => {
     const { cart, loading, error, handleUpdateCartProduct, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart(pantryId);
     const { state } = usePantryDetail()
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    console.log("LOGG cart", cart)
     if (loading) {
         return <p>Carregando carrinho...</p>;
     }
@@ -27,10 +27,10 @@ const ShoppingCart: React.FC = () => {
         <div className="shopping-cart-container">
             <h2>Carrinho de Compras</h2>
 
-            {cart?.products?.length ? (
+            {cart?.cartProducts?.length ? (
                 <div className="shopping-cart-products">
                     <ShoppingCartTable
-                        products={cart?.products}
+                        products={cart.cartProducts}
                         onUpdateProduct={handleUpdateCartProduct}
                         onRemoveProduct={handleRemoveCartProduct}
                         onAddProducts={handleAddToCart}
@@ -56,7 +56,7 @@ const ShoppingCart: React.FC = () => {
             )}
 
             {
-                (cart?.products?.length ?? 0) > 0 && (
+                (cart?.cartProducts?.length ?? 0) > 0 && (
                     <button className="finalize-button" onClick={handleFinalizePurchase}>
                         Finalizar Compra
                     </button>

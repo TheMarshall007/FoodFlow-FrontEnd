@@ -12,7 +12,6 @@ const Products = () => {
     const { user } = useUser();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate(); // Hook para navegação
-console.log("LOGG", state)
 
     const shoppingListProducts = state.shoppingList.items.reduce((map, item) => {
         map[item.productId] = {

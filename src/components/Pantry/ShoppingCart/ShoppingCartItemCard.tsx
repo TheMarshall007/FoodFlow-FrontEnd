@@ -9,30 +9,48 @@ interface ShoppingCartProductCardProps {
 }
 
 const ShoppingCartProductCard: React.FC<ShoppingCartProductCardProps> = ({ product, onUpdateQuantity, onRemoveProduct }) => {
-    const [cartQuantity, setCartQuantity] = useState(product.cartQuantity);
-    const [price, setPrice] = useState(product.price);
+    const [purchasedQuantity, setCartQuantity] = useState(product.purchasedQuantity);
+    const [totalPrice, setPrice] = useState(product.totalPrice);
 
     const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
         setCartQuantity(newQuantity);
-        onUpdateQuantity({ id: product.id, product: product.product, cartQuantity: newQuantity, price });
+        onUpdateQuantity({
+            id: product.id, 
+            systemProduct: product.systemProduct, 
+            plannedQuantity: product.plannedQuantity,
+            plannedUnit: product.plannedUnit,
+            purchasedQuantity: newQuantity, 
+            purchasedUnit: product.purchasedUnit,
+            unityPrice: product.unityPrice,
+            totalPrice,
+        });
     };
 
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newPrice = parseFloat(e.target.value) || 0;
         setPrice(newPrice);
-        onUpdateQuantity({ id: product.id, product: product.product, cartQuantity, price: newPrice });
+        onUpdateQuantity({
+            id: product.id, 
+            systemProduct: product.systemProduct, 
+            plannedQuantity: product.plannedQuantity,
+            plannedUnit: product.plannedUnit,
+            purchasedQuantity: product.purchasedQuantity, 
+            purchasedUnit: product.purchasedUnit,
+            unityPrice: product.unityPrice,
+            totalPrice: newPrice,
+        });
     };
 
     return (
         <div className="shopping-cart-product-card">
-            <p className="product-name">{product.product.brand}</p>
+            <p className="product-name">{product.systemProduct.brand}</p>
 
             <div className="product-controls">
                 <label>Quantidade:</label>
                 <input
                     type="number"
-                    value={cartQuantity}
+                    value={purchasedQuantity}
                     onChange={handleQuantityChange}
                     min="0"
                 />
@@ -43,7 +61,7 @@ const ShoppingCartProductCard: React.FC<ShoppingCartProductCardProps> = ({ produ
                 <input
                     type="number"
                     step="0.01"
-                    value={price}
+                    value={totalPrice}
                     onChange={handlePriceChange}
                 />
             </div>

@@ -25,43 +25,43 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement>,
         product: ShoppingCartProduct,
-        field: "cartQuantity" | "price" | "unityPrice"
+        field: "purchasedQuantity" | "price" | "unityPrice"
     ) => {
         const newValue = parseFloat(e.target.value) || 0;
         let updatedProduct = { ...product };
-    
+
         switch (field) {
-            case "cartQuantity":
-                updatedProduct.cartQuantity = newValue;
+            case "purchasedQuantity":
+                updatedProduct.purchasedQuantity = newValue;
                 if (updatedProduct.unityPrice) {
-                    updatedProduct.price = updatedProduct.cartQuantity * updatedProduct.unityPrice;
-                } else if (updatedProduct.price) {
-                    updatedProduct.unityPrice = updatedProduct.price / updatedProduct.cartQuantity;
+                    updatedProduct.totalPrice = updatedProduct.purchasedQuantity * updatedProduct.unityPrice;
+                } else if (updatedProduct.totalPrice) {
+                    updatedProduct.unityPrice = updatedProduct.totalPrice / updatedProduct.purchasedQuantity;
                 }
                 break;
-    
+
             case "unityPrice":
                 updatedProduct.unityPrice = newValue;
-                if (updatedProduct.cartQuantity) {
-                    updatedProduct.price = updatedProduct.cartQuantity * updatedProduct.unityPrice;
+                if (updatedProduct.purchasedQuantity) {
+                    updatedProduct.totalPrice = updatedProduct.purchasedQuantity * updatedProduct.unityPrice;
                 }
                 break;
-    
+
             case "price":
-                updatedProduct.price = newValue;
-                if (updatedProduct.cartQuantity) {
-                    updatedProduct.unityPrice = updatedProduct.price / updatedProduct.cartQuantity;
+                updatedProduct.totalPrice = newValue;
+                if (updatedProduct.purchasedQuantity) {
+                    updatedProduct.unityPrice = updatedProduct.totalPrice / updatedProduct.purchasedQuantity;
                 }
                 break;
-    
+
             default:
                 break;
         }
-    
+
         // Chama a função para atualizar o item com os novos valores calculados
         onUpdateProduct(updatedProduct);
     };
-    
+
 
 
     return (
@@ -83,14 +83,17 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                         .sort((a, b) => a.id - b.id) // Ensure items are ordered by ID
                         .map((product) => (
                             <tr key={product.id}>
-                                <td>{product.product.brand}</td>
+                                <td>
+                                    {product?.systemProduct?.variety?.name ?? "Produto Desconhecido"}
+                                    ({product?.systemProduct?.brand ?? "Marca Desconhecida"})
+                                </td>
                                 <td>{product.plannedQuantity}</td>
                                 <td>
                                     <input
                                         type="number"
-                                        value={product.cartQuantity}
+                                        value={product.purchasedQuantity}
                                         onChange={(e) =>
-                                            handleInputChange(e, product, "cartQuantity")
+                                            handleInputChange(e, product, "purchasedQuantity")
                                         }
                                         min="0"
                                     />
@@ -108,7 +111,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                 <td>
                                     <input
                                         type="number"
-                                        value={product.price}
+                                        value={product.totalPrice}
                                         onChange={(e) =>
                                             handleInputChange(e, product, "price")
                                         }

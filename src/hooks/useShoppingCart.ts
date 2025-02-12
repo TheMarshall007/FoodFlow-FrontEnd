@@ -1,6 +1,5 @@
 import { useEffect, useReducer, useRef } from "react";
 import {
-  fetchShoppingCart,
   updateShoppingCartProduct,
   removeShoppingCartProduct,
   finalizePurchase,
@@ -14,7 +13,7 @@ import { useUser } from "../context/UserContext";
 import { ShoppingListProduct } from "../services/shopping/shoppingListService";
 import { fetchProductsByIds, Product } from "../services/product/productService";
 import { fetchVarietyByIds, Variety } from "../services/variety/varietyService";
-import { updateShoppingListWithProductNames } from "../utils/shoppingListUtils";
+import { fetchIngredientsByIds, Ingredient } from "../services/ingredients/ingredientsService";
 
 // 1. Definindo o tipo do estado
 type ShoppingCartState = {
@@ -49,7 +48,7 @@ const shoppingCartReducer = (
       return { ...state, cart: action.payload, loading: false, error: null };
     case "ADD_ITEM":
       return state.cart
-        ? { ...state, cart: { ...state.cart, products: [...state.cart.products, action.payload] } }
+        ? { ...state, cart: { ...state.cart, cartProducts: [...state.cart.cartProducts, action.payload] } }
         : state;
     case "UPDATE_ITEM":
       return state.cart
@@ -57,8 +56,8 @@ const shoppingCartReducer = (
           ...state,
           cart: {
             ...state.cart,
-            products: state.cart.products.map((product) =>
-              product.product.id === action.payload.product.id ? action.payload : product
+            cartProducts: state.cart.cartProducts.map((product) =>
+              product.systemProduct.id === action.payload.systemProduct.id ? action.payload : product
             ),
           },
         }
@@ -67,12 +66,12 @@ const shoppingCartReducer = (
       return state.cart
         ? {
           ...state,
-          cart: { ...state.cart, products: state.cart.products.filter((product) => product?.product?.id !== action.payload) },
+          cart: { ...state.cart, cartProducts: state.cart.cartProducts.filter((product) => product?.systemProduct?.id !== action.payload) },
         }
         : state;
     case "FINALIZE_PURCHASE":
       return state.cart
-        ? { ...state, cart: { ...state.cart, products: [] } }
+        ? { ...state, cart: { ...state.cart, cartProducts: [] } }
         : state;
     case "SET_LOADING":
       return { ...state, loading: action.payload };
@@ -92,21 +91,43 @@ export const useShoppingCart = (pantryId: number) => {
   );
   const hasFetched = useRef(false); // Controle de execução
 
-  const fetchProductsAndVarietiesByIds = async (productIds: number[]) => {
+  const fetchProductsWithDetailsByIds = async (productIds: number[]) => {
     let products: Product[] = [];
     let varieties: Variety[] = [];
+    let ingredients: Ingredient[] = [];
 
     if (productIds.length > 0) {
-      products = await fetchProductsByIds(productIds);
+        products = await fetchProductsByIds(productIds);
 
-      const varietyIds = products.map((product) => product.varietyId).filter((id) => id !== null);
-      if (varietyIds.length > 0) {
-        varieties = await fetchVarietyByIds(varietyIds);
-      }
+        // Buscar as variedades associadas aos produtos
+        const varietyIds = products.map((product) => product.varietyId).filter((id): id is number => id !== null);
+        if (varietyIds.length > 0) {
+            varieties = await fetchVarietyByIds(varietyIds);
+
+            // Buscar os ingredientes associados às variedades
+            const ingredientIds = varieties.map((variety) => variety.ingredientId);
+            if (ingredientIds.length > 0) {
+                ingredients = await fetchIngredientsByIds(ingredientIds);
+            }
+
+            // Mapear variedades e associar ingredientes corretamente
+            varieties = varieties.map((variety) => ({
+                ...variety,
+                ingredient: ingredients.find((ingredient) => ingredient.id === variety.ingredientId) ?? {} as Ingredient
+            }));
+        }
+
+        // Mapear produtos e associar variedades corretamente
+        products = products.map((product) => ({
+            ...product,
+            variety: varieties.find((variety) => variety.id === product.varietyId) ?? {} as Variety
+        }));
     }
 
-    return { products, varieties };
-  };
+    return products; // Agora já retorna os produtos prontos com variedades e ingredientes
+};
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -114,34 +135,22 @@ export const useShoppingCart = (pantryId: number) => {
         hasFetched.current = true; // Marca como executado
         try {
           const cart = await loadCartFromShoppingList(pantryId)
-          const productIds = cart.products.map((item) => item.productId);
-          let products: Product[] = [];
-          let varieties: Variety[] = [];
+          console.log("LOGG cart", cart)
+          const productIds: number[] = cart.cartProducts.map((item) => item.systemProductId ?? 0);
+          const productsWithDetails = await fetchProductsWithDetailsByIds(productIds);
 
-          if (productIds.length > 0) {
-            ({ products, varieties } = await fetchProductsAndVarietiesByIds(productIds));
-          }          // Recalcula o valor unitário de todos os itens do carrinho antes de armazená-los no estado
+          const updatedProducts = cart.cartProducts.map((item) => ({
+            ...item,
+            systemProduct: productsWithDetails.find((product) => product.id === item.systemProductId) || {} as Product
+          }));
 
-          const updatedProducts = cart.products.map((item) => {
-            // Buscar o produto correspondente
-            const product = products.find((product) => product.id === item.productId);
-        
-            // Buscar a variedade correspondente ao produto
-            const variety = varieties.find((variety) => variety.id === product?.varietyId);
-        
-            return {
-                ...item,
-                name: product ? `${variety?.name} (${product.brand || "Variedade Desconhecida"})` : "Produto Desconhecido",
-                unityPrice: item.cartQuantity > 0 ? item.price / item.cartQuantity : 0 // Evita divisão por zero
-            };
-        });
-        
-        const updatedCartWithUnitPrice = {
+          const updatedCartWithUnitPrice: ShoppingCart = {
             ...cart,
-            products: updatedProducts
-        };
-        
+            cartProducts: updatedProducts
+          };
+
           dispatch({ type: "SET_CART", payload: updatedCartWithUnitPrice });
+
         }
         catch (error) {
           const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
@@ -182,9 +191,9 @@ export const useShoppingCart = (pantryId: number) => {
 
       const updatedCartWithUnitPrice = {
         ...updatedCart,
-        products: updatedCart.products.map(product => ({
+        products: updatedCart.cartProducts.map(product => ({
           ...product,
-          unityPrice: product.cartQuantity > 0 ? product.price / product.cartQuantity : 0 // Evita divisão por zero
+          unityPrice: product.purchasedQuantity > 0 ? product.totalPrice / product.purchasedQuantity : 0 // Evita divisão por zero
         }))
       };
 
