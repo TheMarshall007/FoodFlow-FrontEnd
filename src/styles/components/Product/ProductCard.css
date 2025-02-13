@@ -8,7 +8,7 @@
     transition: transform 0.2s ease-in-out;
 }
 
-.product-card.added {
+.product-card.selected {
     background: #d4edda;
     border-color: #28a745;
 }

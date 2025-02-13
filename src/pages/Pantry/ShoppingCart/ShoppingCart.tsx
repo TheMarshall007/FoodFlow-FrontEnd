@@ -8,10 +8,8 @@ import { FaPlus } from "react-icons/fa";
 import ProductSelectionModal from "../../../components/ShoppingListProduct/ProductSelectionModal/ProductSelectionModal";
 
 const ShoppingCart: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const pantryId = id ? parseInt(id) : 0;
-    const { cart, loading, error, handleUpdateCartProduct, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart(pantryId);
-    const { state } = usePantryDetail(pantryId)
+    const { cart, loading, error, handleUpdateCartProduct, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart();
+    const { state } = usePantryDetail()
     const [isModalOpen, setIsModalOpen] = useState(false);
     console.log("LOGG cart", cart)
     if (loading) {

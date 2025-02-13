@@ -12,6 +12,7 @@ import {
 import { useUser } from "../context/UserContext";
 import { ShoppingListProduct } from "../services/shopping/shoppingListService";
 import { fetchProductsWithDetailsByIds, Product } from "../services/product/productService";
+import { useParams } from "react-router-dom";
 
 // 1. Definindo o tipo do estado
 type ShoppingCartState = {
@@ -81,7 +82,8 @@ const shoppingCartReducer = (
 };
 
 // 4. Hook useShoppingCart com tipagem explícita no useReducer e tratamento dos erros
-export const useShoppingCart = (pantryId: number) => {
+export const useShoppingCart = () => {
+  let { id } = useParams<{ id: string }>();
   const { user } = useUser();
   const [state, dispatch] = useReducer<React.Reducer<ShoppingCartState, ShoppingCartAction>>(
     shoppingCartReducer,
@@ -91,10 +93,10 @@ export const useShoppingCart = (pantryId: number) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!hasFetched.current && user && pantryId) {
+      if (!hasFetched.current && user && id) {
         hasFetched.current = true; // Marca como executado
         try {
-          const cart = await loadCartFromShoppingList(pantryId)
+          const cart = await loadCartFromShoppingList(parseInt(id))
           const productIds: number[] = cart.cartProducts.map((item) => item.systemProductId ?? 0);
           const productsWithDetails = await fetchProductsWithDetailsByIds(productIds);
 
@@ -119,71 +121,79 @@ export const useShoppingCart = (pantryId: number) => {
     }
 
     fetchData();
-  }, [user, pantryId, dispatch]);
+  }, [user, id, dispatch]);
 
 
 
   const handleAddToCart = async (data: ShoppingListProduct[]) => {
-    try {
-      // Converte ShoppingListProduct[] para ShoppingCartProduct[]
-      const cartProducts: ShoppingCartProductInsert[] = data.map((product) => ({
-        productId: product.systemProductId,
-        plannedQuantity: 0,
-        cartQuantity: product.plannedQuantity,
-        price: 0
-      }));
+    if (id) {
+      try {
+        // Converte ShoppingListProduct[] para ShoppingCartProduct[]
+        const cartProducts: ShoppingCartProductInsert[] = data.map((product) => ({
+          productId: product.systemProductId,
+          plannedQuantity: 0,
+          cartQuantity: product.plannedQuantity,
+          price: 0
+        }));
 
-      // Envia os itens convertidos para o backend
-      const updatedCart = await addProductToShoppingCart(pantryId, cartProducts);
-      dispatch({ type: "SET_CART", payload: updatedCart });
-    } catch (error: unknown) {
-      console.error("Erro ao adicionar itens ao carrinho:", error);
-      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-      dispatch({ type: "SET_ERROR", payload: errorMessage });
+        // Envia os itens convertidos para o backend
+        const updatedCart = await addProductToShoppingCart(parseInt(id), cartProducts);
+        dispatch({ type: "SET_CART", payload: updatedCart });
+      } catch (error: unknown) {
+        console.error("Erro ao adicionar itens ao carrinho:", error);
+        const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+        dispatch({ type: "SET_ERROR", payload: errorMessage });
+      }
     }
   };
 
 
   const handleUpdateCartProduct = async (data: ShoppingCartProduct) => {
-    try {
-      const updatedCart = await updateShoppingCartProduct(pantryId, data.id, data);
+    if (id) {
+      try {
+        const updatedCart = await updateShoppingCartProduct(parseInt(id), data.id, data);
 
-      const updatedCartWithUnitPrice = {
-        ...updatedCart,
-        products: updatedCart.cartProducts.map(product => ({
-          ...product,
-          unityPrice: product.purchasedQuantity > 0 ? product.totalPrice / product.purchasedQuantity : 0 // Evita divisão por zero
-        }))
-      };
+        const updatedCartWithUnitPrice = {
+          ...updatedCart,
+          products: updatedCart.cartProducts.map(product => ({
+            ...product,
+            unityPrice: product.purchasedQuantity > 0 ? product.totalPrice / product.purchasedQuantity : 0 // Evita divisão por zero
+          }))
+        };
 
-      dispatch({ type: "SET_CART", payload: updatedCartWithUnitPrice });
-    } catch (error: unknown) {
-      console.error("Erro ao atualizar product:", error);
-      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-      dispatch({ type: "SET_ERROR", payload: errorMessage });
+        dispatch({ type: "SET_CART", payload: updatedCartWithUnitPrice });
+      } catch (error: unknown) {
+        console.error("Erro ao atualizar product:", error);
+        const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+        dispatch({ type: "SET_ERROR", payload: errorMessage });
+      }
     }
   };
 
 
   const handleRemoveCartProduct = async (cartProductId: number) => {
-    try {
-      await removeShoppingCartProduct(pantryId, cartProductId);
-      dispatch({ type: "REMOVE_ITEM", payload: cartProductId });
-    } catch (error: unknown) {
-      console.error("Erro ao remover product:", error);
-      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-      dispatch({ type: "SET_ERROR", payload: errorMessage });
+    if (id) {
+      try {
+        await removeShoppingCartProduct(parseInt(id), cartProductId);
+        dispatch({ type: "REMOVE_ITEM", payload: cartProductId });
+      } catch (error: unknown) {
+        console.error("Erro ao remover product:", error);
+        const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+        dispatch({ type: "SET_ERROR", payload: errorMessage });
+      }
     }
   };
 
   const handleFinalizePurchase = async () => {
-    try {
-      await finalizePurchase(pantryId);
-      dispatch({ type: "FINALIZE_PURCHASE" });
-    } catch (error: unknown) {
-      console.error("Erro ao finalizar a compra:", error);
-      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-      dispatch({ type: "SET_ERROR", payload: errorMessage });
+    if (id) {
+      try {
+        await finalizePurchase(parseInt(id));
+        dispatch({ type: "FINALIZE_PURCHASE" });
+      } catch (error: unknown) {
+        console.error("Erro ao finalizar a compra:", error);
+        const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+        dispatch({ type: "SET_ERROR", payload: errorMessage });
+      }
     }
   };
 

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { FaTrash, FaPlus } from "react-icons/fa";
 import "../../../styles/components/Shopping/ShoppingCartTable.css";
 import { ShoppingCartProduct } from "../../../services/shopping/shoppingCartService";
-import ProductSelectionModal from "../../ShoppingListProduct/ProductSelectionModal/ProductSelectionModal";
 import { ShoppingListProduct } from "../../../services/shopping/shoppingListService";
+import ProductSelectionModal from "../../Product/ProductSelectionModal";
 
 interface ShoppingCartTableProps {
     products: ShoppingCartProduct[];
@@ -16,7 +16,6 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
     products,
     onUpdateProduct,
     onRemoveProduct,
-    onAddProducts,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -27,7 +26,6 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
     ) => {
         const newValue = parseFloat(e.target.value) || 0;
         let updatedProduct = { ...product };
-
         switch (field) {
             case "purchasedQuantity":
                 updatedProduct.purchasedQuantity = newValue;
@@ -37,21 +35,18 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                     updatedProduct.unityPrice = updatedProduct.totalPrice / updatedProduct.purchasedQuantity;
                 }
                 break;
-
             case "unityPrice":
                 updatedProduct.unityPrice = newValue;
                 if (updatedProduct.purchasedQuantity) {
                     updatedProduct.totalPrice = updatedProduct.purchasedQuantity * updatedProduct.unityPrice;
                 }
                 break;
-
             case "price":
                 updatedProduct.totalPrice = newValue;
                 if (updatedProduct.purchasedQuantity) {
                     updatedProduct.unityPrice = updatedProduct.totalPrice / updatedProduct.purchasedQuantity;
                 }
                 break;
-
             default:
                 break;
         }
@@ -136,6 +131,12 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                     </tr>
                 </tbody>
             </table>
+            {isModalOpen && (
+                <ProductSelectionModal
+                    onClose={() => setIsModalOpen(false)}
+                    onConfirm={() => {console.log("Confirma")}}
+                />
+            )}
 
         </div>
     );

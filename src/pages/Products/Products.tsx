@@ -8,23 +8,49 @@ import "../../styles/pages/Product/Products.css";
 import { Product } from "../../services/product/productService";
 
 const Products = () => {
-    const { id } = useParams<{ id: string }>();
-    const pantryId = id ? parseInt(id) : 0;
-    const { state, handleSearch, handleAddProductToShoppingList, handleUpdateQuantity, handleRemoveProduct } = useProduct(pantryId);
+    let { id } = useParams<{ id: string }>();
+    const { state, handleSearch, handleAddProductToShoppingList, handleUpdateQuantity, handleRemoveProduct } = useProduct();
     const { user } = useUser();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const navigate = useNavigate(); // Hook para navegação
-    console.log("LOGG state", state)
+    const navigate = useNavigate();
+
+    // Mapear produtos já na lista de compras
     const shoppingListProducts = state.shoppingList?.products.reduce((map, product) => {
-        console.log("LOGG PROD", product)
         map[product.systemProductId] = {
             plannedQuantity: product.plannedQuantity,
-            shoppingListProductId: product.id, // ID do item dentro da lista de compras
+            shoppingListProductId: product.id,
         };
         return map;
     }, {} as Record<number, { plannedQuantity: number; shoppingListProductId: number }>);
 
-    console.log("shoppingListProducts", shoppingListProducts)
+    // Função para adicionar um produto à lista de compras
+    const handleAddProduct = (product: Product) => {
+        handleAddProductToShoppingList({ productId: product.id, quantity: 1 });
+    };
+
+    // Função para aumentar quantidade de um produto já adicionado
+    const handleIncrease = (productId: number, currentQuantity: number) => {
+        handleUpdateQuantity(productId, currentQuantity + 1);
+    };
+
+    // Função para diminuir quantidade ou remover produto se zerado
+    const handleDecrease = (productId: number, currentQuantity: number, shoppingListProductId: number) => {
+        if (currentQuantity <= 1) {
+            handleRemoveProduct(shoppingListProductId );
+        } else {
+            handleUpdateQuantity(productId, currentQuantity - 1);
+        }
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, shoppingListProductId: number) => {
+        const newQuantity = Math.max(parseInt(e.target.value) || 0, 0);
+        if (newQuantity === 0) {
+            handleRemoveProduct(shoppingListProductId);
+        } else {
+            handleUpdateQuantity(shoppingListProductId, newQuantity);
+        }
+    };
+
 
     return (
         <div className="products-page">
@@ -40,10 +66,7 @@ const Products = () => {
                 <p>Adicione produtos à lista de compras da despensa ID: {id}</p>
             ) : (
                 user?.roles.includes("ROLE_ADMIN") && (
-                    <button
-                        className="add-product-button"
-                        onClick={() => setIsModalOpen(true)}
-                    >
+                    <button className="add-product-button" onClick={() => setIsModalOpen(true)}>
                         Adicionar Produto
                     </button>
                 )
@@ -59,16 +82,32 @@ const Products = () => {
                 ) : (
                     state.systemProduct.map((product: Product) => {
                         const productData = shoppingListProducts[product.id] || { plannedQuantity: 0, shoppingListProductId: null };
-
+                       console.log("LOGG state",state)
                         return (
                             <ProductCard
                                 key={product.id}
                                 product={product}
-                                handleAddProductToShoppingList={handleAddProductToShoppingList}
-                                onUpdateQuantity={handleUpdateQuantity}
-                                onRemoveProduct={handleRemoveProduct}
-                                initialQuantity={productData.plannedQuantity}
-                                shoppingListProductId={productData.shoppingListProductId} // Passamos o ID do item na lista
+                                isSelected={productData.shoppingListProductId !== null}
+                                actions={
+                                    productData.plannedQuantity === 0 ? (
+                                        <button onClick={() => handleAddProduct(product)}>Adicionar à Lista</button>
+                                    ) : (
+                                        <div className="quantity-controls">
+                                            <button onClick={() => handleDecrease(productData.shoppingListProductId, productData.plannedQuantity, productData.shoppingListProductId)}>
+                                                -
+                                            </button>
+                                            <input
+                                                type="number"
+                                                value={productData.plannedQuantity}
+                                                onChange={(e) => handleInputChange(e, productData.shoppingListProductId)}
+                                                min="0"
+                                            />
+                                            <button onClick={() => handleIncrease(productData.shoppingListProductId, productData.plannedQuantity)}>
+                                                +
+                                            </button>
+                                        </div>
+                                    )
+                                }
                             />
                         );
                     })
@@ -76,7 +115,6 @@ const Products = () => {
             </div>
 
             {isModalOpen && <ProductForm />}
-
         </div>
     );
 };

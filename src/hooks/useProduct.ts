@@ -3,7 +3,6 @@ import { fetchProducts, fetchVarietiesWithDetailsByIds, Product } from "../servi
 import { addProductToShoppingList, fetchShoppingList, removeProductFromShoppingList, ShoppingList, ShoppingListProductInsert, updateProductQuantityInShoppingList } from "../services/shopping/shoppingListService";
 import { useParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
-import { updateShoppingListWithProductNames } from "../utils/shoppingListUtils";
 import { Variety } from "../services/variety/varietyService";
 
 interface ProductState {
@@ -16,7 +15,6 @@ interface ProductState {
 type ProductAction =
     | { type: "SET_PRODUCTS"; payload: Product[] }
     | { type: "SET_SHOPPING_LIST"; payload: ShoppingList }
-    | { type: "UPDATE_SHOPPING_LIST"; payload: { systemProductId: number; plannedQuantity: number } }
     | { type: "SET_LOADING"; payload: boolean }
     | { type: "SET_ERROR"; payload: string | null };
 
@@ -24,52 +22,20 @@ type ProductAction =
         switch (action.type) {
             case "SET_PRODUCTS":
                 return { ...state, systemProduct: action.payload, loading: false };
-    
             case "SET_SHOPPING_LIST":
                 return { ...state, shoppingList: action.payload };
-    
-            case "UPDATE_SHOPPING_LIST":
-                const updatedProducts = state.shoppingList.products.map((item) =>
-                    item.systemProductId === action.payload.systemProductId
-                        ? { ...item, plannedQuantity: action.payload.plannedQuantity }
-                        : item
-                );
-    
-                // Se o item não existe na lista e a quantidade for maior que 0, adicionamos
-                if (!updatedProducts.find((item) => item.systemProductId === action.payload.systemProductId) && action.payload.plannedQuantity > 0) {
-                    const product = state.systemProduct.find((p) => p.id === action.payload.systemProductId);
-    
-                    if (product) {
-                        updatedProducts.push({
-                            id: Date.now(), // ID temporário para frontend
-                            systemProductId: action.payload.systemProductId,
-                            systemProduct: product, // Agora inclui o objeto `Product`
-                            plannedQuantity: action.payload.plannedQuantity,
-                        });
-                    }
-                }
-    
-                return {
-                    ...state,
-                    shoppingList: {
-                        ...state.shoppingList,
-                        products: updatedProducts,
-                    },
-                };
-    
             case "SET_LOADING":
                 return { ...state, loading: action.payload };
-    
             case "SET_ERROR":
                 return { ...state, error: action.payload, loading: false };
-    
             default:
                 return state;
         }
     };
     
 
-export const useProduct = (id: number) => {
+export const useProduct = () => {
+    let { id } = useParams<{ id: string }>();
     const { user } = useUser();
     const [state, dispatch] = useReducer(productReducer, {
         systemProduct: [],
@@ -95,7 +61,7 @@ export const useProduct = (id: number) => {
 
                     // Se um pantryId foi passado, buscar a lista de compras dessa despensa
 
-                    const shoppingListData = await fetchShoppingList(id);
+                    const shoppingListData = await fetchShoppingList(parseInt(id));
                     dispatch({ type: "SET_SHOPPING_LIST", payload: shoppingListData });
 
                 } catch (error) {
@@ -130,7 +96,7 @@ export const useProduct = (id: number) => {
         if (id && user) {
             try {
                 // 🔥 Chama o endpoint e obtém a lista atualizada
-                const updatedShoppingList = await addProductToShoppingList({ pantryId: id, product });
+                const updatedShoppingList = await addProductToShoppingList({ pantryId: parseInt(id), product });
 
                 // 🔥 Atualiza o estado com a lista de compras completa retornada pela API
                 dispatch({ type: "SET_SHOPPING_LIST", payload: updatedShoppingList });
@@ -144,7 +110,7 @@ export const useProduct = (id: number) => {
     const handleUpdateQuantity = async (productId: number, newQuantity: number) => {
         if (id && user) {
             try {
-                const updatedShoppingList = await updateProductQuantityInShoppingList(id, productId, newQuantity);
+                const updatedShoppingList = await updateProductQuantityInShoppingList(parseInt(id), productId, newQuantity);
                 dispatch({ type: "SET_SHOPPING_LIST", payload: updatedShoppingList });
             } catch (error) {
                 console.error("Erro ao atualizar a quantidade do product:", error);
@@ -156,8 +122,8 @@ export const useProduct = (id: number) => {
     const handleRemoveProduct = async (itemId: number) => {
         if (id && user) {
             try {
-                const updatedShoppingList = await removeProductFromShoppingList(id, itemId);
-                dispatch({ type: 'UPDATE_SHOPPING_LIST', payload: updatedShoppingList });
+                const updatedShoppingList = await removeProductFromShoppingList(parseInt(id), itemId);
+                dispatch({ type: 'SET_SHOPPING_LIST', payload: updatedShoppingList });
             } catch (error) {
                 console.error('Erro ao remover item da lista de compras:', error);
                 alert('Erro ao remover item. Tente novamente.');

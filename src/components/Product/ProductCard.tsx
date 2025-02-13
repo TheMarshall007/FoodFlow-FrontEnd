@@ -1,85 +1,22 @@
-import { useEffect, useState } from "react";
-import { Product } from "../../services/product/productService";
+import React from "react";
 import "../../styles/components/Product/ProductCard.css";
-import { ShoppingListProductInsert } from "../../services/shopping/shoppingListService";
+import { Product } from "../../services/product/productService";
 
-const ProductCard: React.FC<{
+interface ProductCardProps {
     product: Product;
-    initialQuantity: number;
-    shoppingListProductId: number;
-    handleAddProductToShoppingList: (product: ShoppingListProductInsert) => void;
-    onUpdateQuantity: (productId: number, newQuantity: number) => void;
-    onRemoveProduct: (productId: number) => void;
-}> = ({ product, initialQuantity, shoppingListProductId, handleAddProductToShoppingList, onUpdateQuantity, onRemoveProduct }) => {
-    const [quantity, setQuantity] = useState(initialQuantity);
+    actions?: React.ReactNode; // Permite passar botões personalizados
+    isSelected?: boolean; // Indica se o produto está selecionado
+}
 
-
-    useEffect(() => {
-        setQuantity(initialQuantity);
-    }, [initialQuantity]);
-
-    const handleAddProduct = () => {
-        setQuantity(1);
-        handleAddProductToShoppingList({ productId: product.id, quantity: 1 });
-    };
-
-    const handleIncrease = () => {
-        const newQuantity = quantity + 1;
-        setQuantity(newQuantity);
-        onUpdateQuantity(shoppingListProductId, newQuantity);
-    };
-
-    const handleDecrease = () => {
-
-        const newQuantity = Math.max(quantity - 1, 0);
-        setQuantity(newQuantity);
-        if (newQuantity === 0) {
-            onRemoveProduct(shoppingListProductId);
-        } else {
-            onUpdateQuantity(shoppingListProductId, newQuantity);
-        }
-    };
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newQuantity = Math.max(parseInt(e.target.value) || 0, 0);
-        setQuantity(newQuantity);
-        handleDebouncedChange(newQuantity);
-    };
-
-    const handleDebouncedChange = (() => {
-        let timeout: NodeJS.Timeout;
-        return (value: number) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                if (value === 0) {
-                    onRemoveProduct(shoppingListProductId);
-                } else {
-                    onUpdateQuantity(product.id, value);
-                }
-            }, 500); // Tempo de debounce (500ms)
-        };
-    })();
-
+const ProductCard: React.FC<ProductCardProps> = ({ product, actions, isSelected = false }) => {
     return (
-        <div className={`product-card ${quantity > 0 ? "added" : ""}`}>
-            <h3>{product.variety?.ingredient?.name ?? "Produto Desconhecido"} - {product.variety?.name ?? "Sem Variedade"} ({product.brand})</h3>
+        <div className={`product-card ${isSelected ? "selected" : ""}`}>
+            <h3>
+                {product.variety?.ingredient?.name ?? "Produto Desconhecido"} -{" "}
+                {product.variety?.name ?? "Sem Variedade"} ({product.brand})
+            </h3>
             <p>{product.quantityPerUnit} {product.unit}</p>
-            {quantity === 0 ? (
-                <button className="add-to-list-btn" onClick={handleAddProduct}>
-                    Adicionar à Lista
-                </button>
-            ) : (
-                <div className="quantity-controls">
-                    <button className="decrease-btn" onClick={handleDecrease}>-</button>
-                    <input
-                        type="number"
-                        value={quantity}
-                        onChange={handleInputChange}
-                        min="0"
-                    />
-                    <button className="increase-btn" onClick={handleIncrease}>+</button>
-                </div>
-            )}
+            {actions && <div className="product-actions">{actions}</div>}
         </div>
     );
 };
