@@ -22,7 +22,7 @@ const ShoppingCartProductCard: React.FC<ShoppingCartProductCardProps> = ({ produ
             plannedUnit: product.plannedUnit,
             purchasedQuantity: newQuantity, 
             purchasedUnit: product.purchasedUnit,
-            unityPrice: product.unityPrice,
+            unitPrice: product.unitPrice,
             totalPrice,
         });
     };
@@ -37,7 +37,7 @@ const ShoppingCartProductCard: React.FC<ShoppingCartProductCardProps> = ({ produ
             plannedUnit: product.plannedUnit,
             purchasedQuantity: product.purchasedQuantity, 
             purchasedUnit: product.purchasedUnit,
-            unityPrice: product.unityPrice,
+            unitPrice: product.unitPrice,
             totalPrice: newPrice,
         });
     };

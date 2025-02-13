@@ -65,7 +65,7 @@ const shoppingCartReducer = (
       return state.cart
         ? {
           ...state,
-          cart: { ...state.cart, cartProducts: state.cart.cartProducts.filter((product) => product?.systemProduct?.id !== action.payload) },
+          cart: { ...state.cart, cartProducts: state.cart.cartProducts.filter((product) => product?.id !== action.payload) },
         }
         : state;
     case "FINALIZE_PURCHASE":
@@ -123,21 +123,38 @@ export const useShoppingCart = () => {
     fetchData();
   }, [user, id, dispatch]);
 
+  const transformCartResponse = (apiResponse: any): ShoppingCart => {
+    return {
+        id: apiResponse.id,
+        pantryId: apiResponse.pantryId ?? undefined,
+        createdAt: apiResponse.createdAt,
+        cartProducts: apiResponse.products.map((product: any) => ({
+            id: product.id,
+            systemProductId: product.systemProduct.id,
+            systemProduct: {
+                ...product.systemProduct,
+                variety: {
+                    ...product.systemProduct.variety,
+                    ingredient: { ...product.systemProduct.variety.ingredient }
+                }
+            },
+            plannedQuantity: product.plannedQuantity ?? null, // Default para 0 se for null
+            plannedUnit: product.plannedUnit ?? "Unidade", // Default para "Unidade"
+            purchasedQuantity: product.purchasedQuantity,
+            purchasedUnit: product.purchasedUnit,
+            unitPrice: product.unitPrice,
+            totalPrice: product.totalPrice,
+        })),
+    };
+};
 
 
-  const handleAddToCart = async (data: ShoppingListProduct[]) => {
+  const handleAddToCart = async (data: ShoppingCartProductInsert[]) => {
     if (id) {
-      try {
-        // Converte ShoppingListProduct[] para ShoppingCartProduct[]
-        const cartProducts: ShoppingCartProductInsert[] = data.map((product) => ({
-          productId: product.systemProductId,
-          plannedQuantity: 0,
-          cartQuantity: product.plannedQuantity,
-          price: 0
-        }));
+      try {      
+        const apiResponse = await addProductToShoppingCart(parseInt(id), data);
+        const updatedCart = transformCartResponse(apiResponse);
 
-        // Envia os itens convertidos para o backend
-        const updatedCart = await addProductToShoppingCart(parseInt(id), cartProducts);
         dispatch({ type: "SET_CART", payload: updatedCart });
       } catch (error: unknown) {
         console.error("Erro ao adicionar itens ao carrinho:", error);
@@ -151,17 +168,10 @@ export const useShoppingCart = () => {
   const handleUpdateCartProduct = async (data: ShoppingCartProduct) => {
     if (id) {
       try {
-        const updatedCart = await updateShoppingCartProduct(parseInt(id), data.id, data);
+        const apiResponse  = await updateShoppingCartProduct(parseInt(id), data.id, data);
+        const updatedCart = transformCartResponse(apiResponse); // Converte para ShoppingCart
 
-        const updatedCartWithUnitPrice = {
-          ...updatedCart,
-          products: updatedCart.cartProducts.map(product => ({
-            ...product,
-            unityPrice: product.purchasedQuantity > 0 ? product.totalPrice / product.purchasedQuantity : 0 // Evita divisão por zero
-          }))
-        };
-
-        dispatch({ type: "SET_CART", payload: updatedCartWithUnitPrice });
+        dispatch({ type: "SET_CART", payload: updatedCart });
       } catch (error: unknown) {
         console.error("Erro ao atualizar product:", error);
         const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";

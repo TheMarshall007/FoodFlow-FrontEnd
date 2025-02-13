@@ -16,7 +16,7 @@ export interface ShoppingCartProduct {
     plannedUnit: String;
     purchasedQuantity: number;
     purchasedUnit: String;
-    unityPrice: number;
+    unitPrice: number;
     totalPrice: number;
 }
 

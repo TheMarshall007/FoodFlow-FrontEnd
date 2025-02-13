@@ -8,7 +8,7 @@ export interface Product {
     quantityPerUnit: number;
     unit: string;
     varietyId: number;
-    variety?: Variety;
+    variety: Variety;
 }
 
 interface Variety {
