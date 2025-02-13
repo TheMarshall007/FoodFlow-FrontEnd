@@ -1,6 +1,7 @@
 import User from '../../context/UserContext';
 import { api } from '../api/apiConfig';
 import { Ingredient } from '../ingredients/ingredientsService';
+import { Product } from '../product/productService';
 
 export interface PantryInsertData {
     userId: number;
@@ -17,7 +18,7 @@ interface PantryData {
 export interface Pantry {
     id: number;
     propertyName: string;
-    items: PantryProduct[];
+    products: PantryProduct[];
     sharedWith: User[];
     menuCount?: number
     lastUpdated: string;
@@ -27,7 +28,7 @@ export interface Pantry {
 
 export interface PantryProduct {
     id: number;
-    ingredient: Ingredient;
+    systemProduct: Product
     quantity: number;
 }
 

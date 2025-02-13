@@ -5,7 +5,7 @@ export interface Variety {
     id: number;
     name: string;
     ingredientId: number;
-    ingredient?: Ingredient
+    ingredient: Ingredient
 }
 
 export const fetchVarietyByIds = async (ids: number[]): Promise<Variety[]> => {

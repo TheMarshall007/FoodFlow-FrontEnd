@@ -1,7 +1,7 @@
 import React from "react";
 import { usePantryDetail } from "../../hooks/pentry/usePantryDetail";
 import { useNavigate, useParams } from "react-router-dom";
-import ShoppingListProductCard from "../../components/ShoppingListProduct/ShoppingListProductCard";
+import ProductCard from "../../components/Product/ProductCard";
 import "../../styles/pages/Pantry/PantryDetail.css";
 
 const PantryDetail: React.FC = () => {
@@ -9,10 +9,13 @@ const PantryDetail: React.FC = () => {
     const pantryId = id ? parseInt(id) : 0;
     const { state, dispatch, handleUpdateQuantity, handleRemoveProduct, handleReduceQuantity } = usePantryDetail(pantryId);
     const navigate = useNavigate(); // Hook para navegação
+
     if (!state.pantry) {
         return <p>Carregando ou despensa não encontrada...</p>;
     }
-    console.log("LOGG STATE DETAIL", state)
+
+    console.log("LOGG STATE DETAIL", state);
+
     return (
         <div className="pantry-detail-container">
             <div className="pantry-header">
@@ -23,12 +26,11 @@ const PantryDetail: React.FC = () => {
                     <p className="low-quantity-text">{state.pantry?.lowQuantityProducts?.length} itens quase acabando</p>
                 </div>
                 <button className="back-button" onClick={() => navigate("/pantries")}>Voltar</button>
-
             </div>
 
             {/* Abas de navegação */}
             <div className="pantry-tabs">
-                <button className={`tab-button ${state.activeTab === "items" ? "active" : ""}`} onClick={() => dispatch({ type: "SET_ACTIVE_TAB", payload: "items" })}>
+                <button className={`tab-button ${state.activeTab === "products" ? "active" : ""}`} onClick={() => dispatch({ type: "SET_ACTIVE_TAB", payload: "products" })}>
                     Itens na Dispensa
                 </button>
                 <button className={`tab-button ${state.activeTab === "shoppingList" ? "active" : ""}`} onClick={() => dispatch({ type: "SET_ACTIVE_TAB", payload: "shoppingList" })}>
@@ -42,48 +44,41 @@ const PantryDetail: React.FC = () => {
             {/* Conteúdo das abas */}
             <div className="tab-content">
                 {/* Pantry Products */}
-                {state.activeTab === "items" &&
-                    < div className="tab-items">
+                {state.activeTab === "products" &&
+                    <div className="tab-items">
                         <div className="items-grid">
-                            {state.pantry?.items?.slice()
+                            {state.pantry?.products?.slice()
                                 .sort((a, b) => a.id - b.id)
-                                .map((item) => {
-                                    const isLowQuantity = state.pantry.lowQuantityProducts?.some(lowProduct => lowProduct.id === item.id);
+                                .map((product) => {
+                                    const isLowQuantity = state.pantry.lowQuantityProducts?.some(lowProduct => lowProduct.id === product.id);
                                     return (
-                                        <div
-                                            key={item.id}
-                                            className={`product-card ${isLowQuantity ? "low-quantity" : ""}`} // Adiciona uma classe condicional
-                                        >
-                                            <img
-                                                src={item.ingredient?.image || "/assets/fotos/default-item.png"}
-                                                alt={item.ingredient?.name}
-                                                className="product-card-image"
-                                            />
-                                            <div className="product-card-info">
-                                                <h4>{item.ingredient?.name}</h4>
-                                                <p>Quantidade: {item.quantity}</p>
+                                        <ProductCard
+                                            key={product.id}
+                                            product={product.systemProduct}
+                                            isSelected={isLowQuantity}
+                                            actions={
                                                 <div className="product-quantity-control">
                                                     <button
                                                         className="quantity-button"
-                                                        onClick={() => handleReduceQuantity(state.pantry.id, item.ingredient.id, 1)}
+                                                        onClick={() => handleReduceQuantity(state.pantry.id, product.systemProduct.variety.ingredient.id, 1)}
                                                     >
                                                         -1
                                                     </button>
                                                     <button
                                                         className="quantity-button"
-                                                        onClick={() => handleReduceQuantity(state.pantry.id, item.ingredient.id, 2)}
+                                                        onClick={() => handleReduceQuantity(state.pantry.id, product.systemProduct.variety.ingredient.id, 2)}
                                                     >
                                                         -2
                                                     </button>
                                                     <button
                                                         className="quantity-button"
-                                                        onClick={() => handleReduceQuantity(state.pantry.id, item.ingredient.id, 5)}
+                                                        onClick={() => handleReduceQuantity(state.pantry.id, product.systemProduct.variety.ingredient.id, 5)}
                                                     >
                                                         -5
                                                     </button>
                                                 </div>
-                                            </div>
-                                        </div>
+                                            }
+                                        />
                                     );
                                 })}
                         </div>
@@ -96,7 +91,6 @@ const PantryDetail: React.FC = () => {
                         <button className="add-items-auto-button" onClick={() => navigate(`/products/${state.pantry.id}`)}>
                             Adicionar Itens
                         </button>
-                        {/* Botão para abrir o Carrinho de Compras */}
                         <button className="view-cart-button" onClick={() => navigate(`/shopping-cart/${state?.pantry?.id}`)}>
                             Ver Carrinho
                         </button>
@@ -105,15 +99,19 @@ const PantryDetail: React.FC = () => {
                                 .slice()
                                 .sort((a, b) => a.systemProductId - b.systemProductId)
                                 .map((product) => (
-                                    <ShoppingListProductCard
+                                    <ProductCard
                                         key={product.id}
-                                        product={product}
-                                        onUpdateQuantity={handleUpdateQuantity}
-                                        onRemoveProduct={handleRemoveProduct}
-                                    />))}
+                                        product={product.systemProduct}
+                                        actions={
+                                            <div className="shopping-list-actions">
+                                                <button onClick={() => handleUpdateQuantity(product.systemProductId, product.plannedQuantity + 1)}>+</button>
+                                                <button onClick={() => handleUpdateQuantity(product.systemProductId, product.plannedQuantity - 1)}>-</button>
+                                                <button onClick={() => handleRemoveProduct(product.id)}>🗑</button>
+                                            </div>
+                                        }
+                                    />
+                                ))}
                         </div>
-
-
                     </div>
                 )}
 
@@ -150,10 +148,8 @@ const PantryDetail: React.FC = () => {
                         )}
                     </div>
                 )}
-
             </div>
-
-        </div >
+        </div>
     );
 };
 

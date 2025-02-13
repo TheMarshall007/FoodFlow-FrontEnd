@@ -9,6 +9,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, actions, isSelected = false }) => {
+    console.log(isSelected)
     return (
         <div className={`product-card ${isSelected ? "selected" : ""}`}>
             <h3>

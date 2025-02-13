@@ -1,6 +1,6 @@
 import { fetchIngredientsByIds, Ingredient } from "../ingredients/ingredientsService";
 import { api } from "../api/apiConfig";
-import { fetchVarietyByIds } from "../variety/varietyService";
+import { fetchVarietyByIds, Variety } from "../variety/varietyService";
 
 export interface Product {
     id: number;
@@ -9,13 +9,6 @@ export interface Product {
     unit: string;
     varietyId: number;
     variety: Variety;
-}
-
-interface Variety {
-    id: number;
-    name: string;
-    ingredientId: number;
-    ingredient?: Ingredient;
 }
 
 interface ProductDTOSearch {
