@@ -7,7 +7,7 @@ import "../../styles/pages/Pantry/PantryDetail.css";
 const PantryDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const pantryId = id ? parseInt(id) : 0;
-    const { state, dispatch, handleUpdateQuantity, handleRemoveProduct, handleReduceQuantity } = usePantryDetail(pantryId);
+    const { state, dispatch, handleUpdateProductQuantityInShoppingList, handleRemoveProductFromShoppingList, handleReduceQuantity } = usePantryDetail(pantryId);
     const navigate = useNavigate(); // Hook para navegação
 
     if (!state.pantry) {
@@ -55,27 +55,30 @@ const PantryDetail: React.FC = () => {
                                         <ProductCard
                                             key={product.id}
                                             product={product.systemProduct}
-                                            isSelected={isLowQuantity}
+                                            isLowQuantity={isLowQuantity}
                                             actions={
-                                                <div className="product-quantity-control">
-                                                    <button
-                                                        className="quantity-button"
-                                                        onClick={() => handleReduceQuantity(state.pantry.id, product.systemProduct.variety.ingredient.id, 1)}
-                                                    >
-                                                        -1
-                                                    </button>
-                                                    <button
-                                                        className="quantity-button"
-                                                        onClick={() => handleReduceQuantity(state.pantry.id, product.systemProduct.variety.ingredient.id, 2)}
-                                                    >
-                                                        -2
-                                                    </button>
-                                                    <button
-                                                        className="quantity-button"
-                                                        onClick={() => handleReduceQuantity(state.pantry.id, product.systemProduct.variety.ingredient.id, 5)}
-                                                    >
-                                                        -5
-                                                    </button>
+                                                <div>
+                                                    <h3>Quantitdade: {product.quantity}</h3>
+                                                    <div className="product-quantity-control">
+                                                        <button
+                                                            className="quantity-button"
+                                                            onClick={() => handleReduceQuantity(state.pantry.id, product.id, 1)}
+                                                        >
+                                                            -1
+                                                        </button>
+                                                        <button
+                                                            className="quantity-button"
+                                                            onClick={() => handleReduceQuantity(state.pantry.id, product.id, 2)}
+                                                        >
+                                                            -2
+                                                        </button>
+                                                        <button
+                                                            className="quantity-button"
+                                                            onClick={() => handleReduceQuantity(state.pantry.id, product.id, 5)}
+                                                        >
+                                                            -5
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             }
                                         />
@@ -104,9 +107,9 @@ const PantryDetail: React.FC = () => {
                                         product={product.systemProduct}
                                         actions={
                                             <div className="shopping-list-actions">
-                                                <button onClick={() => handleUpdateQuantity(product.systemProductId, product.plannedQuantity + 1)}>+</button>
-                                                <button onClick={() => handleUpdateQuantity(product.systemProductId, product.plannedQuantity - 1)}>-</button>
-                                                <button onClick={() => handleRemoveProduct(product.id)}>🗑</button>
+                                                <button onClick={() => handleUpdateProductQuantityInShoppingList(product.systemProductId, product.plannedQuantity + 1)}>+</button>
+                                                <button onClick={() => handleUpdateProductQuantityInShoppingList(product.systemProductId, product.plannedQuantity - 1)}>-</button>
+                                                <button onClick={() => handleRemoveProductFromShoppingList(product.id)}>🗑</button>
                                             </div>
                                         }
                                     />

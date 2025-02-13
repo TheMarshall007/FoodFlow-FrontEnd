@@ -119,7 +119,7 @@ export const useProduct = () => {
         }
     };
 
-    const handleRemoveProduct = async (itemId: number) => {
+    const handleRemoveProductFromShoppingList = async (itemId: number) => {
         if (id && user) {
             try {
                 const updatedShoppingList = await removeProductFromShoppingList(parseInt(id), itemId);
@@ -135,6 +135,6 @@ export const useProduct = () => {
         state,
         handleSearch,
         handleAddProduct,
-        handleAddProductToShoppingList, handleUpdateQuantity, handleRemoveProduct
+        handleAddProductToShoppingList, handleUpdateQuantity, handleRemoveProductFromShoppingList
     };
 };

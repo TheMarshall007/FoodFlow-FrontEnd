@@ -3,8 +3,7 @@ import { useUser } from "../../context/UserContext";
 import { fetchLowQuantityProducts, fetchPantry, fetchProductsByPantryId, Pantry, PantryProduct, reduceProductQuantity } from "../../services/pantry/pantryService";
 import { fetchShoppingList, updateProductQuantityInShoppingList, removeProductFromShoppingList, ShoppingList, } from "../../services/shopping/shoppingListService";
 import { fetchShoppingCartHistory, ShoppingCartHistory } from "../../services/shopping/shoppingCartHistoryService";
-import { fetchProductsByIds, fetchProductsWithDetailsByIds, Product } from "../../services/product/productService";
-import { fetchVarietyByIds, Variety } from "../../services/variety/varietyService";
+import {  fetchProductsWithDetailsByIds, Product } from "../../services/product/productService";
 
 // Define o estado inicial
 export const initialState = {
@@ -75,7 +74,7 @@ export const usePantryDetail = (id: number) => {
         fetchData();
     }, [user, id, dispatch]);
 
-    const handleUpdateQuantity = async (productId: number, newQuantity: number) => {
+    const handleUpdateProductQuantityInShoppingList = async (productId: number, newQuantity: number) => {
         if (id && user) {
             try {
                 const updatedShoppingList = await updateProductQuantityInShoppingList(id, productId, newQuantity);
@@ -107,29 +106,20 @@ export const usePantryDetail = (id: number) => {
 
     const handleReduceQuantity = async (pantryId: number, productId: number, quantityToReduce: number) => {
         try {
-            const updatedProducts = await reduceProductQuantity(pantryId, productId, quantityToReduce);
+            // Faz a requisição para reduzir a quantidade do produto na API
+            const updatedPantry = await reduceProductQuantity(pantryId, productId, quantityToReduce);
+            updatedPantry.lowQuantityProducts = await fetchLowQuantityProducts(id);
 
-            // Se `state.pantry.items` não existir, não tenta mapear
-            if (!state.pantry.products) return;
-
-            // Atualiza apenas os produtos modificados na despensa sem perder os dados existentes
-            const updatedPantryItems = state.pantry.products.map((product) =>
-                product.id === productId // Corrigindo a comparação, pois `systemProductId` não existe
-                    ? { ...product, quantity: (product.quantity ?? 0) - quantityToReduce } // Usando `quantity` no lugar de `plannedQuantity`
-                    : product
-            );
-
-            dispatch({
-                type: "UPDATE_PANTRY_PRODUCTS",
-                payload: updatedPantryItems,
-            });
-
+            // Atualiza o estado da despensa com o retorno da API
+            dispatch({ type: "SET_PANTRY", payload: updatedPantry });
+    
         } catch (error) {
             console.error("Erro ao reduzir a quantidade do produto:", error);
         }
     };
+    
 
-    const handleRemoveProduct = async (itemId: number) => {
+    const handleRemoveProductFromShoppingList = async (itemId: number) => {
         if (id && user) {
             try {
                 await removeProductFromShoppingList(id, itemId);
@@ -159,5 +149,5 @@ export const usePantryDetail = (id: number) => {
 
 
 
-    return { state, dispatch, handleUpdateQuantity, handleRemoveProduct, handleReduceQuantity };
+    return { state, dispatch, handleUpdateProductQuantityInShoppingList, handleRemoveProductFromShoppingList, handleReduceQuantity };
 };

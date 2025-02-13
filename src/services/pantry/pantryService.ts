@@ -62,10 +62,10 @@ export async function fetchProductsByPantryId(pantryId: number) {
     }
 }
 
-export async function reduceProductQuantity(pantryId: number, ingredientId: number, quantityToReduce: number) {
+export async function reduceProductQuantity(pantryId: number, productId: number, quantityToReduce: number) {
     try {
         const response = await api.post(`/pantry/${pantryId}/reduce-quantity`, null, {
-            params: { ingredientId, quantityToReduce },
+            params: { productId, quantityToReduce },
         });
         return response.data;
     } catch (error) {

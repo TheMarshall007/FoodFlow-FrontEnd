@@ -13,6 +13,11 @@
     border-color: #28a745;
 }
 
+.product-card.low-quantity {
+    background: #edd4d4;
+    border-color: #a72828;
+}
+
 .add-to-list-btn {
     background: #007bff;
     color: white;

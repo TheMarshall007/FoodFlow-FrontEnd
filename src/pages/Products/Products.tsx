@@ -9,7 +9,7 @@ import { Product } from "../../services/product/productService";
 
 const Products = () => {
     let { id } = useParams<{ id: string }>();
-    const { state, handleSearch, handleAddProductToShoppingList, handleUpdateQuantity, handleRemoveProduct } = useProduct();
+    const { state, handleSearch, handleAddProductToShoppingList, handleUpdateQuantity, handleRemoveProductFromShoppingList } = useProduct();
     const { user } = useUser();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
@@ -36,7 +36,7 @@ const Products = () => {
     // Função para diminuir quantidade ou remover produto se zerado
     const handleDecrease = (productId: number, currentQuantity: number, shoppingListProductId: number) => {
         if (currentQuantity <= 1) {
-            handleRemoveProduct(shoppingListProductId );
+            handleRemoveProductFromShoppingList(shoppingListProductId );
         } else {
             handleUpdateQuantity(productId, currentQuantity - 1);
         }
@@ -45,7 +45,7 @@ const Products = () => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, shoppingListProductId: number) => {
         const newQuantity = Math.max(parseInt(e.target.value) || 0, 0);
         if (newQuantity === 0) {
-            handleRemoveProduct(shoppingListProductId);
+            handleRemoveProductFromShoppingList(shoppingListProductId);
         } else {
             handleUpdateQuantity(shoppingListProductId, newQuantity);
         }
