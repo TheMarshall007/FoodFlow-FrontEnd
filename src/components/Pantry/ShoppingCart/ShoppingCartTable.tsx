@@ -54,57 +54,65 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
         let newValue: string | number =
             (editValues[product.id]?.[field] as string | number) ??
             (product[field] as string | number) ??
-            (field === "purchasedUnit" ? "GRAM" : 0);
-
+            (field === "purchasedUnit" ? "g" : 0);
+    
         let updatedProduct: ShoppingCartProduct = {
             ...product,
             [field]: newValue,
         };
-
-        let convertedQuantity = updatedProduct.purchasedQuantity; // Mantém valor original para cálculos
-
-        // ⚡ Se a unidade foi alterada, converter apenas para cálculos, mas sem mudar a unidade original
-        if (field === "purchasedUnit") {
-            switch (newValue) {
-                case "GRAM":
-                    convertedQuantity = product.purchasedQuantity / 1000; // Converte para kg para cálculo
-                    break;
-                case "MILLILITER":
-                    convertedQuantity = product.purchasedQuantity / 1000; // Converte para L para cálculo
-                    break;
-                default:
-                    convertedQuantity = product.purchasedQuantity;
+    
+        /*
+        // 🔹 Código de cálculo removido para ser feito no backend
+        let convertedQuantity = Number(updatedProduct.purchasedQuantity) || 0;
+    
+        // 🔹 Definição explícita do tipo de unidade
+        type UnitType = "g" | "Kg" | "ml" | "L" | "unit";
+    
+        // 🔹 Mapeamento de conversão entre unidades
+        const conversionFactors: Record<UnitType, Record<UnitType, number>> = {
+            g:   { g: 1, Kg: 1 / 1000, ml: 0, L: 0, unit: 0 },
+            Kg:  { g: 1000, Kg: 1, ml: 0, L: 0, unit: 0 },
+            ml:  { g: 0, Kg: 0, ml: 1, L: 1 / 1000, unit: 0 },
+            L:   { g: 0, Kg: 0, ml: 1000, L: 1, unit: 0 },
+            unit: { g: 0, Kg: 0, ml: 0, L: 1, unit: 1 }
+        };
+    
+        if (field === "purchasedUnit" && product.purchasedUnit !== newValue) {
+            const prevUnit = product.purchasedUnit as UnitType;
+            const newUnit = newValue as UnitType;
+    
+            if (conversionFactors[prevUnit] && conversionFactors[prevUnit][newUnit] !== undefined) {
+                convertedQuantity *= conversionFactors[prevUnit][newUnit];
             }
         }
-
-        // ⚡ Atualizar os valores com base no campo alterado
-        if (field === "purchasedQuantity") {
-            updatedProduct.totalPrice =
-                updatedProduct.unitPrice > 0
-                    ? Number(formatBigDecimal(convertedQuantity * updatedProduct.unitPrice)) // 🔥 Converte para número
-                    : 0; // Evita erro
+    
+        if (field === "purchasedQuantity" || field === "purchasedUnit") {
+            updatedProduct.totalPrice = updatedProduct.unitPrice > 0
+                ? Number(formatBigDecimal(convertedQuantity * updatedProduct.unitPrice))
+                : 0;
         } else if (field === "unitPrice") {
-            updatedProduct.totalPrice =
-                convertedQuantity > 0
-                    ? Number(formatBigDecimal(convertedQuantity * updatedProduct.unitPrice)) // 🔥 Converte para número
-                    : 0; // Evita erro
+            updatedProduct.totalPrice = convertedQuantity > 0
+                ? Number(formatBigDecimal(convertedQuantity * updatedProduct.unitPrice))
+                : 0;
         } else if (field === "totalPrice") {
-            updatedProduct.unitPrice =
-                convertedQuantity > 0
-                    ? Number(formatBigDecimal(updatedProduct.totalPrice / convertedQuantity)) // 🔥 Converte para número
-                    : 0; // Evita erro
+            updatedProduct.unitPrice = convertedQuantity > 0
+                ? Number(formatBigDecimal(updatedProduct.totalPrice / convertedQuantity))
+                : 0;
         }
-
-        // Atualiza o estado do produto no carrinho
-        onUpdateProduct(updatedProduct , isAdvancedMode);
-
-        // Remove o valor editado temporariamente para limpar o input
+        */
+    
+        // 🔹 Atualiza o estado do produto no carrinho
+        onUpdateProduct(updatedProduct, isAdvancedMode);
+    
+        // 🔹 Remove o valor editado temporariamente para limpar o input
         setEditValues((prev) => {
             const newValues = { ...prev };
             delete newValues[product.id];
             return newValues;
         });
     };
+    
+    
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>, product: ShoppingCartProduct, field: string) => {
         const { value } = e.target;
@@ -119,6 +127,20 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
 
     const totalPrice = products.reduce((sum, product) => sum + (product.totalPrice || 0), 0);
 
+    const getAllowedUnits = (plannedUnit: string | undefined): string[] => {
+        if (!plannedUnit) return ["Unidade", "g", "Kg", "ml", "L"];
+    
+        const unitMap: Record<string, string[]> = {
+            "g": ["g", "Kg", "Unidade"],     // Ex: Frutas, legumes, temperos
+            "Kg": ["g", "Kg", "Unidade"],    // Ex: Carnes, arroz, frutas vendidas por Kg
+            "ml": ["ml", "L", "Unidade"],    // Ex: Óleos, leite em embalagens menores
+            "L": ["ml", "L", "Unidade"],     // Ex: Bebidas em garrafas maiores
+            "Unidade": ["Unidade", "g", "Kg", "ml", "L"], // Ex: Ovos, maçãs, caixas de leite
+        };
+    
+        return unitMap[plannedUnit] || ["Unidade"];
+    };
+   
     return (
         <div>
             {/* Switch entre Modo Simples e Avançado */}
@@ -151,8 +173,9 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                 {product.plannedQuantity !== null ? <FaClipboard /> : <FaLightbulb />}
                             </td>
                             <td>
-                                {product?.systemProduct?.variety?.ingredient?.name ?? "Produto Desconhecido"} -{" "}
+                                {product?.systemProduct?.variety?.ingredient?.name ?? "Produto Desconhecido"}{" "}
                                 {product?.systemProduct?.variety?.name ?? "Variedade Desconhecida"}{" "}
+                                {product?.systemProduct.quantityPerUnit} { product?.systemProduct.unit} - 
                                 ({product?.systemProduct?.brand ?? "Marca Desconhecida"})
                             </td>
                             <td>
@@ -169,16 +192,13 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                             </td>
                             <td>
                                 <select
-                                    value={String(editValues[product.id]?.purchasedUnit ?? product.purchasedUnit ?? product.plannedUnit ?? "GRAM")}
+                                    value={String(editValues[product.id]?.purchasedUnit ?? product.purchasedUnit ?? product.plannedUnit ?? "Unidade")}
                                     onChange={(e) => handleSelectChange(e, product, "purchasedUnit")}
                                     onBlur={() => handleEditBlur(product, "purchasedUnit")}
                                 >
-                                    <option value="Quilo">K</option>
-                                    <option value="Quilograma">Kg</option>
-                                    <option value="Grama">g</option>
-                                    <option value="Mililitro">ml</option>
-                                    <option value="Litro">L</option>
-                                    <option value="Unidade">Unidade</option>
+                                    {getAllowedUnits(String(product.plannedUnit) || "").map((unit) => ( // 🔥 Correção aqui
+                                        <option key={unit} value={unit}>{unit}</option>
+                                    ))}
                                 </select>
                             </td>
                             {isAdvancedMode && (
