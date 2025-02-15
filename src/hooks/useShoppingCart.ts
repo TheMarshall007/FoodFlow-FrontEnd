@@ -165,10 +165,10 @@ export const useShoppingCart = () => {
   };
 
 
-  const handleUpdateCartProduct = async (data: ShoppingCartProduct) => {
+  const handleUpdateCartProduct = async (data: ShoppingCartProduct, isAdvancedMode: boolean) => {
     if (id) {
       try {
-        const apiResponse  = await updateShoppingCartProduct(parseInt(id), data.id, data);
+        const apiResponse  = await updateShoppingCartProduct(parseInt(id), data.id, data, isAdvancedMode);
         const updatedCart = transformCartResponse(apiResponse); // Converte para ShoppingCart
 
         dispatch({ type: "SET_CART", payload: updatedCart });
@@ -194,10 +194,10 @@ export const useShoppingCart = () => {
     }
   };
 
-  const handleFinalizePurchase = async () => {
+  const handleFinalizePurchase = async (isAdvancedMode: boolean) => {
     if (id) {
       try {
-        await finalizePurchase(parseInt(id));
+        await finalizePurchase(parseInt(id), isAdvancedMode);
         dispatch({ type: "FINALIZE_PURCHASE" });
       } catch (error: unknown) {
         console.error("Erro ao finalizar a compra:", error);

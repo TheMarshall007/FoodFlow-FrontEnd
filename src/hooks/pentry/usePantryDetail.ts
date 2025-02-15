@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useRef } from "react";
 import { useUser } from "../../context/UserContext";
 import { fetchLowQuantityProducts, fetchPantry, fetchProductsByPantryId, Pantry, PantryProduct, reduceProductQuantity } from "../../services/pantry/pantryService";
-import { fetchShoppingList, updateProductQuantityInShoppingList, removeProductFromShoppingList, ShoppingList, } from "../../services/shopping/shoppingListService";
+import { fetchShoppingList, updateProductQuantityInShoppingList, removeProductFromShoppingList, ShoppingList, ShoppingListProduct, } from "../../services/shopping/shoppingListService";
 import { fetchShoppingCartHistory, ShoppingCartHistory } from "../../services/shopping/shoppingCartHistoryService";
 import {  fetchProductsWithDetailsByIds, Product } from "../../services/product/productService";
 
@@ -78,31 +78,35 @@ export const usePantryDetail = (id: number) => {
         if (id && user) {
             try {
                 const updatedShoppingList = await updateProductQuantityInShoppingList(id, productId, newQuantity);
-
-                if (!state.shoppingList) return; // Evita erro de acesso a `null`
-
-                // Atualiza apenas os produtos modificados sem perder as outras informações
-                const updatedProducts = state.shoppingList.products.map((item) =>
-                    item.systemProductId === productId
-                        ? { ...item, plannedQuantity: newQuantity } // Atualiza apenas a quantidade
-                        : item
-                );
-
+    
+                if (!state.shoppingList || !updatedShoppingList) return; // Evita erro de acesso a `null`
+    
+                // Atualiza apenas o plannedQuantity dos produtos existentes sem perder outras informações
+                const updatedProducts = state.shoppingList.products.map((item) => {
+                    const updatedProduct = updatedShoppingList.products.find(
+                        (updated:ShoppingListProduct) => updated.systemProductId === item.systemProductId
+                    );
+    
+                    return updatedProduct
+                        ? { ...item, plannedQuantity: updatedProduct.plannedQuantity } // Atualiza apenas a quantidade
+                        : item; // Mantém os outros produtos inalterados
+                });
+    
                 dispatch({
                     type: "SET_SHOPPING_LIST",
                     payload: {
                         ...state.shoppingList,
-                        pantryId: state.shoppingList.pantryId ?? 0, // Garante que pantryId não seja undefined
-                        products: updatedProducts,
+                        products: updatedProducts, // Apenas as quantidades foram atualizadas
                     },
                 });
-
+    
             } catch (error) {
                 console.error("Erro ao atualizar a quantidade do produto:", error);
                 alert("Erro ao atualizar a quantidade. Tente novamente.");
             }
         }
     };
+    
 
     const handleReduceQuantity = async (pantryId: number, productId: number, quantityToReduce: number) => {
         try {

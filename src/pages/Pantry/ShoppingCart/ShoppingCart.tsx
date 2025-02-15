@@ -3,12 +3,18 @@ import "../../../styles/pages/Shopping/ShoppingCart.css";
 import { useShoppingCart } from "../../../hooks/useShoppingCart";
 import ShoppingCartTable from "../../../components/Pantry/ShoppingCart/ShoppingCartTable";
 import { FaPlus } from "react-icons/fa";
+import { useNavigate, useParams } from "react-router-dom";
+import ProductSelectionModal from "../../../components/Product/ProductSelectionModal";
 
 const ShoppingCart: React.FC = () => {
+    let { id } = useParams<{ id: string }>();
     const { cart, loading, error, handleUpdateCartProduct, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate(); // Hook para navegação
+    const [isAdvancedMode, setIsAdvancedMode] = useState(false); // 🚀 Estado de Modo Avançado
+
     console.log("LOGG cart", cart)
-    
+
     if (loading) {
         return <p>Carregando carrinho...</p>;
     }
@@ -20,6 +26,7 @@ const ShoppingCart: React.FC = () => {
     return (
         <div className="shopping-cart-container">
             <h2>Carrinho de Compras</h2>
+            <button className="back-button" onClick={() => navigate(`/pantry/${id}`)}>Voltar</button>
 
             {cart?.cartProducts?.length ? (
                 <div className="shopping-cart-products">
@@ -28,6 +35,8 @@ const ShoppingCart: React.FC = () => {
                         onUpdateProduct={handleUpdateCartProduct}
                         onRemoveProduct={handleRemoveCartProduct}
                         onAddProducts={handleAddToCart}
+                        isAdvancedMode={isAdvancedMode}
+                        setIsAdvancedMode={setIsAdvancedMode}
                     />
                 </div>
             ) : (
@@ -41,11 +50,28 @@ const ShoppingCart: React.FC = () => {
             }
             {
                 (cart?.cartProducts?.length ?? 0) > 0 && (
-                    <button className="finalize-button" onClick={handleFinalizePurchase}>
+                    <button className="finalize-button" onClick={() => handleFinalizePurchase(isAdvancedMode)}>
                         Finalizar Compra
                     </button>
                 )
             }
+
+            {isModalOpen && (
+                <ProductSelectionModal
+                    onClose={() => setIsModalOpen(false)}
+                    onConfirm={(selectedProducts) => {
+                        setIsModalOpen(false);
+                        if (selectedProducts.length !== 0) {
+                            const formattedProducts = selectedProducts.map((product) => ({
+                                productId: product.id,
+                                cartQuantity: 0,
+                                price: 0,
+                            }));
+                            handleAddToCart(formattedProducts);
+                        }
+                    }}
+                />
+            )}
         </div >
     );
 };

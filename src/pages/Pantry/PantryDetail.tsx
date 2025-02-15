@@ -106,10 +106,16 @@ const PantryDetail: React.FC = () => {
                                         key={product.id}
                                         product={product.systemProduct}
                                         actions={
-                                            <div className="shopping-list-actions">
-                                                <button onClick={() => handleUpdateProductQuantityInShoppingList(product.systemProductId, product.plannedQuantity + 1)}>+</button>
-                                                <button onClick={() => handleUpdateProductQuantityInShoppingList(product.systemProductId, product.plannedQuantity - 1)}>-</button>
-                                                <button onClick={() => handleRemoveProductFromShoppingList(product.id)}>🗑</button>
+                                            <div>
+                                                <h3>Quantitdade: {product.plannedQuantity}</h3>
+                                                <div className="product-quantity-control">
+                                                    <button className="quantity-button"
+                                                        onClick={() => handleUpdateProductQuantityInShoppingList(product.id, product.plannedQuantity + 1)}>+1</button>
+                                                    <button className="quantity-button"
+                                                        onClick={() => handleUpdateProductQuantityInShoppingList(product.systemProductId, product.plannedQuantity - 1)}>-1</button>
+                                                    <button className="quantity-button"
+                                                        onClick={() => handleRemoveProductFromShoppingList(product.id)}>🗑</button>
+                                                </div>
                                             </div>
                                         }
                                     />
@@ -137,7 +143,7 @@ const PantryDetail: React.FC = () => {
                                             <tr key={item.id}>
                                                 <td>{item.id}</td>
                                                 <td>{new Date(item.purchaseDate.toString()).toLocaleDateString()}</td>
-                                                <td>{item.totalValue.toFixed(2)}</td>
+                                                <td>{item?.totalValue?.toFixed(2)}</td>
                                                 <td className="table-action">
                                                     <button onClick={() => { }}>Ver carrinho</button>
                                                 </td>
