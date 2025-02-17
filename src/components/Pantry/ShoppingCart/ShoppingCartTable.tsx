@@ -55,12 +55,12 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
             (editValues[product.id]?.[field] as string | number) ??
             (product[field] as string | number) ??
             (field === "purchasedUnit" ? "g" : 0);
-    
+
         let updatedProduct: ShoppingCartProduct = {
             ...product,
             [field]: newValue,
         };
-    
+
         /*
         // 🔹 Código de cálculo removido para ser feito no backend
         let convertedQuantity = Number(updatedProduct.purchasedQuantity) || 0;
@@ -100,10 +100,10 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                 : 0;
         }
         */
-    
+
         // 🔹 Atualiza o estado do produto no carrinho
         onUpdateProduct(updatedProduct, isAdvancedMode);
-    
+
         // 🔹 Remove o valor editado temporariamente para limpar o input
         setEditValues((prev) => {
             const newValues = { ...prev };
@@ -111,8 +111,8 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
             return newValues;
         });
     };
-    
-    
+
+
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>, product: ShoppingCartProduct, field: string) => {
         const { value } = e.target;
@@ -129,7 +129,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
 
     const getAllowedUnits = (plannedUnit: string | undefined): string[] => {
         if (!plannedUnit) return ["Unidade", "g", "Kg", "ml", "L"];
-    
+
         const unitMap: Record<string, string[]> = {
             "g": ["g", "Kg", "Unidade"],     // Ex: Frutas, legumes, temperos
             "Kg": ["g", "Kg", "Unidade"],    // Ex: Carnes, arroz, frutas vendidas por Kg
@@ -137,10 +137,30 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
             "L": ["ml", "L", "Unidade"],     // Ex: Bebidas em garrafas maiores
             "Unidade": ["Unidade", "g", "Kg", "ml", "L"], // Ex: Ovos, maçãs, caixas de leite
         };
-    
+
         return unitMap[plannedUnit] || ["Unidade"];
     };
-   
+
+    // Função para formatar o valor com "R$" automaticamente
+const formatCurrency = (value: string) => {
+    // Remove tudo que não seja número ou ponto decimal
+    let numericValue = value.replace(/[^\d,]/g, "");
+
+    // Substitui ',' por '.' para garantir o formato decimal correto
+    numericValue = numericValue.replace(",", ".");
+
+    // Converte para número e volta para string formatada com 2 casas decimais
+    let formattedValue = parseFloat(numericValue).toFixed(2);
+
+    // Retorna no formato "R$ 99,99"
+    return isNaN(parseFloat(formattedValue)) ? "R$ 0,00" : `R$ ${formattedValue}`;
+};
+
+// Função para remover "R$" e converter para número antes de salvar
+const parseCurrency = (value: string) => {
+    return parseFloat(value.replace(/[^\d,]/g, "").replace(",", "."));
+};
+
     return (
         <div>
             {/* Switch entre Modo Simples e Avançado */}
@@ -157,11 +177,11 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Nome do Produto</th>
                         <th>Quantidade Planejada</th>
+                        <th>Nome do Produto</th>
                         <th>Quantidade no Carrinho</th>
                         <th>Unidade de Medida</th>
-                        {isAdvancedMode && <th>Preço Unitário (R$ p/ Kg/L)</th>}
+                        {isAdvancedMode && <th>Preço por Kg, L ou Unidade</th>}
                         {isAdvancedMode && <th>Preço Total (R$)</th>}
                         <th>Ações</th>
                     </tr>
@@ -173,13 +193,13 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                 {product.plannedQuantity !== null ? <FaClipboard /> : <FaLightbulb />}
                             </td>
                             <td>
-                                {product?.systemProduct?.variety?.ingredient?.name ?? "Produto Desconhecido"}{" "}
-                                {product?.systemProduct?.variety?.name ?? "Variedade Desconhecida"}{" "}
-                                {product?.systemProduct.quantityPerUnit} { product?.systemProduct.unit} - 
-                                ({product?.systemProduct?.brand ?? "Marca Desconhecida"})
+                                {product.plannedQuantity !== null ? `${product.plannedQuantity} ${product.plannedUnit}` : ""}
                             </td>
                             <td>
-                                {product.plannedQuantity !== null ? `${product.plannedQuantity} ${product.plannedUnit}` : ""}
+                                {product?.systemProduct?.variety?.ingredient?.name ?? "Produto Desconhecido"}{" "}
+                                {product?.systemProduct?.variety?.name ?? "Variedade Desconhecida"}{" "}
+                                {product?.systemProduct.quantityPerUnit} {product?.systemProduct.unit} -
+                                ({product?.systemProduct?.brand ?? "Marca Desconhecida"})
                             </td>
                             <td>
                                 <input
@@ -196,11 +216,14 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                     onChange={(e) => handleSelectChange(e, product, "purchasedUnit")}
                                     onBlur={() => handleEditBlur(product, "purchasedUnit")}
                                 >
-                                    {getAllowedUnits(String(product.plannedUnit) || "").map((unit) => ( // 🔥 Correção aqui
-                                        <option key={unit} value={unit}>{unit}</option>
+                                    {getAllowedUnits(String(product.plannedUnit) || "").map((unit) => (
+                                        <option key={unit} value={unit}>
+                                            {unit} {unit === "Unidade" && product.systemProduct.quantityPerUnit ? `(${product.systemProduct.quantityPerUnit} ${product.systemProduct.unit})` : ""}
+                                        </option>
                                     ))}
                                 </select>
                             </td>
+
                             {isAdvancedMode && (
                                 <td>
                                     <input
