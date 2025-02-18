@@ -7,7 +7,7 @@ import ProductSelectionModal from "../../Product/ProductSelectionModal";
 interface ShoppingCartTableProps {
     products: ShoppingCartProduct[];
     onUpdateProduct: (product: ShoppingCartProduct, isAdvancedMode: boolean) => void;
-    onUpdateProductList: (product: ShoppingCartProduct[], isAdvancedMode: boolean) => void;
+    onUpdateProductList: (product: ShoppingCartProduct, isAdvancedMode: boolean) => void;
     onRemoveProduct: (productId: number) => void;
     onAddProducts: (selectedProducts: ShoppingCartProductInsert[]) => void;
     isAdvancedMode: boolean;
@@ -77,7 +77,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
         updatedProduct.unitPrice = newUnitPrice;
     
         // Atualiza o estado do produto no carrinho
-        onUpdateProduct(updatedProduct, isAdvancedMode);
+        onUpdateProductList(updatedProduct, isAdvancedMode);
     
         // Remove o valor editado temporariamente para limpar o input
         setEditValues((prev) => {

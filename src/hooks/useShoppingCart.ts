@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import {
   updateShoppingCartProduct,
   removeShoppingCartProduct,
@@ -126,33 +126,33 @@ export const useShoppingCart = () => {
 
   const transformCartResponse = (apiResponse: any): ShoppingCart => {
     return {
-        id: apiResponse.id,
-        pantryId: apiResponse.pantryId ?? undefined,
-        createdAt: apiResponse.createdAt,
-        cartProducts: apiResponse.products.map((product: any) => ({
-            id: product.id,
-            systemProductId: product.systemProduct.id,
-            systemProduct: {
-                ...product.systemProduct,
-                variety: {
-                    ...product.systemProduct.variety,
-                    ingredient: { ...product.systemProduct.variety.ingredient }
-                }
-            },
-            plannedQuantity: product.plannedQuantity ?? null, // Default para 0 se for null
-            plannedUnit: product.plannedUnit ?? "Unidade", // Default para "Unidade"
-            purchasedQuantity: product.purchasedQuantity,
-            purchasedUnit: product.purchasedUnit,
-            unitPrice: product.unitPrice,
-            totalPrice: product.totalPrice,
-        })),
+      id: apiResponse.id,
+      pantryId: apiResponse.pantryId ?? undefined,
+      createdAt: apiResponse.createdAt,
+      cartProducts: apiResponse.products.map((product: any) => ({
+        id: product.id,
+        systemProductId: product.systemProduct.id,
+        systemProduct: {
+          ...product.systemProduct,
+          variety: {
+            ...product.systemProduct.variety,
+            ingredient: { ...product.systemProduct.variety.ingredient }
+          }
+        },
+        plannedQuantity: product.plannedQuantity ?? null, // Default para 0 se for null
+        plannedUnit: product.plannedUnit ?? "Unidade", // Default para "Unidade"
+        purchasedQuantity: product.purchasedQuantity,
+        purchasedUnit: product.purchasedUnit,
+        unitPrice: product.unitPrice,
+        totalPrice: product.totalPrice,
+      })),
     };
-};
+  };
 
 
   const handleAddToCart = async (data: ShoppingCartProductInsert[]) => {
     if (id) {
-      try {      
+      try {
         const apiResponse = await addProductToShoppingCart(parseInt(id), data);
         const updatedCart = transformCartResponse(apiResponse);
 
@@ -169,7 +169,7 @@ export const useShoppingCart = () => {
   const handleUpdateCartProduct = async (data: ShoppingCartProduct, isAdvancedMode: boolean) => {
     if (id) {
       try {
-        const apiResponse  = await updateShoppingCartProduct(parseInt(id), data.id, data, isAdvancedMode);
+        const apiResponse = await updateShoppingCartProduct(parseInt(id), data.id, data, isAdvancedMode);
         const updatedCart = transformCartResponse(apiResponse); // Converte para ShoppingCart
 
         dispatch({ type: "SET_CART", payload: updatedCart });
@@ -181,19 +181,53 @@ export const useShoppingCart = () => {
     }
   };
 
-  const handleUpdateCartProductList = async (data: ShoppingCartProduct[], isAdvancedMode: boolean) => {
-    if (id) {
-      try {
-        const apiResponse  = await updateShoppingCartProducts(parseInt(id), data, isAdvancedMode);
-        const updatedCart = transformCartResponse(apiResponse); // Converte para ShoppingCart
+  const [pendingUpdates, setPendingUpdates] = useState<{ [key: number]: ShoppingCartProduct }>({});
+  const [updateTimer, setUpdateTimer] = useState<NodeJS.Timeout | null>(null);
 
-        dispatch({ type: "SET_CART", payload: updatedCart });
-      } catch (error: unknown) {
-        console.error("Erro ao atualizar product:", error);
-        const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-        dispatch({ type: "SET_ERROR", payload: errorMessage });
-      }
+  const handleUpdateCartProductList = async (data: ShoppingCartProduct, isAdvancedMode: boolean) => {
+    // Atualiza o estado local imediatamente para refletir os cálculos no frontend
+    setPendingUpdates((prev) => ({
+      ...prev,
+      [data.id]: data, // Adiciona o produto atualizado à lista de pendentes
+    }));
+
+    // 🔹 Atualiza o estado global do carrinho para refletir a alteração instantaneamente no frontend
+    dispatch({
+      type: "SET_CART",
+      payload: state.cart ? {
+        ...state.cart,
+        cartProducts: state.cart.cartProducts.map((product) =>
+          product.id === data.id ? { ...product, ...data } : product
+        )
+      } : { cartProducts: [data] } // Se `state.cart` for `null`, cria um novo carrinho com o item atualizado
+    });
+
+
+    // Se já houver um timer, cancela e reinicia
+    if (updateTimer) {
+      clearTimeout(updateTimer);
     }
+
+    // Define um novo timer para enviar as alterações ao backend após 10 segundos
+    const newTimer = setTimeout(async () => {
+      const productsToUpdate = Object.values(pendingUpdates);
+
+      if (productsToUpdate.length > 0 && id) {
+        try {
+          const apiResponse = await updateShoppingCartProducts(parseInt(id), productsToUpdate, isAdvancedMode);
+          const updatedCart = transformCartResponse(apiResponse);
+
+          dispatch({ type: "SET_CART", payload: updatedCart }); // 🔹 Atualiza o estado com os dados do backend
+          setPendingUpdates({}); // Limpa os produtos pendentes após a atualização
+        } catch (error: unknown) {
+          console.error("Erro ao atualizar produto:", error);
+          const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+          dispatch({ type: "SET_ERROR", payload: errorMessage });
+        }
+      }
+    }, 10000); // 10 segundos
+
+    setUpdateTimer(newTimer);
   };
 
   const handleRemoveCartProduct = async (cartProductId: number) => {
