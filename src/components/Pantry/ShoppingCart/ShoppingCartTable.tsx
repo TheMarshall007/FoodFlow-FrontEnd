@@ -3,7 +3,6 @@ import { FaTrash, FaPlus, FaClipboard, FaLightbulb } from "react-icons/fa";
 import "../../../styles/components/Shopping/ShoppingCartTable.css";
 import { ShoppingCartProduct, ShoppingCartProductInsert } from "../../../services/shopping/shoppingCartService";
 import ProductSelectionModal from "../../Product/ProductSelectionModal";
-import { UnitOfMeasure } from "../../../services/product/productService";
 
 interface ShoppingCartTableProps {
     products: ShoppingCartProduct[];
@@ -18,6 +17,7 @@ interface ShoppingCartTableProps {
 const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
     products,
     onUpdateProduct,
+    onUpdateProductList,
     onRemoveProduct,
     onAddProducts,
     isAdvancedMode,
@@ -25,14 +25,6 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editValues, setEditValues] = useState<{ [key: number]: Partial<ShoppingCartProduct> }>({});
-
-    const parseBigDecimal = (value: string | number): number => {
-        return typeof value === "string" ? parseFloat(value.replace(",", ".")) || 0 : value;
-    };
-
-    const formatBigDecimal = (value: string | number): number => {
-        return parseFloat(parseBigDecimal(value).toFixed(2));
-    };
 
     const handleEditChange = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -55,48 +47,84 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
     ) => {
         let newValue: string | number =
             (editValues[product.id]?.[field] as string | number) ??
-            (product[field] as string | number) ??
-            (field === "purchasedUnit" ? "g" : 0);
+            (product[field] as string | number) ?? 0;
     
         let updatedProduct: ShoppingCartProduct = {
             ...product,
             [field]: newValue,
         };
     
-        let purchasedQuantity = Number(updatedProduct.purchasedQuantity) || 0;
-        let unitPrice = Number(updatedProduct.unitPrice) || 0;
-        let totalPrice = Number(updatedProduct.totalPrice) || 0;
-        let purchasedUnit = updatedProduct.purchasedUnit as UnitOfMeasure;
-        let productUnit = product.systemProduct.unit as UnitOfMeasure;
-        let productQuantity = Number(product.systemProduct.quantityPerUnit) || 1;
+        // Obtendo os valores antes do cálculo
+        const purchasedQuantity = Number(updatedProduct.purchasedQuantity) || 0;
+        const purchasedUnit = String(updatedProduct.purchasedUnit) || "Unidade";
+        const unitPrice = Number(updatedProduct.unitPrice) || 0;
+        const totalPrice = Number(updatedProduct.totalPrice) || 0;
+        const productUnit = String(product.systemProduct.unit) || "Unidade";
+        const productQuantity = Number(product.systemProduct.quantityPerUnit) || 1;
     
-        // 🔹 Aplicação da lógica de cálculo do backend no frontend
-        if (purchasedUnit === "Kg" || purchasedUnit === "L") {
-            totalPrice = unitPrice * purchasedQuantity;
-        } else if (purchasedUnit === "g" || purchasedUnit === "ml") {
-            totalPrice = (unitPrice / 1000) * purchasedQuantity;
-        } else if (purchasedUnit === "unit" && (productUnit === "Kg" || productUnit === "L")) {
-            totalPrice = productQuantity * purchasedQuantity * unitPrice;
-        } else if (purchasedUnit === "unit" && (productUnit === "g" || productUnit === "ml")) {
-            totalPrice = (productQuantity * purchasedQuantity / 1000) * unitPrice;
-        } else if (purchasedUnit === "unit" && productUnit === "unit") {
-            unitPrice = totalPrice / purchasedQuantity;
-        }
+        // ⚡ Chamando `calculatePrices` para calcular os valores corretos
+        const { totalPrice: newTotalPrice, unitPrice: newUnitPrice } = calculatePrices(
+            purchasedQuantity,
+            purchasedUnit,
+            unitPrice,
+            totalPrice,
+            productUnit,
+            productQuantity
+        );
     
-        updatedProduct.totalPrice = Number(formatBigDecimal(totalPrice));
-        updatedProduct.unitPrice = Number(formatBigDecimal(unitPrice));
+        // Atualiza os valores calculados no produto atualizado
+        updatedProduct.totalPrice = newTotalPrice;
+        updatedProduct.unitPrice = newUnitPrice;
     
-        // 🔹 Atualiza o estado do produto no carrinho
+        // Atualiza o estado do produto no carrinho
         onUpdateProduct(updatedProduct, isAdvancedMode);
     
-        // 🔹 Remove o valor editado temporariamente para limpar o input
+        // Remove o valor editado temporariamente para limpar o input
         setEditValues((prev) => {
             const newValues = { ...prev };
             delete newValues[product.id];
             return newValues;
         });
-    };
+    };    
+
+    const calculatePrices = (
+        purchasedQuantity: number,
+        purchasedUnit: string,
+        unitPrice: number,
+        totalPrice: number,
+        productUnit: string,
+        productQuantity: number
+    ) => {
+        let newTotalPrice = totalPrice;
+        let newUnitPrice = unitPrice;
     
+        // Se unidade no carrinho for Kg ou L → Multiplicar diretamente
+        if (purchasedUnit === "Kg" || purchasedUnit === "L") {
+            newTotalPrice = unitPrice * purchasedQuantity;
+        }
+        // Se unidade no carrinho for g ou ml → Dividir o preço por 1000
+        else if (purchasedUnit === "g" || purchasedUnit === "ml") {
+            newTotalPrice = (unitPrice / 1000) * purchasedQuantity;
+        }
+        // Se unidade no carrinho for UNIDADE e o produto for vendido por Kg ou L
+        else if (purchasedUnit === "Unidade" && (productUnit === "Kg" || productUnit === "L")) {
+            newTotalPrice = productQuantity * purchasedQuantity * unitPrice;
+        }
+        // Se unidade no carrinho for UNIDADE e o produto for vendido por g ou ml
+        else if (purchasedUnit === "Unidade" && (productUnit === "g" || productUnit === "ml")) {
+            newTotalPrice = (productQuantity * purchasedQuantity / 1000) * unitPrice;
+        }
+        // Se unidade no carrinho for UNIDADE e o produto também for UNIDADE
+        else if (purchasedUnit === "Unidade" && productUnit === "Unidade") {
+            newUnitPrice = newTotalPrice / purchasedQuantity;
+        }
+    
+        return {
+            totalPrice: Number(newTotalPrice.toFixed(2)),
+            unitPrice: Number(newUnitPrice.toFixed(2))
+        };
+    };    
+
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>, product: ShoppingCartProduct, field: string) => {
         const { value } = e.target;
         setEditValues((prev) => ({
@@ -141,11 +169,11 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                     <tr>
                         <th></th>
                         <th>Quantidade Planejada</th>
-                        <th>Produto</th>
+                        <th>Nome do Produto</th>
                         <th>Quantidade no Carrinho</th>
                         <th>Unidade de Medida</th>
                         {isAdvancedMode && <th>Preço por Kg, L ou Unidade</th>}
-                        {isAdvancedMode && <th>Preço Total (R$)</th>}
+                        {isAdvancedMode && <th>Preço Total</th>}
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -200,15 +228,10 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                             )}
                             {isAdvancedMode && (
                                 <td>
-                                    <input
-                                        type="number"
-                                        value={editValues[product.id]?.totalPrice ?? product.totalPrice}
-                                        onChange={(e) => handleEditChange(e, product, "totalPrice")}
-                                        onBlur={() => handleEditBlur(product, "totalPrice")}
-                                        step="0.01"
-                                    />
+                                    <span>R$ {(editValues[product.id]?.totalPrice ?? product.totalPrice).toFixed(2)}</span>
                                 </td>
                             )}
+
                             <td>
                                 {product.plannedQuantity == null && (
                                     <button className="remove-button" onClick={() => onRemoveProduct(product.id)}>
@@ -229,15 +252,12 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                     {isAdvancedMode && (
                         <tr>
                             <td colSpan={6} style={{ fontWeight: "bold", textAlign: "right" }}>Total:</td>
-                            <td style={{ fontWeight: "bold" }}>R$ {totalPrice.toFixed(2)}</td>
+                            <td style={{ fontWeight: "bold" }}>{totalPrice.toFixed(2)}</td>
                             <td></td>
                         </tr>
                     )}
                 </tbody>
             </table>
-
-
-
 
             {isModalOpen && (
                 <ProductSelectionModal
