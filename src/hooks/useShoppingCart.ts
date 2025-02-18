@@ -8,6 +8,7 @@ import {
   addProductToShoppingCart,
   loadCartFromShoppingList,
   ShoppingCartProductInsert,
+  updateShoppingCartProducts,
 } from "../services/shopping/shoppingCartService";
 import { useUser } from "../context/UserContext";
 import { ShoppingListProduct } from "../services/shopping/shoppingListService";
@@ -180,6 +181,20 @@ export const useShoppingCart = () => {
     }
   };
 
+  const handleUpdateCartProductList = async (data: ShoppingCartProduct[], isAdvancedMode: boolean) => {
+    if (id) {
+      try {
+        const apiResponse  = await updateShoppingCartProducts(parseInt(id), data, isAdvancedMode);
+        const updatedCart = transformCartResponse(apiResponse); // Converte para ShoppingCart
+
+        dispatch({ type: "SET_CART", payload: updatedCart });
+      } catch (error: unknown) {
+        console.error("Erro ao atualizar product:", error);
+        const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+        dispatch({ type: "SET_ERROR", payload: errorMessage });
+      }
+    }
+  };
 
   const handleRemoveCartProduct = async (cartProductId: number) => {
     if (id) {
@@ -213,6 +228,7 @@ export const useShoppingCart = () => {
     error: state.error,
     handleAddToCart,
     handleUpdateCartProduct,
+    handleUpdateCartProductList,
     handleRemoveCartProduct,
     handleFinalizePurchase,
   };

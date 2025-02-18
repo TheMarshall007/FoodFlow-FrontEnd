@@ -3,10 +3,12 @@ import { FaTrash, FaPlus, FaClipboard, FaLightbulb } from "react-icons/fa";
 import "../../../styles/components/Shopping/ShoppingCartTable.css";
 import { ShoppingCartProduct, ShoppingCartProductInsert } from "../../../services/shopping/shoppingCartService";
 import ProductSelectionModal from "../../Product/ProductSelectionModal";
+import { UnitOfMeasure } from "../../../services/product/productService";
 
 interface ShoppingCartTableProps {
     products: ShoppingCartProduct[];
     onUpdateProduct: (product: ShoppingCartProduct, isAdvancedMode: boolean) => void;
+    onUpdateProductList: (product: ShoppingCartProduct[], isAdvancedMode: boolean) => void;
     onRemoveProduct: (productId: number) => void;
     onAddProducts: (selectedProducts: ShoppingCartProductInsert[]) => void;
     isAdvancedMode: boolean;
@@ -55,55 +57,38 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
             (editValues[product.id]?.[field] as string | number) ??
             (product[field] as string | number) ??
             (field === "purchasedUnit" ? "g" : 0);
-
+    
         let updatedProduct: ShoppingCartProduct = {
             ...product,
             [field]: newValue,
         };
-
-        /*
-        // 🔹 Código de cálculo removido para ser feito no backend
-        let convertedQuantity = Number(updatedProduct.purchasedQuantity) || 0;
     
-        // 🔹 Definição explícita do tipo de unidade
-        type UnitType = "g" | "Kg" | "ml" | "L" | "unit";
+        let purchasedQuantity = Number(updatedProduct.purchasedQuantity) || 0;
+        let unitPrice = Number(updatedProduct.unitPrice) || 0;
+        let totalPrice = Number(updatedProduct.totalPrice) || 0;
+        let purchasedUnit = updatedProduct.purchasedUnit as UnitOfMeasure;
+        let productUnit = product.systemProduct.unit as UnitOfMeasure;
+        let productQuantity = Number(product.systemProduct.quantityPerUnit) || 1;
     
-        // 🔹 Mapeamento de conversão entre unidades
-        const conversionFactors: Record<UnitType, Record<UnitType, number>> = {
-            g:   { g: 1, Kg: 1 / 1000, ml: 0, L: 0, unit: 0 },
-            Kg:  { g: 1000, Kg: 1, ml: 0, L: 0, unit: 0 },
-            ml:  { g: 0, Kg: 0, ml: 1, L: 1 / 1000, unit: 0 },
-            L:   { g: 0, Kg: 0, ml: 1000, L: 1, unit: 0 },
-            unit: { g: 0, Kg: 0, ml: 0, L: 1, unit: 1 }
-        };
-    
-        if (field === "purchasedUnit" && product.purchasedUnit !== newValue) {
-            const prevUnit = product.purchasedUnit as UnitType;
-            const newUnit = newValue as UnitType;
-    
-            if (conversionFactors[prevUnit] && conversionFactors[prevUnit][newUnit] !== undefined) {
-                convertedQuantity *= conversionFactors[prevUnit][newUnit];
-            }
+        // 🔹 Aplicação da lógica de cálculo do backend no frontend
+        if (purchasedUnit === "Kg" || purchasedUnit === "L") {
+            totalPrice = unitPrice * purchasedQuantity;
+        } else if (purchasedUnit === "g" || purchasedUnit === "ml") {
+            totalPrice = (unitPrice / 1000) * purchasedQuantity;
+        } else if (purchasedUnit === "unit" && (productUnit === "Kg" || productUnit === "L")) {
+            totalPrice = productQuantity * purchasedQuantity * unitPrice;
+        } else if (purchasedUnit === "unit" && (productUnit === "g" || productUnit === "ml")) {
+            totalPrice = (productQuantity * purchasedQuantity / 1000) * unitPrice;
+        } else if (purchasedUnit === "unit" && productUnit === "unit") {
+            unitPrice = totalPrice / purchasedQuantity;
         }
     
-        if (field === "purchasedQuantity" || field === "purchasedUnit") {
-            updatedProduct.totalPrice = updatedProduct.unitPrice > 0
-                ? Number(formatBigDecimal(convertedQuantity * updatedProduct.unitPrice))
-                : 0;
-        } else if (field === "unitPrice") {
-            updatedProduct.totalPrice = convertedQuantity > 0
-                ? Number(formatBigDecimal(convertedQuantity * updatedProduct.unitPrice))
-                : 0;
-        } else if (field === "totalPrice") {
-            updatedProduct.unitPrice = convertedQuantity > 0
-                ? Number(formatBigDecimal(updatedProduct.totalPrice / convertedQuantity))
-                : 0;
-        }
-        */
-
+        updatedProduct.totalPrice = Number(formatBigDecimal(totalPrice));
+        updatedProduct.unitPrice = Number(formatBigDecimal(unitPrice));
+    
         // 🔹 Atualiza o estado do produto no carrinho
         onUpdateProduct(updatedProduct, isAdvancedMode);
-
+    
         // 🔹 Remove o valor editado temporariamente para limpar o input
         setEditValues((prev) => {
             const newValues = { ...prev };
@@ -111,9 +96,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
             return newValues;
         });
     };
-
-
-
+    
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>, product: ShoppingCartProduct, field: string) => {
         const { value } = e.target;
         setEditValues((prev) => ({
@@ -141,26 +124,6 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
         return unitMap[plannedUnit] || ["Unidade"];
     };
 
-    // Função para formatar o valor com "R$" automaticamente
-const formatCurrency = (value: string) => {
-    // Remove tudo que não seja número ou ponto decimal
-    let numericValue = value.replace(/[^\d,]/g, "");
-
-    // Substitui ',' por '.' para garantir o formato decimal correto
-    numericValue = numericValue.replace(",", ".");
-
-    // Converte para número e volta para string formatada com 2 casas decimais
-    let formattedValue = parseFloat(numericValue).toFixed(2);
-
-    // Retorna no formato "R$ 99,99"
-    return isNaN(parseFloat(formattedValue)) ? "R$ 0,00" : `R$ ${formattedValue}`;
-};
-
-// Função para remover "R$" e converter para número antes de salvar
-const parseCurrency = (value: string) => {
-    return parseFloat(value.replace(/[^\d,]/g, "").replace(",", "."));
-};
-
     return (
         <div>
             {/* Switch entre Modo Simples e Avançado */}
@@ -178,7 +141,7 @@ const parseCurrency = (value: string) => {
                     <tr>
                         <th></th>
                         <th>Quantidade Planejada</th>
-                        <th>Nome do Produto</th>
+                        <th>Produto</th>
                         <th>Quantidade no Carrinho</th>
                         <th>Unidade de Medida</th>
                         {isAdvancedMode && <th>Preço por Kg, L ou Unidade</th>}
@@ -266,7 +229,7 @@ const parseCurrency = (value: string) => {
                     {isAdvancedMode && (
                         <tr>
                             <td colSpan={6} style={{ fontWeight: "bold", textAlign: "right" }}>Total:</td>
-                            <td style={{ fontWeight: "bold" }}>{totalPrice.toFixed(2)}</td>
+                            <td style={{ fontWeight: "bold" }}>R$ {totalPrice.toFixed(2)}</td>
                             <td></td>
                         </tr>
                     )}

@@ -6,7 +6,7 @@ export interface Product {
     id: number;
     brand: string;
     quantityPerUnit: number;
-    unit: string;
+    unit: UnitOfMeasure;
     varietyId: number;
     variety: Variety;
 }
@@ -15,6 +15,15 @@ interface ProductDTOSearch {
     id?: number;
     page: number
 }
+
+export enum UnitOfMeasure {
+    GRAM = "g",
+    KILOGRAM = "Kg",
+    MILLILITER = "ml",
+    LITER = "L",
+    UNIT = "unit"
+}
+
 
 export const fetchProductById = async (id: number): Promise<Product> => {
     try {

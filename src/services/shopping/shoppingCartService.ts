@@ -80,6 +80,19 @@ export const updateShoppingCartProduct = async (pantryId: number, productId: num
 };
 
 /**
+ * Atualiza uma lista de product do carrinho de compras.
+ */
+export const updateShoppingCartProducts = async (pantryId: number, product: ShoppingCartProduct[], isAdvancedMode: boolean): Promise<ShoppingCart> => {
+    try {
+        const response = await api.put(`/pantries/${pantryId}/shopping-cart/products/updateItems`, {...product, isAdvancedMode});
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao atualizar product do carrinho:', error);
+        throw error;
+    }
+};
+
+/**
  * Remove um product do carrinho de compras.
  */
 export const removeShoppingCartProduct = async (pantryId: number, productId: number): Promise<ShoppingCart> => {

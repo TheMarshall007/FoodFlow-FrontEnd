@@ -8,7 +8,7 @@ import ProductSelectionModal from "../../../components/Product/ProductSelectionM
 
 const ShoppingCart: React.FC = () => {
     let { id } = useParams<{ id: string }>();
-    const { cart, loading, error, handleUpdateCartProduct, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart();
+    const { cart, loading, error, handleUpdateCartProduct, handleUpdateCartProductList, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate(); // Hook para navegação
     const [isAdvancedMode, setIsAdvancedMode] = useState(false); // 🚀 Estado de Modo Avançado
@@ -33,6 +33,7 @@ const ShoppingCart: React.FC = () => {
                     <ShoppingCartTable
                         products={cart.cartProducts}
                         onUpdateProduct={handleUpdateCartProduct}
+                        onUpdateProductList={handleUpdateCartProductList}
                         onRemoveProduct={handleRemoveCartProduct}
                         onAddProducts={handleAddToCart}
                         isAdvancedMode={isAdvancedMode}
