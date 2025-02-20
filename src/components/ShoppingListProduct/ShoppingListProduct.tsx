@@ -1,22 +1,22 @@
 import React from 'react';
 
-interface ShoppingListItemProps {
+interface ShoppingListProductProps {
     id: number;
     name: string;
     quantityPlanned: number;
     onRemove: (itemId: number) => void;
 }
 
-const ShoppingListItem: React.FC<ShoppingListItemProps> = ({ id, name, quantityPlanned, onRemove }) => {
+const ShoppingListProduct: React.FC<ShoppingListProductProps> = ({ id, name, quantityPlanned, onRemove }) => {
     return (
         <div className="shopping-list-item">
             <p><strong>{name}</strong></p>
             <p>Quantidade Planejada: {quantityPlanned}</p>
-            <button className="remove-item-button" onClick={() => onRemove(id)}>
+            <button className="remove-product-button" onClick={() => onRemove(id)}>
                 Remover
             </button>
         </div>
     );
 };
 
-export default ShoppingListItem;
+export default ShoppingListProduct;

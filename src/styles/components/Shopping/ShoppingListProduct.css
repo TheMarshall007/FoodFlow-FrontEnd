@@ -9,7 +9,7 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.remove-item-button {
+.remove-product-button {
     background-color: #ff4d4d;
     color: #fff;
     border: none;
@@ -18,6 +18,6 @@
     cursor: pointer;
 }
 
-.remove-item-button:hover {
+.remove-product-button:hover {
     background-color: #d12e2e;
 }

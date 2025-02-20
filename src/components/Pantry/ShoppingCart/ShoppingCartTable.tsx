@@ -1,145 +1,278 @@
 import React, { useState } from "react";
-import { FaTrash, FaPlus } from "react-icons/fa";
+import { FaTrash, FaPlus, FaClipboard, FaLightbulb } from "react-icons/fa";
 import "../../../styles/components/Shopping/ShoppingCartTable.css";
-import { ShoppingCartItem } from "../../../services/shopping/shoppingCartService";
-import ItemSelectionModal from "../../ShoppingListItem/ItemSelectionModal/ItemSelectionModal";
-import { ShoppingListItem } from "../../../services/shopping/shoppingListService";
+import { ShoppingCartProduct, ShoppingCartProductInsert } from "../../../services/shopping/shoppingCartService";
+import ProductSelectionModal from "../../Product/ProductSelectionModal";
 
 interface ShoppingCartTableProps {
-    items: ShoppingCartItem[];
-    availableItems: { id: number; name: string }[];
-    onUpdateItem: (item: ShoppingCartItem) => void;
-    onRemoveItem: (itemId: number) => void;
-    onAddItems: (selectedItems: ShoppingListItem[]) => void;
+    products: ShoppingCartProduct[];
+    onUpdateProduct: (product: ShoppingCartProduct, isAdvancedMode: boolean) => void;
+    onUpdateProductList: (product: ShoppingCartProduct, isAdvancedMode: boolean) => void;
+    onRemoveProduct: (productId: number) => void;
+    onAddProducts: (selectedProducts: ShoppingCartProductInsert[]) => void;
+    isAdvancedMode: boolean;
+    setIsAdvancedMode: (value: boolean) => void;
 }
 
 const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
-    items,
-    availableItems,
-    onUpdateItem,
-    onRemoveItem,
-    onAddItems,
+    products,
+    onUpdateProduct,
+    onUpdateProductList,
+    onRemoveProduct,
+    onAddProducts,
+    isAdvancedMode,
+    setIsAdvancedMode
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editValues, setEditValues] = useState<{ [key: number]: Partial<ShoppingCartProduct> }>({});
 
-    const handleInputChange = (
+    const handleEditChange = (
         e: React.ChangeEvent<HTMLInputElement>,
-        item: ShoppingCartItem,
-        field: "cartQuantity" | "price" | "unityPrice"
+        product: ShoppingCartProduct,
+        field: keyof ShoppingCartProduct
     ) => {
-        const newValue = parseFloat(e.target.value) || 0;
-        let updatedItem = { ...item };
+        const newValue = e.target.value;
+        setEditValues((prev) => ({
+            ...prev,
+            [product.id]: {
+                ...prev[product.id],
+                [field]: newValue
+            }
+        }));
+    };
+
+    const handleEditBlur = (
+        product: ShoppingCartProduct,
+        field: keyof ShoppingCartProduct
+    ) => {
+        let newValue: string | number =
+            (editValues[product.id]?.[field] as string | number) ??
+            (product[field] as string | number) ?? 0;
     
-        switch (field) {
-            case "cartQuantity":
-                updatedItem.cartQuantity = newValue;
-                if (updatedItem.unityPrice) {
-                    updatedItem.price = updatedItem.cartQuantity * updatedItem.unityPrice;
-                } else if (updatedItem.price) {
-                    updatedItem.unityPrice = updatedItem.price / updatedItem.cartQuantity;
-                }
-                break;
+        let updatedProduct: ShoppingCartProduct = {
+            ...product,
+            [field]: newValue,
+        };
     
-            case "unityPrice":
-                updatedItem.unityPrice = newValue;
-                if (updatedItem.cartQuantity) {
-                    updatedItem.price = updatedItem.cartQuantity * updatedItem.unityPrice;
-                }
-                break;
+        // Obtendo os valores antes do cálculo
+        const purchasedQuantity = Number(updatedProduct.purchasedQuantity) || 0;
+        const purchasedUnit = String(updatedProduct.purchasedUnit) || "Unidade";
+        const unitPrice = Number(updatedProduct.unitPrice) || 0;
+        const totalPrice = Number(updatedProduct.totalPrice) || 0;
+        const productUnit = String(product.systemProduct.unit) || "Unidade";
+        const productQuantity = Number(product.systemProduct.quantityPerUnit) || 1;
     
-            case "price":
-                updatedItem.price = newValue;
-                if (updatedItem.cartQuantity) {
-                    updatedItem.unityPrice = updatedItem.price / updatedItem.cartQuantity;
-                }
-                break;
+        // ⚡ Chamando `calculatePrices` para calcular os valores corretos
+        const { totalPrice: newTotalPrice, unitPrice: newUnitPrice } = calculatePrices(
+            purchasedQuantity,
+            purchasedUnit,
+            unitPrice,
+            totalPrice,
+            productUnit,
+            productQuantity
+        );
     
-            default:
-                break;
+        // Atualiza os valores calculados no produto atualizado
+        updatedProduct.totalPrice = newTotalPrice;
+        updatedProduct.unitPrice = newUnitPrice;
+    
+        // Atualiza o estado do produto no carrinho
+        onUpdateProductList(updatedProduct, isAdvancedMode);
+    
+        // Remove o valor editado temporariamente para limpar o input
+        setEditValues((prev) => {
+            const newValues = { ...prev };
+            delete newValues[product.id];
+            return newValues;
+        });
+    };    
+
+    const calculatePrices = (
+        purchasedQuantity: number,
+        purchasedUnit: string,
+        unitPrice: number,
+        totalPrice: number,
+        productUnit: string,
+        productQuantity: number
+    ) => {
+        let newTotalPrice = totalPrice;
+        let newUnitPrice = unitPrice;
+    
+        // Se unidade no carrinho for Kg ou L → Multiplicar diretamente
+        if (purchasedUnit === "Kg" || purchasedUnit === "L") {
+            newTotalPrice = unitPrice * purchasedQuantity;
+        }
+        // Se unidade no carrinho for g ou ml → Dividir o preço por 1000
+        else if (purchasedUnit === "g" || purchasedUnit === "ml") {
+            newTotalPrice = (unitPrice / 1000) * purchasedQuantity;
+        }
+        // Se unidade no carrinho for UNIDADE e o produto for vendido por Kg ou L
+        else if (purchasedUnit === "Unidade" && (productUnit === "Kg" || productUnit === "L")) {
+            newTotalPrice = productQuantity * purchasedQuantity * unitPrice;
+        }
+        // Se unidade no carrinho for UNIDADE e o produto for vendido por g ou ml
+        else if (purchasedUnit === "Unidade" && (productUnit === "g" || productUnit === "ml")) {
+            newTotalPrice = (productQuantity * purchasedQuantity / 1000) * unitPrice;
+        }
+        // Se unidade no carrinho for UNIDADE e o produto também for UNIDADE
+        else if (purchasedUnit === "Unidade" && productUnit === "Unidade") {
+            newUnitPrice = newTotalPrice / purchasedQuantity;
         }
     
-        // Chama a função para atualizar o item com os novos valores calculados
-        onUpdateItem(updatedItem);
-    };
-    
+        return {
+            totalPrice: Number(newTotalPrice.toFixed(2)),
+            unitPrice: Number(newUnitPrice.toFixed(2))
+        };
+    };    
 
+    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>, product: ShoppingCartProduct, field: string) => {
+        const { value } = e.target;
+        setEditValues((prev) => ({
+            ...prev,
+            [product.id]: {
+                ...prev[product.id],
+                [field]: value,
+            },
+        }));
+    };
+
+    const totalPrice = products.reduce((sum, product) => sum + (product.totalPrice || 0), 0);
+
+    const getAllowedUnits = (productUnit: string | undefined): string[] => {
+        if (!productUnit) return ["Unidade", "g", "Kg", "ml", "L"];
+
+        const unitMap: Record<string, string[]> = {
+            "g": ["g", "Kg", "Unidade"],     // Ex: Frutas, legumes, temperos
+            "Kg": ["g", "Kg", "Unidade"],    // Ex: Carnes, arroz, frutas vendidas por Kg
+            "ml": ["ml", "L", "Unidade"],    // Ex: Óleos, leite em embalagens menores
+            "L": ["ml", "L", "Unidade"],     // Ex: Bebidas em garrafas maiores
+            "Unidade": ["Unidade", "g", "Kg", "ml", "L"], // Ex: Ovos, maçãs, caixas de leite
+        };
+
+        return unitMap[productUnit] || ["Unidade"];
+    };
 
     return (
         <div>
+            {/* Switch entre Modo Simples e Avançado */}
+            <div className="cart-header">
+                <label className="switch">
+                    <input type="checkbox" checked={isAdvancedMode} onChange={() => setIsAdvancedMode(!isAdvancedMode)} />
+                    <span className="slider">
+                        <span className="switch-text">{isAdvancedMode ? "Avançado" : "Simples"}</span>
+                    </span>
+                </label>
+            </div>
+
             <table className="shopping-cart-table">
                 <thead>
                     <tr>
+                        <th></th>
+                        <th>Quantidade Planejada</th>
                         <th>Nome do Produto</th>
-                        <th>Quantidade Necessária</th>
                         <th>Quantidade no Carrinho</th>
-                        <th>Preço Unitário (R$)</th>
-                        <th>Preço Total (R$)</th>
+                        <th>Unidade de Medida</th>
+                        {isAdvancedMode && <th>Preço por Kg, L ou Unidade</th>}
+                        {isAdvancedMode && <th>Preço Total</th>}
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {items
-                        .slice()
-                        .sort((a, b) => a.id - b.id) // Ensure items are ordered by ID
-                        .map((item) => (
-                            <tr key={item.id}>
-                                <td>{item.ingredient.name}</td>
-                                <td>{item.plannedQuantity}</td>
+                    {products.map((product) => (
+                        <tr key={product.id}>
+                            <td>
+                                {product.plannedQuantity !== null ? <FaClipboard /> : <FaLightbulb />}
+                            </td>
+                            <td>
+                                {product.plannedQuantity !== null ? `${product.plannedQuantity} ${product.plannedUnit}` : ""}
+                            </td>
+                            <td>
+                                {product?.systemProduct?.variety?.ingredient?.name ?? "Produto Desconhecido"}{" "}
+                                {product?.systemProduct?.variety?.name ?? "Variedade Desconhecida"}{" "}
+                                {product?.systemProduct.quantityPerUnit} {product?.systemProduct.unit} -
+                                ({product?.systemProduct?.brand ?? "Marca Desconhecida"})
+                            </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    value={editValues[product.id]?.purchasedQuantity ?? product.purchasedQuantity}
+                                    onChange={(e) => handleEditChange(e, product, "purchasedQuantity")}
+                                    onBlur={() => handleEditBlur(product, "purchasedQuantity")}
+                                    min="0"
+                                />
+                            </td>
+                            <td>
+                                <select
+                                    value={String(editValues[product.id]?.purchasedUnit ?? product.purchasedUnit ?? product.plannedUnit ?? "Unidade")}
+                                    onChange={(e) => handleSelectChange(e, product, "purchasedUnit")}
+                                    onBlur={() => handleEditBlur(product, "purchasedUnit")}
+                                >
+                                    {getAllowedUnits(String(product.systemProduct.unit) || "").map((unit) => (
+                                        <option key={unit} value={unit}>
+                                            {unit} {unit === "Unidade" && product.systemProduct.quantityPerUnit ? `(${product.systemProduct.quantityPerUnit} ${product.systemProduct.unit})` : ""}
+                                        </option>
+                                    ))}
+                                </select>
+                            </td>
+
+                            {isAdvancedMode && (
                                 <td>
                                     <input
                                         type="number"
-                                        value={item.cartQuantity}
-                                        onChange={(e) =>
-                                            handleInputChange(e, item, "cartQuantity")
-                                        }
-                                        min="0"
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        value={item.unityPrice}
-                                        onChange={(e) =>
-                                            handleInputChange(e, item, "unityPrice")
-                                        }
+                                        value={editValues[product.id]?.unitPrice ?? product.unitPrice}
+                                        onChange={(e) => handleEditChange(e, product, "unitPrice")}
+                                        onBlur={() => handleEditBlur(product, "unitPrice")}
                                         step="0.01"
                                     />
                                 </td>
+                            )}
+                            {isAdvancedMode && (
                                 <td>
-                                    <input
-                                        type="number"
-                                        value={item.price}
-                                        onChange={(e) =>
-                                            handleInputChange(e, item, "price")
-                                        }
-                                        step="0.01"
-                                    />
+                                    <span>R$ {(editValues[product.id]?.totalPrice ?? product.totalPrice).toFixed(2)}</span>
                                 </td>
-                                <td>
-                                    <button
-                                        className="remove-button"
-                                        onClick={() => onRemoveItem(item.id)}
-                                    >
+                            )}
+
+                            <td>
+                                {product.plannedQuantity == null && (
+                                    <button className="remove-button" onClick={() => onRemoveProduct(product.id)}>
                                         <FaTrash />
                                     </button>
-                                </td>
-                            </tr>
-                        ))}
+                                )}
+                            </td>
+                        </tr>
+                    ))}
+                    {/* Botão para adicionar itens */}
                     <tr>
-                        <td colSpan={6} style={{ textAlign: "center", padding: "10px" }}>
-                            <button className="add-items-button" onClick={() => setIsModalOpen(true)}>
+                        <td colSpan={isAdvancedMode ? 8 : 6} style={{ fontWeight: "bold", textAlign: "center" }}>
+                            <button className="add-products-button" onClick={() => setIsModalOpen(true)}>
                                 <FaPlus /> Adicionar Itens
                             </button>
                         </td>
                     </tr>
+                    {isAdvancedMode && (
+                        <tr>
+                            <td colSpan={6} style={{ fontWeight: "bold", textAlign: "right" }}>Total:</td>
+                            <td style={{ fontWeight: "bold" }}>{totalPrice.toFixed(2)}</td>
+                            <td></td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
 
             {isModalOpen && (
-                <ItemSelectionModal
-                    availableItems={availableItems}
+                <ProductSelectionModal
                     onClose={() => setIsModalOpen(false)}
-                    onConfirm={onAddItems}
+                    onConfirm={(selectedProducts) => {
+                        setIsModalOpen(false);
+                        if (selectedProducts.length !== 0) {
+                            const formattedProducts = selectedProducts.map((product) => ({
+                                productId: product.id,
+                                cartQuantity: 0,
+                                price: 0,
+                            }));
+                            onAddProducts(formattedProducts);
+                        }
+                    }}
                 />
             )}
         </div>

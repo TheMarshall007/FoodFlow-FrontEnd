@@ -28,7 +28,7 @@
     transition: color 0.3s ease;
 }
 
-.navbar-item:hover {
+.navbar-product:hover {
     color: #ffd700;
     /* Amarelo para o hover */
 }

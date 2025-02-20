@@ -1,8 +1,9 @@
 import User from '../../context/UserContext';
 import { api } from '../api/apiConfig';
 import { Ingredient } from '../ingredients/ingredientsService';
+import { Product, UnitOfMeasure } from '../product/productService';
 
-interface PantryInsertData {
+export interface PantryInsertData {
     userId: number;
     propertyName: string;
     image: string;
@@ -17,24 +18,25 @@ interface PantryData {
 export interface Pantry {
     id: number;
     propertyName: string;
-    items: PantryItem[];
+    products: PantryProduct[];
     sharedWith: User[];
     menuCount?: number
     lastUpdated: string;
-    lowQuantityItems: PantryItem[];
+    lowQuantityProducts: PantryProduct[];
     image: string;
 }
 
-export interface PantryItem {
+export interface PantryProduct {
     id: number;
-    ingredient: Ingredient;
+    systemProduct: Product
     quantity: number;
+    unit: UnitOfMeasure
 }
 
 export async function createPantry(data: PantryInsertData) {
     try {
         const response = await api.post('/pantry/insert', data);
-        return response.data.content;
+        return response.data;
     } catch (error) {
         console.error('Erro ao buscar o inventário:', error);
         return [];
@@ -51,20 +53,20 @@ export async function fetchPantry(data: PantryData) {
     }
 }
 
-export async function fetchItemsByPantryId(pantryId: number) {
+export async function fetchProductsByPantryId(pantryId: number) {
     try {
-        const response = await api.get(`/pantry/${pantryId}/items`);
+        const response = await api.get(`/pantry/${pantryId}/products`);
         return response.data;
     } catch (error) {
-        console.error('Erro ao buscar o itens do inventário:', error);
+        console.error('Erro ao buscar os produtos do inventário:', error);
         return [];
     }
 }
 
-export async function reduceItemQuantity(pantryId: number, ingredientId: number, quantityToReduce: number) {
+export async function reduceProductQuantity(pantryId: number, productId: number, quantityToReduce: number) {
     try {
         const response = await api.post(`/pantry/${pantryId}/reduce-quantity`, null, {
-            params: { ingredientId, quantityToReduce },
+            params: { productId, quantityToReduce },
         });
         return response.data;
     } catch (error) {
@@ -73,7 +75,7 @@ export async function reduceItemQuantity(pantryId: number, ingredientId: number,
     }
 }
 
-export const fetchLowQuantityItems = async (pantryId: number, threshold: number = 5) => {
+export const fetchLowQuantityProducts = async (pantryId: number, threshold: number = 5) => {
     try {
         const response = await api.get(`/pantry/${pantryId}/low-quantity`, {
             params: { threshold },

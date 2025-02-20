@@ -1,0 +1,81 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content-product-selection {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80vw; /* O modal agora ocupa 80% da largura da tela */
+    max-width: 1000px; /* Define um limite máximo maior */
+    height: 80vh; /* Ajusta a altura do modal */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Ajuste dinâmico */
+    gap: 15px;
+    justify-content: center;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.product-card {
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.product-card:hover {
+    transform: scale(1.05);
+}
+
+.selected {
+    background-color: rgba(0, 128, 0, 0.3); /* Destaque para selecionados */
+    border: 2px solid green;
+}
+
+.modal-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.cancel-button {
+    background-color: red;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.confirm-button {
+    background-color: green;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
