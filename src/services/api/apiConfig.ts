@@ -1,8 +1,11 @@
 import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
-const BASE_URL = 'http://localhost:8080';
+// const BASE_URL = 'http://localhost:8080';
+//URL NGROK
+const BASE_URL = 'https://0f81-2804-7f5-d180-33cd-1d16-eddd-7dde-6ff1.ngrok-free.app';
 
 export const api = axios.create({
+  // baseURL: BASE_URL,
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',

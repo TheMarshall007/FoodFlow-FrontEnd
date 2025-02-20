@@ -6,8 +6,8 @@ import '../../styles/pages/Login/Login.css';
 import { postLogin } from '../../services/auth/authService';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('leonardovinicius_silva@hotmail.com');
-  const [password, setPassword] = useState('Teste123!');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [reminder, setReminder] = useState(false);
   const { setUser } = useUser();
   const navigate = useNavigate();
