@@ -52,3 +52,69 @@
 .add-items-button:hover {
     background-color: #45a049;
 }
+
+
+
+
+/* Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 110px; /* Aumentado para caber o texto */
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: 0.4s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    padding: 0 10px;
+}
+
+.switch-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    transition: 0.4s;
+    z-index: 1;
+}
+
+input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+input:checked + .slider::before {
+    transform: translateX(75px);
+}
+
+/* Ajuste no texto para mudar de posição junto com o botão */
+input:checked + .slider .switch-text {
+    transform: translateX(-15px);
+}

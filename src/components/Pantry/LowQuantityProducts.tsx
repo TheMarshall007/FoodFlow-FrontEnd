@@ -1,35 +1,35 @@
-// src/components/Pantry/LowQuantityItems.tsx
+// src/components/Pantry/LowQuantityProducts.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchLowQuantityItems } from '../../services/pantry/pantryService';
+import { fetchLowQuantityProducts } from '../../services/pantry/pantryService';
 
-interface LowQuantityItemType {
+interface LowQuantityProductType {
     id: number;
     name: string;
     quantity: number;
 }
 
-const LowQuantityItems: React.FC = () => {
+const LowQuantityProducts: React.FC = () => {
     const { pantryId } = useParams<{ pantryId: string }>();
-    const [lowQuantityItems, setLowQuantityItems] = useState<LowQuantityItemType[]>([]);
+    const [lowQuantityProducts, setLowQuantityProducts] = useState<LowQuantityProductType[]>([]);
     const threshold = 5; // ou defina como variável
 
     useEffect(() => {
-        async function loadLowQuantityItems() {
+        async function loadLowQuantityProducts() {
             if (pantryId) {
-                const data = await fetchLowQuantityItems(parseInt(pantryId), threshold);
-                setLowQuantityItems(data);
+                const data = await fetchLowQuantityProducts(parseInt(pantryId), threshold);
+                setLowQuantityProducts(data);
             }
         }
 
-        loadLowQuantityItems();
+        loadLowQuantityProducts();
     }, [pantryId, threshold]);
 
     return (
         <div>
             <h2>Itens com Baixa Quantidade</h2>
             <ul>
-                {lowQuantityItems?.map((item) => (
+                {lowQuantityProducts?.map((item) => (
                     <li key={item.id}>
                         {item.name} - {item.quantity}
                     </li>
@@ -39,4 +39,4 @@ const LowQuantityItems: React.FC = () => {
     );
 };
 
-export default LowQuantityItems;
+export default LowQuantityProducts;

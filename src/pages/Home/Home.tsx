@@ -4,7 +4,7 @@ import  { useUser } from '../../context/UserContext';
 import PantryCard from '../../components/Pantry/PantryCard';
 import { Dish } from '../../services/dish/dishService';
 import '../../styles/pages/Home/Home.css';
-import { fetchLowQuantityItems, fetchPantry, Pantry } from '../../services/pantry/pantryService';
+import { fetchLowQuantityProducts, fetchPantry, Pantry } from '../../services/pantry/pantryService';
 import { fetchDailySuggestion } from '../../services/suggestion/dailySuggestionService';
 import { fetchDishImage } from '../../services/dish/dishImageService';
 
@@ -27,16 +27,16 @@ const Home: React.FC = () => {
 
                 const pant = await fetchPantry({ userId: user.id, page: 0 });
                 if (pant) {
-                    const pantryWithLowItem = await Promise.all(pant?.map(async (invent: Pantry) => {
-                        const lowItem = await fetchLowQuantityItems(invent?.id, 5);
-                        if (lowItem) {
+                    const pantryWithLowProduct = await Promise.all(pant?.map(async (invent: Pantry) => {
+                        const lowProduct = await fetchLowQuantityProducts(invent?.id, 5);
+                        if (lowProduct) {
                             return {
                                 ...invent,
-                                lowQuantityItems: lowItem,
+                                lowQuantityProducts: lowProduct,
                             }
                         }
                     }))
-                    setPantry(pantryWithLowItem);
+                    setPantry(pantryWithLowProduct);
                 }
             }
 

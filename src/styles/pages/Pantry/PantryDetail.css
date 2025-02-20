@@ -58,11 +58,11 @@
     transition: transform 0.3s;
 }
 
-.pantry-item:hover {
+.pantry-product:hover {
     transform: translateY(-5px);
 }
 
-.item-image {
+.product-image {
     width: 100px;
     height: 100px;
     object-fit: cover;
@@ -159,7 +159,7 @@
 }
 
 /* Estilos para os cards de itens */
-.shopping-list-item-card {
+.shopping-list-product-card {
     background: #ffffff;
     border-radius: 10px;
     padding: 15px;
@@ -172,21 +172,21 @@
     text-align: center;
 }
 
-.item-name {
+.product-name {
     font-size: 1.2rem;
     font-weight: bold;
     margin-bottom: 10px;
     color: #333;
 }
 
-.item-quantity-control {
+.product-quantity-control {
     display: flex;
     justify-content: center; /* Centraliza os botões horizontalmente */
     gap: 10px; /* Espaçamento entre os botões */
     margin-top: 10px; /* Espaço entre os botões e os outros elementos do card */
 }
 
-.item-quantity-control button {
+.product-quantity-control button {
     background-color: #3498db;
     color: #fff;
     border: none;
@@ -197,17 +197,17 @@
     transition: background-color 0.3s;
 }
 
-.item-quantity-control button:hover {
+.product-quantity-control button:hover {
     background-color: #2980b9;
 }
 
-.item-quantity-control span {
+.product-quantity-control span {
     font-size: 1.2rem;
     font-weight: bold;
     color: #555;
 }
 
-.item-quantity-control button:disabled {
+.product-quantity-control button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
@@ -241,7 +241,7 @@
     margin-top: 20px;
 }
 
-.item-card {
+.product-card {
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -250,11 +250,11 @@
     transition: transform 0.2s;
 }
 
-.item-card:hover {
+.product-card:hover {
     transform: scale(1.05);
 }
 
-.item-card-image {
+.product-card-image {
     width: 100%;
     height: 150px;
     object-fit: cover;
@@ -262,18 +262,18 @@
     margin-bottom: 10px;
 }
 
-.item-card-info h4 {
+.product-card-info h4 {
     font-size: 1.2rem;
     margin: 10px 0;
     color: #333;
 }
 
-.item-card-info p {
+.product-card-info p {
     font-size: 1rem;
     color: #555;
 }
 
-.item-card-info {
+.product-card-info {
     display: flex;
     flex-direction: column;
     align-items: center; /* Centraliza os elementos horizontalmente */

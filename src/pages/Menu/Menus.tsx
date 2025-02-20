@@ -5,13 +5,15 @@ import { useMenu } from "../../hooks/Menu/useMenu";
 import MenuForm from "./MenuForm";
 
 const Menus = () => {
-    const { state } = useMenu();
     const navigate = useNavigate();
+    const { state } = useMenu();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    if (state.loading) return <p>Carregando menus...</p>;
     if (!state.menus) {
-        return <p>Carregando ou despensa não encontrada...</p>;
+        return <p>Menus não encontrada...</p>;
     }
+
     return (
         <div className="menu-section">
             <h2>Meus Menus</h2>
@@ -29,9 +31,8 @@ const Menus = () => {
                     ))}
                 </div>
             )}
-            {/* Modal para adicionar novo menu */}
-            <MenuForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
+            <MenuForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </div>
 
     );

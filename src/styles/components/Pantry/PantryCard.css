@@ -74,7 +74,7 @@
     color: #67cf89;
 }
 
-.remove-item-button {
+.remove-product-button {
     background: transparent;
     border: none;
     cursor: pointer;
@@ -84,6 +84,6 @@
     transition: color 0.2s;
 }
 
-.remove-item-button:hover {
+.remove-product-button:hover {
     color: #d11a2a;
 }

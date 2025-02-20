@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { ShoppingListItem } from "../../services/shopping/shoppingListService";
+import { ShoppingListProduct } from "../../services/shopping/shoppingListService";
 import { FaTrash } from "react-icons/fa";
 
-const ShoppingListItemCard: React.FC<{
-    item: ShoppingListItem;
-    onUpdateQuantity: (ingredientId: number, newQuantity: number) => void;
-    onRemoveItem: (ingredientId: number) => void;
-}> = ({ item, onUpdateQuantity, onRemoveItem }) => {
-    const [inputValue, setInputValue] = useState(item.quantity);
+const ShoppingListProductCard: React.FC<{
+    product: ShoppingListProduct;
+    onUpdateQuantity: (productId: number, newQuantity: number) => void;
+    onRemoveProduct: (productId: number) => void;
+}> = ({ product, onUpdateQuantity, onRemoveProduct }) => {
+    const [inputValue, setInputValue] = useState(product.plannedQuantity);
 
     const handleDebouncedChange = (() => {
         let timeout: NodeJS.Timeout;
@@ -15,11 +15,11 @@ const ShoppingListItemCard: React.FC<{
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 if (value === 0) {
-                    onRemoveItem(item.id);
+                    onRemoveProduct(product.id);
                 } else {
-                    onUpdateQuantity(item.ingredientId, value);
+                    onUpdateQuantity(product.id, value);
                 }
-            }, 500); // Tempo de debounce (500ms)
+            }, 500);
         };
     })();
 
@@ -27,22 +27,28 @@ const ShoppingListItemCard: React.FC<{
         const newQuantity = Math.max(inputValue - 1, 0);
         setInputValue(newQuantity);
         if (newQuantity === 0) {
-            onRemoveItem(item.id);
+            onRemoveProduct(product.id);
         } else {
-            onUpdateQuantity(item.ingredientId, newQuantity);
+            onUpdateQuantity(product.id, newQuantity);
         }
     };
 
     const handleIncrement = () => {
         const newQuantity = inputValue + 1;
         setInputValue(newQuantity);
-        onUpdateQuantity(item.ingredientId, newQuantity);
+        onUpdateQuantity(product.id, newQuantity);
     };
 
     return (
-        <div className="shopping-list-item-card">
-            <p className="item-name">{item.name || "Desconhecido"}</p>
-            <div className="item-quantity-control">
+        <div className="shopping-list-product-card">
+            <p className="product-name">
+                {product.systemProduct.variety?.ingredient?.name ?? "Produto"} -{" "}
+                {product.systemProduct.variety?.name ?? "Variedade Desconhecida"} ({product.systemProduct.brand})
+            </p>
+            <p className="product-details">
+                Quantidade por unidade: {product.systemProduct.quantityPerUnit} {product.systemProduct.unit}
+            </p>
+            <div className="product-quantity-control">
                 <button onClick={handleDecrement} disabled={inputValue <= 0}>
                     -
                 </button>
@@ -58,8 +64,8 @@ const ShoppingListItemCard: React.FC<{
                 />
                 <button onClick={handleIncrement}>+</button>
                 <button
-                    className="remove-item-button"
-                    onClick={() => onRemoveItem(item.id)}
+                    className="remove-product-button"
+                    onClick={() => onRemoveProduct(product.id)}
                 >
                     <FaTrash size={16} />
                 </button>
@@ -68,4 +74,4 @@ const ShoppingListItemCard: React.FC<{
     );
 };
 
-export default ShoppingListItemCard;
+export default ShoppingListProductCard;

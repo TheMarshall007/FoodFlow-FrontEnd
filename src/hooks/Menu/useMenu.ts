@@ -32,6 +32,7 @@ export const useMenu = () => {
     useEffect(() => {
         async function fetchData() {
             if (!hasFetched.current && user) {
+                dispatch({ type: "SET_LOADING", payload: true });
                 hasFetched.current = true; // Marca como executado
                 try {
                     const response = await getMenusPaginated({ userId: user.id, page: 0 });
