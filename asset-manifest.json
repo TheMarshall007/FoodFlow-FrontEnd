@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "./static/css/main.243e6e4a.css",
-    "main.js": "./static/js/main.d477e360.js",
+    "main.js": "./static/js/main.e6347879.js",
     "static/js/453.737533f6.chunk.js": "./static/js/453.737533f6.chunk.js",
     "static/media/summer-beach-house-2.png": "./static/media/summer-beach-house-2.df8a82157d149690a5ec.png",
     "static/media/summer-beach-house.png": "./static/media/summer-beach-house.c612bb73f368265e457c.png",
@@ -12,11 +12,11 @@
     "static/media/user-icon.png": "./static/media/user-icon.3c70c6dd4c2f7d7e6286.png",
     "index.html": "./index.html",
     "main.243e6e4a.css.map": "./static/css/main.243e6e4a.css.map",
-    "main.d477e360.js.map": "./static/js/main.d477e360.js.map",
+    "main.e6347879.js.map": "./static/js/main.e6347879.js.map",
     "453.737533f6.chunk.js.map": "./static/js/453.737533f6.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.243e6e4a.css",
-    "static/js/main.d477e360.js"
+    "static/js/main.e6347879.js"
   ]
 }
