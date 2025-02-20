@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/static/css/main.828786b5.css",
+    "main.js": "/static/js/main.c42c77fb.js",
+    "static/js/453.737533f6.chunk.js": "/static/js/453.737533f6.chunk.js",
+    "static/media/summer-beach-house-2.png": "/static/media/summer-beach-house-2.df8a82157d149690a5ec.png",
+    "static/media/summer-beach-house.png": "/static/media/summer-beach-house.c612bb73f368265e457c.png",
+    "static/media/house-field-3.webp": "/static/media/house-field-3.48166d6fb77638c6e5ec.webp",
+    "static/media/house-field-2.webp": "/static/media/house-field-2.93b9babd954cedb23ede.webp",
+    "static/media/food-background.jpg": "/static/media/food-background.98a5cfd4273b34afc295.jpg",
+    "static/media/house-field.webp": "/static/media/house-field.59bc26e0151c16dced05.webp",
+    "static/media/user-icon.png": "/static/media/user-icon.3c70c6dd4c2f7d7e6286.png",
+    "index.html": "/index.html",
+    "main.828786b5.css.map": "/static/css/main.828786b5.css.map",
+    "main.c42c77fb.js.map": "/static/js/main.c42c77fb.js.map",
+    "453.737533f6.chunk.js.map": "/static/js/453.737533f6.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.828786b5.css",
+    "static/js/main.c42c77fb.js"
+  ]
+}
