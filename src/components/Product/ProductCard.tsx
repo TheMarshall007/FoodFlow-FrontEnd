@@ -13,10 +13,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, actions, isSelected 
     return (
         <div className={`product-card ${isSelected ? "selected" : ""} ${isLowQuantity ? "low-quantity" : ""}`}>
             <h3>
-                {product.variety?.ingredient?.name ?? "Produto Desconhecido"} -{" "}
-                {product.variety?.name ?? "Sem Variedade"} ({product.brand})
+                {product.variety?.ingredient?.name ?? "Produto Desconhecido"} {product.variety?.name ?? "Sem Variedade"}{" "}
+                {product.quantityPerUnit}{product.unit} - ({product.brand})
             </h3>
-            <p>{product.quantityPerUnit} {product.unit}</p>
+            <p></p>
             {actions && <div className="product-actions">{actions}</div>}
         </div>
     );

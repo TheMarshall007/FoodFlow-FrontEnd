@@ -185,47 +185,74 @@ export const useShoppingCart = () => {
   const [updateTimer, setUpdateTimer] = useState<NodeJS.Timeout | null>(null);
 
   const handleUpdateCartProductList = async (data: ShoppingCartProduct, isAdvancedMode: boolean) => {
-    // Atualiza o estado local imediatamente para refletir os cálculos no frontend
-    setPendingUpdates((prev) => ({
-      ...prev,
-      [data.id]: data, // Adiciona o produto atualizado à lista de pendentes
-    }));
+    // 🔹 Atualiza a lista de produtos pendentes corretamente
+    setPendingUpdates((prev) => {
+      const updatedPendingUpdates = { ...prev };
 
-    // 🔹 Atualiza o estado global do carrinho para refletir a alteração instantaneamente no frontend
-    dispatch({
-      type: "SET_CART",
-      payload: state.cart ? {
-        ...state.cart,
-        cartProducts: state.cart.cartProducts.map((product) =>
-          product.id === data.id ? { ...product, ...data } : product
-        )
-      } : { cartProducts: [data] } // Se `state.cart` for `null`, cria um novo carrinho com o item atualizado
+      if (updatedPendingUpdates[data.id]) {
+        // ✅ Se o produto já está na lista, atualiza os valores mantendo os existentes
+        updatedPendingUpdates[data.id] = { ...updatedPendingUpdates[data.id], ...data };
+      } else {
+        // ✅ Se o produto **não** está na lista, adiciona como novo
+        updatedPendingUpdates[data.id] = data;
+      }
+
+      return updatedPendingUpdates;
     });
 
+    // 🔹 Atualiza o estado global do carrinho imediatamente no frontend
+    dispatch({
+      type: "SET_CART",
+      payload: state.cart
+        ? {
+          ...state.cart,
+          cartProducts: state.cart.cartProducts.map((product) =>
+            product.id === data.id ? { ...product, ...data } : product
+          ),
+        }
+        : { cartProducts: [data] }, // Se `state.cart` for `null`, cria um novo carrinho com o item atualizado
+    });
 
-    // Se já houver um timer, cancela e reinicia
+    // 🔹 Se já houver um timer, cancela e reinicia
     if (updateTimer) {
       clearTimeout(updateTimer);
     }
 
-    // Define um novo timer para enviar as alterações ao backend após 10 segundos
+    // 🔹 Define um novo timer para enviar as alterações ao backend após 10 segundos
     const newTimer = setTimeout(async () => {
-      const productsToUpdate = Object.values(pendingUpdates);
+      setUpdateTimer(null); // Limpa o timer ativo
 
-      if (productsToUpdate.length > 0 && id) {
-        try {
-          const apiResponse = await updateShoppingCartProducts(parseInt(id), productsToUpdate, isAdvancedMode);
-          const updatedCart = transformCartResponse(apiResponse);
+      setPendingUpdates((prevUpdates) => {
+        const productsToUpdate = Object.values(prevUpdates);
 
-          dispatch({ type: "SET_CART", payload: updatedCart }); // 🔹 Atualiza o estado com os dados do backend
-          setPendingUpdates({}); // Limpa os produtos pendentes após a atualização
-        } catch (error: unknown) {
-          console.error("Erro ao atualizar produto:", error);
-          const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-          dispatch({ type: "SET_ERROR", payload: errorMessage });
+        if (productsToUpdate.length > 0 && id) {
+          (async () => {
+            try {
+              // ✅ Enviando no formato correto para o backend
+              const payload = {
+                products: productsToUpdate,
+                isAdvancedMode,
+              };
+
+              const apiResponse = await updateShoppingCartProducts(parseInt(id), payload);
+              const updatedCart = transformCartResponse(apiResponse);
+
+              // 🔹 Atualiza o estado global do carrinho com os dados do backend
+              dispatch({ type: "SET_CART", payload: updatedCart });
+
+              // 🔹 Limpa os produtos pendentes após a atualização
+              setPendingUpdates({});
+            } catch (error: unknown) {
+              console.error("Erro ao atualizar produto:", error);
+              const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+              dispatch({ type: "SET_ERROR", payload: errorMessage });
+            }
+          })();
         }
-      }
-    }, 10000); // 10 segundos
+
+        return prevUpdates; // Mantém o estado atualizado
+      });
+    }, 10000); // ⏳ Aguarda 10 segundos antes de enviar ao backend
 
     setUpdateTimer(newTimer);
   };

@@ -1,7 +1,7 @@
 import User from '../../context/UserContext';
 import { api } from '../api/apiConfig';
 import { Ingredient } from '../ingredients/ingredientsService';
-import { Product } from '../product/productService';
+import { Product, UnitOfMeasure } from '../product/productService';
 
 export interface PantryInsertData {
     userId: number;
@@ -30,6 +30,7 @@ export interface PantryProduct {
     id: number;
     systemProduct: Product
     quantity: number;
+    unit: UnitOfMeasure
 }
 
 export async function createPantry(data: PantryInsertData) {

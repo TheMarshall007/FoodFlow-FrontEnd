@@ -58,7 +58,7 @@ const PantryDetail: React.FC = () => {
                                             isLowQuantity={isLowQuantity}
                                             actions={
                                                 <div>
-                                                    <h3>Quantitdade: {product.quantity}</h3>
+                                                    <h3>Quantitdade: {product.quantity} {product.unit}</h3>
                                                     <div className="product-quantity-control">
                                                         <button
                                                             className="quantity-button"

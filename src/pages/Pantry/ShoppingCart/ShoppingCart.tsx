@@ -11,8 +11,20 @@ const ShoppingCart: React.FC = () => {
     const { cart, loading, error, handleUpdateCartProduct, handleUpdateCartProductList, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate(); // Hook para navegação
-    const [isAdvancedMode, setIsAdvancedMode] = useState(false); // 🚀 Estado de Modo Avançado
-
+    const [isAdvancedMode, setIsAdvancedMode] = useState<boolean>(() => {
+        // 🔹 Recupera a preferência do usuário do LocalStorage ao carregar a página
+        const savedMode = localStorage.getItem("shoppingCartMode");
+        return savedMode ? JSON.parse(savedMode) : true; // Padrão: Modo Avançado
+      });
+      
+      const toggleMode = () => {
+        setIsAdvancedMode((prevMode) => {
+          const newMode = !prevMode;
+          localStorage.setItem("shoppingCartMode", JSON.stringify(newMode)); // 🔹 Salva a escolha do usuário no LocalStorage
+          return newMode;
+        });
+      };
+      
     console.log("LOGG cart", cart)
 
     if (loading) {
@@ -37,7 +49,7 @@ const ShoppingCart: React.FC = () => {
                         onRemoveProduct={handleRemoveCartProduct}
                         onAddProducts={handleAddToCart}
                         isAdvancedMode={isAdvancedMode}
-                        setIsAdvancedMode={setIsAdvancedMode}
+                        setIsAdvancedMode={toggleMode}
                     />
                 </div>
             ) : (

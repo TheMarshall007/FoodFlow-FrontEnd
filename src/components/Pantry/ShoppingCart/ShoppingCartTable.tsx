@@ -138,8 +138,8 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
 
     const totalPrice = products.reduce((sum, product) => sum + (product.totalPrice || 0), 0);
 
-    const getAllowedUnits = (plannedUnit: string | undefined): string[] => {
-        if (!plannedUnit) return ["Unidade", "g", "Kg", "ml", "L"];
+    const getAllowedUnits = (productUnit: string | undefined): string[] => {
+        if (!productUnit) return ["Unidade", "g", "Kg", "ml", "L"];
 
         const unitMap: Record<string, string[]> = {
             "g": ["g", "Kg", "Unidade"],     // Ex: Frutas, legumes, temperos
@@ -149,7 +149,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
             "Unidade": ["Unidade", "g", "Kg", "ml", "L"], // Ex: Ovos, maçãs, caixas de leite
         };
 
-        return unitMap[plannedUnit] || ["Unidade"];
+        return unitMap[productUnit] || ["Unidade"];
     };
 
     return (
@@ -207,7 +207,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                     onChange={(e) => handleSelectChange(e, product, "purchasedUnit")}
                                     onBlur={() => handleEditBlur(product, "purchasedUnit")}
                                 >
-                                    {getAllowedUnits(String(product.plannedUnit) || "").map((unit) => (
+                                    {getAllowedUnits(String(product.systemProduct.unit) || "").map((unit) => (
                                         <option key={unit} value={unit}>
                                             {unit} {unit === "Unidade" && product.systemProduct.quantityPerUnit ? `(${product.systemProduct.quantityPerUnit} ${product.systemProduct.unit})` : ""}
                                         </option>
