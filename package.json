@@ -1,7 +1,7 @@
 {
   "name": "food-flow",
   "version": "0.1.0",
-  "homepage": "https://TheMarshall007.github.io/FoodFlow-FrontEnd/",
+  "homepage": "https://themarshall007.github.io/FoodFlow-FrontEnd/",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.13.5",
