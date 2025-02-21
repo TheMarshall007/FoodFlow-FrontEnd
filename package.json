@@ -30,6 +30,8 @@
     "predeploy": "yarn run build",
     "deploy": "gh-pages -d build",
     "build": "react-scripts build",
+    "start:homo": "set REACT_APP_API_URL=http://localhost:8080 && react-scripts start",
+    "start:prod": "set REACT_APP_API_URL=https://foodflow-b58096cef866.herokuapp.com/ && react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "analyze": "source-map-explorer 'build/static/js/*.js'"
