@@ -1,11 +1,9 @@
 import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
-// const BASE_URL = 'http://localhost:8080';
-//URL Heroku
-const BASE_URL = 'https://foodflow-b58096cef866.herokuapp.com/';
+// Definir a URL da API com base na variável de ambiente
+const BASE_URL = process.env.REACT_APP_API_URL?.trim() || 'http://localhost:8080';
 
 export const api = axios.create({
-  // baseURL: BASE_URL,
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
