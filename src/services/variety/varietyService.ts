@@ -8,6 +8,12 @@ export interface Variety {
     ingredient: Ingredient
 }
 
+interface VarietyDTOSearch {
+    id?: number;
+    page: number
+}
+
+
 export const fetchVarietyByIds = async (ids: number[]): Promise<Variety[]> => {
     try {
         const response = await api.post(`/variety/findByIds`, ids);
@@ -17,3 +23,15 @@ export const fetchVarietyByIds = async (ids: number[]): Promise<Variety[]> => {
         throw error;
     }
 };
+
+export const fetchVariety = async (
+    dto: VarietyDTOSearch
+): Promise<{ content: Variety[]; totalPages: number; currentPage: number }> => {
+    try {
+        const response = await api.post(`/variety/pagination `, dto);
+        return response.data;
+    } catch (error) {
+        console.error("Erro ao buscar variente paginados:", error);
+        throw error;
+    }
+}

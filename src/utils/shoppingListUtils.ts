@@ -12,7 +12,7 @@ export const updateShoppingListWithProductNames = (
 ): ShoppingList => {
     const updatedProducts = shoppingList.products.map((item) => {
         // Buscar o produto correspondente
-        const product = products.find((product) => product.id === item.systemProductId);
+        const product = products.find((product) => product.gtin === item.systemProductGtin);
 
         // Buscar a variedade correspondente ao produto
         const variety = varieties.find((variety) => variety.id === product?.varietyId);

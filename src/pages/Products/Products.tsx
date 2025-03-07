@@ -15,17 +15,17 @@ const Products = () => {
     const navigate = useNavigate();
 
     // Mapear produtos já na lista de compras
-    const shoppingListProducts = state.shoppingList?.products.reduce((map, product) => {
-        map[product.systemProductId] = {
+    const shoppingListProducts = state.shoppingList?.products.reduce((map: Record<string, { plannedQuantity: number; shoppingListProductId: number }>, product) => {
+        map[product.systemProductGtin!.toString()] = {
             plannedQuantity: product.plannedQuantity,
             shoppingListProductId: product.id,
         };
         return map;
-    }, {} as Record<number, { plannedQuantity: number; shoppingListProductId: number }>);
+    }, {} as Record<string, { plannedQuantity: number; shoppingListProductId: number }>);
 
     // Função para adicionar um produto à lista de compras
     const handleAddProduct = (product: Product) => {
-        handleAddProductToShoppingList({ productId: product.id, quantity: 1 });
+        handleAddProductToShoppingList({ productGtin: product.gtin, quantity: 1 });
     };
 
     // Função para aumentar quantidade de um produto já adicionado
@@ -36,7 +36,7 @@ const Products = () => {
     // Função para diminuir quantidade ou remover produto se zerado
     const handleDecrease = (productId: number, currentQuantity: number, shoppingListProductId: number) => {
         if (currentQuantity <= 1) {
-            handleRemoveProductFromShoppingList(shoppingListProductId );
+            handleRemoveProductFromShoppingList(shoppingListProductId);
         } else {
             handleUpdateQuantity(productId, currentQuantity - 1);
         }
@@ -81,11 +81,11 @@ const Products = () => {
                     <p>Nenhum produto encontrado.</p>
                 ) : (
                     state.systemProduct.map((product: Product) => {
-                        const productData = shoppingListProducts[product.id] || { plannedQuantity: 0, shoppingListProductId: null };
-                       console.log("LOGG state",state)
+                        const productData = shoppingListProducts[product.gtin.toString()] || { plannedQuantity: 0, shoppingListProductId: null };
+                        console.log("LOGG state", state)
                         return (
                             <ProductCard
-                                key={product.id}
+                                key={product.gtin}
                                 product={product}
                                 isSelected={productData.shoppingListProductId !== null}
                                 actions={

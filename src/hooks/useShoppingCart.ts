@@ -57,7 +57,7 @@ const shoppingCartReducer = (
           cart: {
             ...state.cart,
             cartProducts: state.cart.cartProducts.map((product) =>
-              product.systemProduct.id === action.payload.systemProduct.id ? action.payload : product
+              product.systemProduct.gtin === action.payload.systemProduct.gtin ? action.payload : product
             ),
           },
         }
@@ -98,12 +98,12 @@ export const useShoppingCart = () => {
         hasFetched.current = true; // Marca como executado
         try {
           const cart = await loadCartFromShoppingList(parseInt(id))
-          const productIds: number[] = cart.cartProducts.map((item) => item.systemProductId ?? 0);
+          const productIds: string[] = cart.cartProducts.map((item) => item.systemProductGtin ?? '');
           const productsWithDetails = await fetchProductsWithDetailsByIds(productIds);
 
           const updatedProducts = cart.cartProducts.map((item) => ({
             ...item,
-            systemProduct: productsWithDetails.find((product) => product.id === item.systemProductId) || {} as Product
+            systemProduct: productsWithDetails.find((product) => product.gtin === item.systemProductGtin) || {} as Product
           }));
 
           const updatedCartWithUnitPrice: ShoppingCart = {

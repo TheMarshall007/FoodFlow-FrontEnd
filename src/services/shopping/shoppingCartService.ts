@@ -2,7 +2,7 @@ import { api } from "../api/apiConfig";
 import { Product } from "../product/productService";
 
 export interface ShoppingCartProductInsert {
-    productId: number
+    productGtin: string;
     plannedQuantity?: number;
     cartQuantity: number;
     price: number;
@@ -10,7 +10,7 @@ export interface ShoppingCartProductInsert {
 
 export interface ShoppingCartProduct {
     id: number;
-    systemProductId?: number;
+    systemProductGtin?: string;
     systemProduct: Product
     plannedQuantity: number;
     plannedUnit: String;

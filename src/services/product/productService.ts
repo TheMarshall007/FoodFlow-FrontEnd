@@ -3,7 +3,7 @@ import { api } from "../api/apiConfig";
 import { fetchVarietyByIds, Variety } from "../variety/varietyService";
 
 export interface Product {
-    id: number;
+    gtin: string;
     brand: string;
     quantityPerUnit: number;
     unit: UnitOfMeasure;
@@ -35,9 +35,9 @@ export const fetchProductById = async (id: number): Promise<Product> => {
     }
 };
 
-export const fetchProductsByIds = async (ids: number[]): Promise<Product[]> => {
+export const fetchProductsByIds = async (gtins: string[]): Promise<Product[]> => {
     try {
-        const response = await api.post(`/product/findByIds`, ids);
+        const response = await api.post(`/product/findByIds`, gtins);
         return response.data;
     } catch (error) {
         console.error("Erro ao buscar produto por ID:", error);
@@ -57,11 +57,11 @@ export const fetchProducts = async (
     }
 };
 
-export const fetchProductsWithDetailsByIds = async (productIds: number[]) => {
+export const fetchProductsWithDetailsByIds = async (productGtins: string[]) => {
     let products: Product[] = [];
     let varieties: Variety[] = [];
-    if (productIds.length > 0) {
-        products = await fetchProductsByIds(productIds);
+    if (productGtins.length > 0) {
+        products = await fetchProductsByIds(productGtins);
         const varietyIds = products.map((product) => product.varietyId).filter((id): id is number => id !== null);
         varieties = await fetchVarietiesWithDetailsByIds(varietyIds);
         products = products.map((product) => ({
