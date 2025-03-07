@@ -100,8 +100,12 @@ const PantryDetail: React.FC = () => {
                         <div className="shopping-list">
                             {state.shoppingList?.products
                                 .slice()
-                                .sort((a, b) => a.systemProductId - b.systemProductId)
-                                .map((product) => (
+                                .sort((a, b) => {
+                                    const gtinA = typeof a.systemProductGtin === 'string' ? parseInt(a.systemProductGtin, 10) : a.systemProductGtin ?? 0;
+                                    const gtinB = typeof b.systemProductGtin === 'string' ? parseInt(b.systemProductGtin, 10) : b.systemProductGtin ?? 0;
+                                    return gtinA - gtinB;
+                                })
+                                .map((product, index) => (
                                     <ProductCard
                                         key={product.id}
                                         product={product.systemProduct}
@@ -109,10 +113,10 @@ const PantryDetail: React.FC = () => {
                                             <div>
                                                 <h3>Quantitdade: {product.plannedQuantity}</h3>
                                                 <div className="product-quantity-control">
-                                                    <button className="quantity-button"
+                                                    <button className="quantity-button" key={`add-${index}`}
                                                         onClick={() => handleUpdateProductQuantityInShoppingList(product.id, product.plannedQuantity + 1)}>+1</button>
-                                                    <button className="quantity-button"
-                                                        onClick={() => handleUpdateProductQuantityInShoppingList(product.systemProductId, product.plannedQuantity - 1)}>-1</button>
+                                                    <button className="quantity-button" key={`remove-${index}`}
+                                                        onClick={() => handleUpdateProductQuantityInShoppingList(product.id, product.plannedQuantity - 1)}>-1</button>
                                                     <button className="quantity-button"
                                                         onClick={() => handleRemoveProductFromShoppingList(product.id)}>🗑</button>
                                                 </div>

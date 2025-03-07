@@ -1,22 +1,56 @@
 import { api } from '../api/apiConfig';
+import { Ingredient } from '../ingredients/ingredientsService';
+import { Variety } from '../variety/varietyService';
+import { Category } from './dishCategoryService';
+
 interface DishParams {
   dishId?: number;
   page: number;
 }
+
+//Interface atualizada para refletir o DTO do back
 export interface Dish {
   id: number;
   name: string;
   description: string;
-  category: Category;
-  image: { id: number, image: string, type: string };
-  ingredientsId: number[];
+  category: Category; //Utilizando a mesma interface de categoria que ja existe.
+  image: { id: number; image: string; type: string }; //Mesmo formato ja utilizado.
+  ingredientsId: number[]; //Lista de ids dos ingredientes.
   price: number;
+  ingredients?: {
+    systemIngredientId: number;
+    systemIngredient: Ingredient;
+    varietyId?: number | null;
+    variety?: Variety;
+    quantity: number;
+    unit: string;
+  }[];
 }
-
-interface Category {
+//Nova interface para o request de criação
+interface CreateDishRequest {
+  name: string;
+  description: string;
+  categoryId: number | null;
+  image?: { id?:number, image?:string; type?:string };
+  ingredients: {
+    ingredientId: number;
+    varietyId?: number | null;
+    quantity: number;
+    unit: string;
+  }[];
+}
+interface UpdateDishRequest {
   id: number;
-  category: string;
-  displayName: string;
+  name: string;
+  description: string;
+  categoryId: number | null;
+  image?: { id?:number, image?:string; type?:string };
+  ingredients: {
+    ingredientId: number;
+    varietyId?: number | null;
+    quantity: number;
+    unit: string;
+  }[];
 }
 
 export async function insertDish() {
@@ -54,11 +88,14 @@ export const markDishAsDone = async (dishId: number) => {
   return response.data;
 };
 
-export async function createDish(formData: FormData) {
-  const response = await api.post("/dishes", formData);
+//Alterado o formato da requisição.
+export async function createDish(dishData: CreateDishRequest) {
+  const response = await api.post("/dish/insert", dishData);
   return response.data;
 }
-export async function updateDish(formData: FormData) {
-  const response = await api.post("/dishes/update", formData);
+
+//Alterado o formato da requisição.
+export async function updateDish(dishData: UpdateDishRequest) {
+  const response = await api.put(`/dish/update`, dishData);
   return response.data;
 }

@@ -8,7 +8,7 @@ export interface ShoppingList {
 
 export interface ShoppingListProduct {
     id: number;
-    systemProductId: number;
+    systemProductGtin: string;
     systemProduct: Product;
     plannedQuantity: number;
 }
@@ -24,7 +24,7 @@ export interface ShoppingListInsert {
 }
 
 export interface ShoppingListProductInsert {
-    productId: number;
+    productGtin: string;
     quantity: number;
 }
 

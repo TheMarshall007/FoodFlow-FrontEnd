@@ -76,7 +76,7 @@ const ShoppingCart: React.FC = () => {
                         setIsModalOpen(false);
                         if (selectedProducts.length !== 0) {
                             const formattedProducts = selectedProducts.map((product) => ({
-                                productId: product.id,
+                                productGtin: product.gtin,
                                 cartQuantity: 0,
                                 price: 0,
                             }));

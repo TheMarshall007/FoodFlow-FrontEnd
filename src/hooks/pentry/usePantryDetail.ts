@@ -51,11 +51,11 @@ export const usePantryDetail = (id: number) => {
 
                     // Buscar lista de compras
                     const shoppingListData = await fetchShoppingList(id);
-                    const productIds = shoppingListData.products.map((item) => item.systemProductId);
+                    const productIds = shoppingListData.products.map((item) => item.systemProductGtin);
                     const productsWithDetails = await fetchProductsWithDetailsByIds(productIds);
                     const updatedShoppingList = shoppingListData.products.map((item) => ({
                         ...item,
-                        systemProduct: productsWithDetails.find((product) => product.id === item.systemProductId) || {} as Product
+                        systemProduct: productsWithDetails.find((product) => product.gtin === item.systemProductGtin) || {} as Product
                     }));
                     const updatedCartWithUnitPrice = { ...shoppingListData, products: updatedShoppingList };
                     // Atualizar lista de compras com produtos e variedades
@@ -84,7 +84,7 @@ export const usePantryDetail = (id: number) => {
                 // Atualiza apenas o plannedQuantity dos produtos existentes sem perder outras informações
                 const updatedProducts = state.shoppingList.products.map((item) => {
                     const updatedProduct = updatedShoppingList.products.find(
-                        (updated:ShoppingListProduct) => updated.systemProductId === item.systemProductId
+                        (updated:ShoppingListProduct) => updated.systemProductGtin === item.systemProductGtin
                     );
     
                     return updatedProduct

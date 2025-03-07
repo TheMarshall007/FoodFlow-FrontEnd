@@ -17,13 +17,13 @@ const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ onClose, 
     // Alterna a seleção do produto
     const toggleProductSelection = (product: Product) => {
         setSelectedProducts((prevSelected) =>
-            prevSelected.some((p) => p.id === product.id)
-                ? prevSelected.filter((p) => p.id !== product.id) // Remove se já estiver selecionado
+            prevSelected.some((p) => p.gtin === product.gtin)
+                ? prevSelected.filter((p) => p.gtin !== product.gtin) // Remove se já estiver selecionado
                 : [...prevSelected, product] // Adiciona se não estiver
         );
     };
 
-    // Filtra os produtos com base no termo de pesquisa
+// Filtra os produtos com base no termo de pesquisa
     // Função para verificar se todas as palavras do termo aparecem em qualquer ordem
     const matchesSearch = (product: Product, searchTerm: string) => {
         if (!searchTerm) return true; // Se não há busca, retorna todos os produtos
@@ -61,12 +61,12 @@ const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ onClose, 
                     ) : (
                         filteredProducts.map((product) => (
                             <ProductCard
-                                key={product.id}
+                                key={product.gtin}
                                 product={product}
-                                isSelected={selectedProducts.some((p) => p.id === product.id)}
+                                isSelected={selectedProducts.some((p) => p.gtin === product.gtin)}
                                 actions={
                                     <button onClick={() => toggleProductSelection(product)}>
-                                        {selectedProducts.some((p) => p.id === product.id) ? "Remover" : "Selecionar"}
+                                        {selectedProducts.some((p) => p.gtin === product.gtin) ? "Remover" : "Selecionar"}
                                     </button>
                                 }
                             />
