@@ -21,9 +21,14 @@ const Navbar: React.FC = () => {
 
         {/* Exibir o botão apenas se o usuário for ADMIN */}
         {user?.roles.includes("ROLE_ADMIN") && (
-          <Link to="/admin/dishes" className={`${styles['navbar-item']} ${location.pathname === '/admin/dishes' ? styles.active : ''}`}>
-            GERENCIAR PRATOS
-          </Link>
+          <>
+            <Link to="/admin/dishes" className={`${styles['navbar-item']} ${location.pathname === '/admin/dishes' ? styles.active : ''}`}>
+              GERENCIAR PRATOS
+            </Link>
+            <Link to="/admin/products" className={`${styles['navbar-item']} ${location.pathname === '/admin/products' ? styles.active : ''}`}>
+              GERENCIAR PRODUTOS
+            </Link>
+          </>
         )}
       </div>
     </nav>

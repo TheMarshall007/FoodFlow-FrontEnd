@@ -1,22 +1,30 @@
 import React from "react";
 import "../../styles/components/Product/ProductCard.css";
-import { Product } from "../../services/product/productService";
+import { Product, ProductDTOResponseSimple } from "../../services/product/productService";
 
 interface ProductCardProps {
-    product: Product;
+    product: Product | ProductDTOResponseSimple;
     actions?: React.ReactNode;
-    isSelected?: boolean; // Indica se o item está selecionado (para carrinho ou lista de compras)
-    isLowQuantity?: boolean; // Indica se o item está quase acabando
+    isSelected?: boolean; // Indicates if the item is selected (for cart or shopping list)
+    isLowQuantity?: boolean; // Indicates if the item is running low
+    isNew?: boolean; //Indicates if the product is new
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, actions, isSelected = false, isLowQuantity = false }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, actions, isSelected = false, isLowQuantity = false, isNew = false }) => {
+    const productName = (product as Product)?.name ?? (product as ProductDTOResponseSimple).name ?? "Unknown Product";
+    const productBrand = (product as Product).brand ?? "";
+
     return (
         <div className={`product-card ${isSelected ? "selected" : ""} ${isLowQuantity ? "low-quantity" : ""}`}>
             <h3>
-                {product.variety?.ingredient?.name ?? "Produto Desconhecido"} {product.variety?.name ?? "Sem Variedade"}{" "}
-                {product.quantityPerUnit}{product.unit} - ({product.brand})
+                {productName} {isNew && "(New)"} {productBrand && `(${productBrand})`}
             </h3>
-            <p></p>
+            {/* Conditionally display quantity and unit if the product is of type Product */}
+            { (product as Product).quantityPerUnit !== undefined && (
+                <p>
+                   {(product as Product).quantityPerUnit} {(product as Product).unit}
+                </p>
+            )}
             {actions && <div className="product-actions">{actions}</div>}
         </div>
     );

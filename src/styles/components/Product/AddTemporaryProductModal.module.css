@@ -1,0 +1,86 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.addProductModalContent {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  max-width: 90%;
+}
+
+.addProductModalContent h3 {
+  margin-bottom: 20px;
+}
+
+.addProductModalContent input,
+.addProductModalContent select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.cancelButton,
+.confirmButton,
+.validateButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.cancelButton {
+  background-color: #ccc;
+  color: #333;
+}
+
+.confirmButton {
+  background-color: #007bff;
+  color: white;
+}
+
+.validateButton {
+  background-color: #28a745;
+  color: white;
+}
+
+.error {
+  color: red;
+  margin-bottom: 10px;
+}
+
+.required-field::after {
+  content: " *";
+  color: red;
+}
+
+.optional-field::after {
+  content: " (opcional)";
+  color: #777;
+  font-size: 0.8em;
+}
+
+.required-field-input {
+  border-color: red;
+}

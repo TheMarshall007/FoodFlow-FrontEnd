@@ -1,6 +1,5 @@
 import { api } from '../api/apiConfig';
 import { Ingredient } from '../ingredients/ingredientsService';
-import { Variety } from '../variety/varietyService';
 import { Category } from './dishCategoryService';
 
 interface DishParams {
@@ -8,37 +7,36 @@ interface DishParams {
   page: number;
 }
 
-//Interface atualizada para refletir o DTO do back
+// Interface updated to reflect the new backend DTO
 export interface Dish {
   id: number;
   name: string;
   description: string;
-  category: Category; //Utilizando a mesma interface de categoria que ja existe.
-  image: { id: number; image: string; type: string }; //Mesmo formato ja utilizado.
-  ingredientsId: number[]; //Lista de ids dos ingredientes.
+  category: Category; // Using the same existing category interface.
+  image: { id: number; image: string; type: string }; // Same format already used.
+  ingredientsId: number[]; // List of ingredient IDs.
   price: number;
-  ingredients?: {
-    systemIngredientId: number;
-    systemIngredient: Ingredient;
-    varietyId?: number | null;
-    variety?: Variety;
+  ingredients?: { // Optional, only when the dish has the ingredients
+    systemIngredientId: number; // this is the id, not the object
+    systemIngredient: Ingredient; // the complete object
     quantity: number;
     unit: string;
   }[];
 }
-//Nova interface para o request de criação
+
+// New interface for the creation request
 interface CreateDishRequest {
   name: string;
   description: string;
   categoryId: number | null;
   image?: { id?:number, image?:string; type?:string };
   ingredients: {
-    ingredientId: number;
-    varietyId?: number | null;
+    ingredientId: number; // Just ingredientId
     quantity: number;
     unit: string;
   }[];
 }
+
 interface UpdateDishRequest {
   id: number;
   name: string;
@@ -46,8 +44,7 @@ interface UpdateDishRequest {
   categoryId: number | null;
   image?: { id?:number, image?:string; type?:string };
   ingredients: {
-    ingredientId: number;
-    varietyId?: number | null;
+    ingredientId: number; // Just ingredientId
     quantity: number;
     unit: string;
   }[];
@@ -59,7 +56,7 @@ export async function insertDish() {
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar pratos recomendados:', error);
-    return [];
+    throw error;
   }
 }
 
@@ -69,7 +66,7 @@ export async function fetchDishes(data: DishParams) {
     return response.data.content;
   } catch (error) {
     console.error('Erro ao buscar o prato:', error);
-    return [];
+    throw error;
   }
 }
 
@@ -79,23 +76,38 @@ export async function fetchDishesByIds(ids: number[]) {
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar os pratos:', error);
-    return [];
+    throw error;
   }
 }
 
 export const markDishAsDone = async (dishId: number) => {
-  const response = await api.post(`/api/dishes/${dishId}/mark-as-done`,);
-  return response.data;
+  try {
+    const response = await api.post(`/dish/${dishId}/mark-as-done`);
+    return response.data;
+  } catch (error){
+    console.error(`Error marking dish as done: `, error)
+    throw error;
+  }
 };
 
-//Alterado o formato da requisição.
+// Changed the request format.
 export async function createDish(dishData: CreateDishRequest) {
-  const response = await api.post("/dish/insert", dishData);
-  return response.data;
+  try {
+      const response = await api.post("/dish/insert", dishData);
+      return response.data;
+  } catch(error){
+    console.error("Error to create a dish:", error);
+    throw error;
+  }
 }
 
-//Alterado o formato da requisição.
+// Changed the request format.
 export async function updateDish(dishData: UpdateDishRequest) {
-  const response = await api.put(`/dish/update`, dishData);
-  return response.data;
+  try{
+    const response = await api.put(`/dish/update`, dishData);
+    return response.data;
+  } catch(error){
+    console.error("Error to update a dish:", error);
+    throw error;
+  }
 }

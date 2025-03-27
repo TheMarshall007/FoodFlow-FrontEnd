@@ -15,9 +15,12 @@
     background: white;
     padding: 20px;
     border-radius: 10px;
-    width: 80vw; /* O modal agora ocupa 80% da largura da tela */
-    max-width: 1000px; /* Define um limite máximo maior */
-    height: 80vh; /* Ajusta a altura do modal */
+    width: 80vw;
+    /* O modal agora ocupa 80% da largura da tela */
+    max-width: 1000px;
+    /* Define um limite máximo maior */
+    height: 80vh;
+    /* Ajusta a altura do modal */
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
     display: flex;
@@ -27,7 +30,8 @@
 
 .product-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Ajuste dinâmico */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    /* Ajuste dinâmico */
     gap: 15px;
     justify-content: center;
     max-height: 60vh;
@@ -45,7 +49,8 @@
 }
 
 .selected {
-    background-color: rgba(0, 128, 0, 0.3); /* Destaque para selecionados */
+    background-color: rgba(0, 128, 0, 0.3);
+    /* Destaque para selecionados */
     border: 2px solid green;
 }
 
@@ -78,4 +83,29 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
+}
+
+.add-product-button-card {
+    width: 150px;
+    height: 150px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    background-color: rgba(204, 204, 204, 0.2);
+    /* Semi-transparent gray */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: #666;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+}
+
+.add-product-button-card:hover {
+    background-color: rgba(204, 204, 204, 0.4);
+    /* Slightly darker on hover */
+}
+
+.add-product-button-card svg {
+    fill: #666;
 }

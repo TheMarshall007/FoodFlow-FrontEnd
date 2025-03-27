@@ -48,12 +48,12 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
         let newValue: string | number =
             (editValues[product.id]?.[field] as string | number) ??
             (product[field] as string | number) ?? 0;
-    
+
         let updatedProduct: ShoppingCartProduct = {
             ...product,
             [field]: newValue,
         };
-    
+
         // Obtendo os valores antes do cálculo
         const purchasedQuantity = Number(updatedProduct.purchasedQuantity) || 0;
         const purchasedUnit = String(updatedProduct.purchasedUnit) || "Unidade";
@@ -61,7 +61,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
         const totalPrice = Number(updatedProduct.totalPrice) || 0;
         const productUnit = String(product.systemProduct.unit) || "Unidade";
         const productQuantity = Number(product.systemProduct.quantityPerUnit) || 1;
-    
+
         // ⚡ Chamando `calculatePrices` para calcular os valores corretos
         const { totalPrice: newTotalPrice, unitPrice: newUnitPrice } = calculatePrices(
             purchasedQuantity,
@@ -71,21 +71,21 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
             productUnit,
             productQuantity
         );
-    
+
         // Atualiza os valores calculados no produto atualizado
         updatedProduct.totalPrice = newTotalPrice;
         updatedProduct.unitPrice = newUnitPrice;
-    
+
         // Atualiza o estado do produto no carrinho
         onUpdateProductList(updatedProduct, isAdvancedMode);
-    
+
         // Remove o valor editado temporariamente para limpar o input
         setEditValues((prev) => {
             const newValues = { ...prev };
             delete newValues[product.id];
             return newValues;
         });
-    };    
+    };
 
     const calculatePrices = (
         purchasedQuantity: number,
@@ -97,7 +97,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
     ) => {
         let newTotalPrice = totalPrice;
         let newUnitPrice = unitPrice;
-    
+
         // Se unidade no carrinho for Kg ou L → Multiplicar diretamente
         if (purchasedUnit === "Kg" || purchasedUnit === "L") {
             newTotalPrice = unitPrice * purchasedQuantity;
@@ -118,12 +118,12 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
         else if (purchasedUnit === "Unidade" && productUnit === "Unidade") {
             newUnitPrice = newTotalPrice / purchasedQuantity;
         }
-    
+
         return {
             totalPrice: Number(newTotalPrice.toFixed(2)),
             unitPrice: Number(newUnitPrice.toFixed(2))
         };
-    };    
+    };
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>, product: ShoppingCartProduct, field: string) => {
         const { value } = e.target;
@@ -168,13 +168,13 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Quantidade Planejada</th>
-                        <th>Nome do Produto</th>
-                        <th>Quantidade no Carrinho</th>
-                        <th>Unidade de Medida</th>
-                        {isAdvancedMode && <th>Preço por Kg, L ou Unidade</th>}
-                        {isAdvancedMode && <th>Preço Total</th>}
-                        <th>Ações</th>
+                        <th>Planned Quantity</th>
+                        <th>Product Name</th>
+                        <th>Quantity in Cart</th>
+                        <th>Unit of Measure</th>
+                        {isAdvancedMode && <th>Price per Kg, L or Unit</th>}
+                        {isAdvancedMode && <th>Total Price</th>}
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -187,10 +187,9 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                                 {product.plannedQuantity !== null ? `${product.plannedQuantity} ${product.plannedUnit}` : ""}
                             </td>
                             <td>
-                                {product?.systemProduct?.variety?.ingredient?.name ?? "Produto Desconhecido"}{" "}
-                                {product?.systemProduct?.variety?.name ?? "Variedade Desconhecida"}{" "}
-                                {product?.systemProduct.quantityPerUnit} {product?.systemProduct.unit} -
-                                ({product?.systemProduct?.brand ?? "Marca Desconhecida"})
+                                {product.systemProduct.name ?? "Unknown Product"} ({product.systemProduct.brand})
+                                {" "}
+                                {product.systemProduct.quantityPerUnit} {product.systemProduct.unit}
                             </td>
                             <td>
                                 <input
@@ -245,7 +244,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                     <tr>
                         <td colSpan={isAdvancedMode ? 8 : 6} style={{ fontWeight: "bold", textAlign: "center" }}>
                             <button className="add-products-button" onClick={() => setIsModalOpen(true)}>
-                                <FaPlus /> Adicionar Itens
+                                <FaPlus /> Add Items
                             </button>
                         </td>
                     </tr>

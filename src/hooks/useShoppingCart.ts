@@ -11,7 +11,6 @@ import {
   updateShoppingCartProducts,
 } from "../services/shopping/shoppingCartService";
 import { useUser } from "../context/UserContext";
-import { ShoppingListProduct } from "../services/shopping/shoppingListService";
 import { fetchProductsWithDetailsByIds, Product } from "../services/product/productService";
 import { useParams } from "react-router-dom";
 
@@ -57,7 +56,7 @@ const shoppingCartReducer = (
           cart: {
             ...state.cart,
             cartProducts: state.cart.cartProducts.map((product) =>
-              product.systemProduct.gtin === action.payload.systemProduct.gtin ? action.payload : product
+              product.id === action.payload.id ? action.payload : product
             ),
           },
         }
@@ -129,22 +128,24 @@ export const useShoppingCart = () => {
       id: apiResponse.id,
       pantryId: apiResponse.pantryId ?? undefined,
       createdAt: apiResponse.createdAt,
-      cartProducts: apiResponse.products.map((product: any) => ({
+      cartProducts: (apiResponse.products || []).map((product: any) => ({
         id: product.id,
         systemProductId: product.systemProduct.id,
+        systemProductGtin: product.systemProductGtin, // Add the systemProductGtin
         systemProduct: {
           ...product.systemProduct,
-          variety: {
-            ...product.systemProduct.variety,
-            ingredient: { ...product.systemProduct.variety.ingredient }
-          }
+          ingredients: (product.systemProduct.ingredients || []).map((ingredient: any) => ({
+            id: ingredient.id,
+            name: ingredient.name,
+            unit: ingredient.unit,
+          })),
         },
-        plannedQuantity: product.plannedQuantity ?? null, // Default para 0 se for null
-        plannedUnit: product.plannedUnit ?? "Unidade", // Default para "Unidade"
-        purchasedQuantity: product.purchasedQuantity,
-        purchasedUnit: product.purchasedUnit,
-        unitPrice: product.unitPrice,
-        totalPrice: product.totalPrice,
+        plannedQuantity: product.plannedQuantity ?? null, // Default for null
+        plannedUnit: product.plannedUnit ?? "Unidade", // Default for null
+        purchasedQuantity: product.purchasedQuantity ?? null, // Default for null
+        purchasedUnit: product.purchasedUnit, // Default for null
+        unitPrice: product.unitPrice ?? 0, // Default for unit price
+        totalPrice: product.totalPrice ?? 0, // Default for total price
       })),
     };
   };
