@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "./static/css/main.243e6e4a.css",
-    "main.js": "./static/js/main.b7f6170e.js",
+    "main.css": "./static/css/main.83c2f6e9.css",
+    "main.js": "./static/js/main.e8392562.js",
     "static/js/453.737533f6.chunk.js": "./static/js/453.737533f6.chunk.js",
     "static/media/summer-beach-house-2.png": "./static/media/summer-beach-house-2.df8a82157d149690a5ec.png",
     "static/media/summer-beach-house.png": "./static/media/summer-beach-house.c612bb73f368265e457c.png",
@@ -11,12 +11,12 @@
     "static/media/house-field.webp": "./static/media/house-field.59bc26e0151c16dced05.webp",
     "static/media/user-icon.png": "./static/media/user-icon.3c70c6dd4c2f7d7e6286.png",
     "index.html": "./index.html",
-    "main.243e6e4a.css.map": "./static/css/main.243e6e4a.css.map",
-    "main.b7f6170e.js.map": "./static/js/main.b7f6170e.js.map",
+    "main.83c2f6e9.css.map": "./static/css/main.83c2f6e9.css.map",
+    "main.e8392562.js.map": "./static/js/main.e8392562.js.map",
     "453.737533f6.chunk.js.map": "./static/js/453.737533f6.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.243e6e4a.css",
-    "static/js/main.b7f6170e.js"
+    "static/css/main.83c2f6e9.css",
+    "static/js/main.e8392562.js"
   ]
 }
