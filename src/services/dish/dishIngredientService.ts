@@ -1,16 +1,14 @@
 import { api } from '../api/apiConfig';
 import { Dish } from './dishService';
 import { Ingredient } from '../ingredients/ingredientsService';
-import { Variety } from '../variety/varietyService';
 
 // Defina a interface para representar a estrutura do objeto retornado pela API
 export interface DishIngredient {
   id: number;
   dish: Dish;
   systemIngredient: Ingredient;
-  variety: Variety;
-  quantity: number; // Assumindo que BigDecimal se traduz para number no TypeScript
-  unit: string; // Assumindo que UnitOfMeasure se traduz para string no TypeScript
+  quantity: number;
+  unit: string;
 }
 
 // Interface para enviar os ids para o back end
@@ -25,6 +23,6 @@ export async function fetchDishIngredientsByIds(ids: number[]): Promise<DishIngr
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar os DishIngredients:', error);
-    return [];
+    throw error; // Added to rethrow the error for proper handling
   }
 }

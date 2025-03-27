@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { fetchIngredientsByIds } from '../../services/ingredients/ingredientsService';
 import '../../styles/components/Menu/Recipe/RecipeModal.css';
 import { Dish } from '../../services/dish/dishService';
+import { Ingredient } from '../../services/ingredients/ingredientsService';
 
 interface RecipeModalProps {
     show: boolean;
@@ -9,29 +9,21 @@ interface RecipeModalProps {
     dish: Dish;
 }
 
-interface Ingredient {
-    id: number;
-    name: string;
-    description: string;
-    quantity: number;
-    unit: string
-}
-
 const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish }) => {
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
     useEffect(() => {
         async function fetchData() {
-            if(dish.ingredients){
-                const ing = dish.ingredients.map((ingredient) => {
-                    return {
-                        id: ingredient.systemIngredientId,
-                        name: ingredient.systemIngredient.name,
-                        description: ingredient.systemIngredient.description,
-                        quantity: ingredient.quantity,
-                        unit: ingredient.unit
-                    } as Ingredient
-                });
+            if (dish.ingredients) {
+                const ing = dish.ingredients.map((ingredient) => ({
+                    id: ingredient.systemIngredientId,
+                    name: ingredient.systemIngredient.name,
+                    category: ingredient.systemIngredient.category,
+                    type: ingredient.systemIngredient.type,
+                    isValidated: ingredient.systemIngredient.isValidated,
+                    quantity: ingredient.quantity,
+                    unit: ingredient.unit
+                }));
                 setIngredients(ing);
             }
         }
@@ -53,19 +45,18 @@ const RecipeModal: React.FC<RecipeModalProps> = ({ show, onClose, dish }) => {
                     />
                 )}
                 <p>{dish.description}</p>
-                <h3>Ingredientes</h3>
-                 {ingredients.length > 0 ? (
+                <h3>Ingredients</h3>
+                {ingredients.length > 0 ? (
                     <ul>
-                        {ingredients?.map((ingredient) => (
+                        {ingredients.map((ingredient) => (
                             <li key={ingredient.id}>
-                                {ingredient.name}: {ingredient.quantity} {ingredient.unit}
+                                {ingredient.name}
                             </li>
                         ))}
                     </ul>
-                ):(
-                    <p>Não há ingredientes cadastrados para este prato.</p>
+                ) : (
+                    <p>No ingredients registered for this dish.</p>
                 )}
-                
             </div>
         </div>
     );

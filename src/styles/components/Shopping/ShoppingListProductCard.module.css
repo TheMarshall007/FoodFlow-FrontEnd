@@ -1,0 +1,55 @@
+/* src/components/ShoppingListProduct/ShoppingListProductCard.module.css */
+
+.shoppingListProductCard {
+    background-color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .productName {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .productDetails {
+    font-size: 0.9em;
+    margin-bottom: 5px;
+  }
+  
+  .productQuantityControl {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .productQuantityControl button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .productQuantityControl button:disabled {
+    background-color: #eee;
+    cursor: default;
+  }
+  
+  .quantityInput {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+  }
+  
+  .removeProductButton {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }

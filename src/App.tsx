@@ -23,6 +23,7 @@ import MenuDetail from './pages/Menu/MenuDetail';
 import ProtectedRoute from './Router/ProtectedRoute';
 import AdminDishes from './pages/Dish/AdminDishes';
 import Products from './pages/Products/Products';
+import ManageProducts from './components/Product/ManageProducts';
 
 function AppContent() {
   const location = useLocation();
@@ -72,7 +73,7 @@ function AppContent() {
           <Route path="/pantry/:pantryId/low-quantity" element={<LowQuantityProducts />} />
           <Route path="/shopping-cart/:id" element={<ShoppingCart />} />
           <Route path="/products/:id?" element={<Products />} />
-
+          <Route path="/admin/products" element={<ManageProducts />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/admin/dishes" element={<AdminDishes />} />
           </Route>

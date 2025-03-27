@@ -1,6 +1,5 @@
 import User from '../../context/UserContext';
 import { api } from '../api/apiConfig';
-import { Ingredient } from '../ingredients/ingredientsService';
 import { Product, UnitOfMeasure } from '../product/productService';
 
 export interface PantryInsertData {

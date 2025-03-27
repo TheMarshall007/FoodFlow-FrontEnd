@@ -1,86 +1,136 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../styles/components/Product/ProductSelectionModal.css";
-import { Product } from "../../services/product/productService";
+import {
+    Product,
+    ProductDTOResponseSimple,
+    UnitOfMeasure,
+    fetchProducts,
+    findOrCreateTemporaryProduct,
+} from "../../services/product/productService";
 import ProductCard from "../Product/ProductCard";
-import { useProduct } from "../../hooks/useProduct";
+import ProductSearchInput from "./ProductSearchInput";
+import AddTemporaryProductModal from "./AddTemporaryProductModal";
+import { FaPlus } from "react-icons/fa";
+import { useUser } from "../../context/UserContext";
 
 interface ProductSelectionModalProps {
     onClose: () => void;
-    onConfirm: (selectedProducts: Product[]) => void;
+    onConfirm: (selectedProducts: (Product | ProductDTOResponseSimple)[]) => void;
 }
 
 const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ onClose, onConfirm }) => {
-    const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-    const [searchTerm, setSearchTerm] = useState(""); // Estado para armazenar a busca
-    const { state } = useProduct();
+    const { user } = useUser();
+    const [selectedProducts, setSelectedProducts] = useState<(Product | ProductDTOResponseSimple)[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [productNameSearch, setProductNameSearch] = useState("");
+    const [isNewProduct, setIsNewProduct] = useState(false);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [modalGtin, setModalGtin] = useState("");
+    const [modalName, setModalName] = useState("");
 
-    // Alterna a seleção do produto
-    const toggleProductSelection = (product: Product) => {
+    useEffect(() => {
+        const loadProducts = async () => {
+            try {
+                const productData = await fetchProducts({ page: 0 });
+                setProducts(productData.content);
+            } catch (error) {
+                console.error("Error to load products", error);
+            }
+        };
+        loadProducts();
+    }, []);
+
+    const toggleProductSelection = (product: Product | ProductDTOResponseSimple, isNew: boolean) => {
+        setIsNewProduct(isNew);
         setSelectedProducts((prevSelected) =>
             prevSelected.some((p) => p.gtin === product.gtin)
-                ? prevSelected.filter((p) => p.gtin !== product.gtin) // Remove se já estiver selecionado
-                : [...prevSelected, product] // Adiciona se não estiver
+                ? prevSelected.filter((p) => p.gtin !== product.gtin)
+                : [...prevSelected, product]
         );
     };
 
-// Filtra os produtos com base no termo de pesquisa
-    // Função para verificar se todas as palavras do termo aparecem em qualquer ordem
-    const matchesSearch = (product: Product, searchTerm: string) => {
-        if (!searchTerm) return true; // Se não há busca, retorna todos os produtos
+    const matchesSearch = (product: Product, searchTerm: string, productNameSearch: string) => {
+        const gtinMatch = !searchTerm || product.gtin.startsWith(searchTerm);
 
-        const terms = searchTerm.toLowerCase().split(" "); // Divide a busca em palavras
-        const productText = [
-            product.variety.ingredient?.name,
-            product.variety.name,
-            product.brand
-        ].join(" ").toLowerCase(); // Junta os campos para buscar
+        const nameMatch = !productNameSearch || (
+            product.name?.toLowerCase().includes(productNameSearch.toLowerCase()) ||
+            product.brand?.toLowerCase().includes(productNameSearch.toLowerCase())
+        );
 
-        return terms.every((term) => productText.includes(term)); // Verifica se todas as palavras aparecem
+        return gtinMatch && nameMatch;
     };
 
-    // Filtra os produtos com base no termo de pesquisa
-    const filteredProducts = state.systemProduct.filter((product) => matchesSearch(product, searchTerm));
+    const filteredProducts = products.filter((product) => matchesSearch(product, searchTerm, productNameSearch));
+
+    const handleAddProduct = async (gtin: string, name: string, brand: string, quantityPerUnit: number, unit: UnitOfMeasure) => {
+        if (!user) {
+            console.error("User not loaded. Cannot add temporary product.");
+            return;
+        }
+        try {
+            const newProduct = await findOrCreateTemporaryProduct({ gtin, name, brand, quantityPerUnit, unit, userId: user.id });
+            toggleProductSelection({ ...newProduct, brand }, true);
+        } catch (error) {
+            console.error("Error adding temporary product:", error);
+        }
+    };
+
+    const handleSearchTermChange = (searchTerm: string, productName: string) => {
+        setSearchTerm(searchTerm);
+        setModalGtin(searchTerm);
+        setModalName(productName);
+        setProductNameSearch(productName); 
+    };
 
     return (
         <div className="modal-overlay">
             <div className="modal-content-product-selection">
-                <h3>Selecione os Produtos</h3>
-
-                {/* Campo de pesquisa */}
-                <input
-                    type="text"
-                    placeholder="Buscar produtos..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
-                />
+                <h3>Select Products</h3>
+                <ProductSearchInput onSearchTermChange={handleSearchTermChange} />
 
                 <div className="product-list">
                     {filteredProducts.length === 0 ? (
-                        <p>Nenhum produto encontrado.</p>
+                        <p>No products found.</p>
                     ) : (
                         filteredProducts.map((product) => (
                             <ProductCard
                                 key={product.gtin}
                                 product={product}
                                 isSelected={selectedProducts.some((p) => p.gtin === product.gtin)}
+                                isNew={isNewProduct}
                                 actions={
-                                    <button onClick={() => toggleProductSelection(product)}>
-                                        {selectedProducts.some((p) => p.gtin === product.gtin) ? "Remover" : "Selecionar"}
+                                    <button onClick={() => toggleProductSelection(product, false)}>
+                                        {selectedProducts.some((p) => p.gtin === product.gtin)
+                                            ? "Remove"
+                                            : "Select"}
                                     </button>
                                 }
                             />
                         ))
                     )}
+                    {/* Button to open the modal to add a new product */}
+                    <div className="add-product-button-card" onClick={() => setIsAddModalOpen(true)}>
+                        <FaPlus size={32} />
+                    </div>
                 </div>
-
                 <div className="modal-footer">
-                    <button onClick={onClose} className="cancel-button">Cancelar</button>
+                    <button onClick={onClose} className="cancel-button">
+                        Cancel
+                    </button>
                     <button onClick={() => onConfirm(selectedProducts)} className="confirm-button">
-                        Adicionar {selectedProducts.length} Itens
+                        Add {selectedProducts.length} Items
                     </button>
                 </div>
             </div>
+            {isAddModalOpen && (
+                <AddTemporaryProductModal
+                    onClose={() => setIsAddModalOpen(false)}
+                    onAddProduct={handleAddProduct}
+                    prefilledGtin={modalGtin}
+                    prefilledName={modalName}
+                />
+            )}
         </div>
     );
 };

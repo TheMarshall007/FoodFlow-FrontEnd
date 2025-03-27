@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { ShoppingListProduct } from "../../services/shopping/shoppingListService";
 import { FaTrash } from "react-icons/fa";
+import styles from "../../styles/components/Shopping/ShoppingListProductCard.module.css";
 
 const ShoppingListProductCard: React.FC<{
     product: ShoppingListProduct;
     onUpdateQuantity: (productId: number, newQuantity: number) => void;
     onRemoveProduct: (productId: number) => void;
-}> = ({ product, onUpdateQuantity, onRemoveProduct }) => {
+    isNew?: boolean
+}> = ({ product, onUpdateQuantity, onRemoveProduct, isNew }) => {
     const [inputValue, setInputValue] = useState(product.plannedQuantity);
 
     const handleDebouncedChange = (() => {
@@ -40,15 +42,14 @@ const ShoppingListProductCard: React.FC<{
     };
 
     return (
-        <div className="shopping-list-product-card">
-            <p className="product-name">
-                {product.systemProduct.variety?.ingredient?.name ?? "Produto"} -{" "}
-                {product.systemProduct.variety?.name ?? "Variedade Desconhecida"} ({product.systemProduct.brand})
+        <div className={styles.shoppingListProductCard}>
+            <p className={styles.productName}>
+                {product.systemProduct?.name ?? "Produto"} ({product.systemProduct.brand}) {isNew && "(New)"}
             </p>
-            <p className="product-details">
+            <p className={styles.productDetails}>
                 Quantidade por unidade: {product.systemProduct.quantityPerUnit} {product.systemProduct.unit}
             </p>
-            <div className="product-quantity-control">
+            <div className={styles.productQuantityControl}>
                 <button onClick={handleDecrement} disabled={inputValue <= 0}>
                     -
                 </button>
@@ -60,11 +61,11 @@ const ShoppingListProductCard: React.FC<{
                         setInputValue(newQuantity);
                         handleDebouncedChange(newQuantity);
                     }}
-                    className="quantity-input"
+                    className={styles.quantityInput}
                 />
                 <button onClick={handleIncrement}>+</button>
                 <button
-                    className="remove-product-button"
+                    className={styles.removeProductButton}
                     onClick={() => onRemoveProduct(product.id)}
                 >
                     <FaTrash size={16} />

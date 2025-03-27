@@ -1,0 +1,15 @@
+/* src/styles/components/Product/ProductSearchInput.module.css */
+
+.productSearchInput {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.productSearchInput input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex-grow: 1;
+}
