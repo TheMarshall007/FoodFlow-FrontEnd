@@ -28,6 +28,9 @@ const Navbar: React.FC = () => {
             <Link to="/admin/products" className={`${styles['navbar-item']} ${location.pathname === '/admin/products' ? styles.active : ''}`}>
               GERENCIAR PRODUTOS
             </Link>
+            <Link to="/admin/ingredients" className={`${styles['navbar-item']} ${location.pathname === '/admin/ingredients' ? styles.active : ''}`}>
+              GERENCIAR INGREDIENTES
+            </Link>
           </>
         )}
       </div>

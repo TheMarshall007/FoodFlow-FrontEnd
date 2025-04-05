@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchIngredients, updateIngredient, Ingredient } from '../../services/ingredients/ingredientsService';
+import { fetchIngredients, updateIngredient, Ingredient } from '../../services/ingredient/ingredientService';
 
 const IngredientValidation: React.FC = () => {
   const [pendingIngredients, setPendingIngredients] = useState<Ingredient[]>([]);
@@ -7,7 +7,7 @@ const IngredientValidation: React.FC = () => {
   useEffect(() => {
     async function loadPendingIngredients() {
       try {
-        const response = await fetchIngredients({ page: 0, isValidated: false }); // Added page: 0
+        const response = await fetchIngredients({ page: 0}); // Added page: 0
         setPendingIngredients(response.content);
       } catch (error) {
         console.error('Error loading pending ingredients:', error);
@@ -19,7 +19,7 @@ const IngredientValidation: React.FC = () => {
 
   const handleValidate = async (ingredient: Ingredient) => {
     try {
-      await updateIngredient({ ...ingredient, categoryId: ingredient.category.id, isValidated: true }); // Added categoryId
+      await updateIngredient({ ...ingredient, categoryId: ingredient?.category?.id}); 
       setPendingIngredients(pendingIngredients.filter((ing) => ing.id !== ingredient.id));
       alert(`Ingredient ${ingredient.name} validated successfully!`);
     } catch (error) {
@@ -29,7 +29,7 @@ const IngredientValidation: React.FC = () => {
   };
   const handleReject = async (ingredient: Ingredient) => {
     try {
-        await updateIngredient({ ...ingredient, categoryId: ingredient.category.id, isValidated: false, name: `${ingredient.name} (REJEITADO)`}); // Added categoryId
+        await updateIngredient({ ...ingredient, categoryId: ingredient?.category?.id, name: `${ingredient.name} (REJEITADO)`});
         setPendingIngredients(pendingIngredients.filter((ing) => ing.id !== ingredient.id));
         alert(`Ingredient ${ingredient.name} rejected successfully!`);
       } catch (error) {
@@ -49,7 +49,7 @@ const IngredientValidation: React.FC = () => {
                 <strong>Name:</strong> {ingredient.name}
               </div>
               <div>
-                <strong>Category:</strong> {ingredient.category.name}
+                <strong>Category:</strong> {ingredient?.category?.name}
               </div>
               <div>
                 <strong>Type:</strong> {ingredient.type}

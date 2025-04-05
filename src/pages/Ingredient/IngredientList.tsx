@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { fetchIngredients, Ingredient, IngredientType } from '../../services/ingredients/ingredientsService'; // Replace with your actual service
-import { fetchIngredientCategories, IngredientCategory } from '../../services/ingredients/ingredientCategoryService';
+import { fetchIngredients, Ingredient, IngredientType } from '../../services/ingredient/ingredientService'; // Replace with your actual service
+import { fetchIngredientCategories, IngredientCategory } from '../../services/ingredient/ingredientCategoryService';
 
 const IngredientList: React.FC = () => {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -28,8 +28,6 @@ const IngredientList: React.FC = () => {
       try {
         const response = await fetchIngredients({
           page,
-          categoryId: selectedCategory,
-          type: selectedType,
         });
         setIngredients(response.content);
         setTotalPages(response.totalPages);
@@ -93,7 +91,7 @@ const IngredientList: React.FC = () => {
               <strong>Name:</strong> {ingredient.name}
             </div>
             <div>
-              <strong>Category:</strong> {ingredient.category.name}
+              <strong>Category:</strong> {ingredient?.category?.name}
             </div>
             <div>
               <strong>Type:</strong> {ingredient.type}

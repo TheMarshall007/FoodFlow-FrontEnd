@@ -18,7 +18,7 @@ interface ProductDTOSearch {
     page: number
 }
 
-const ManageProducts: React.FC = () => {
+const ManageProduct: React.FC = () => {
     const [products, setProducts] = useState<ProductDTOResponse[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(0);
@@ -181,4 +181,4 @@ const ManageProducts: React.FC = () => {
     );
 };
 
-export default ManageProducts;
+export default ManageProduct;

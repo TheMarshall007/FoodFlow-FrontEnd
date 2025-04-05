@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "../../styles/components/Dishes/RegisterDishModal.css";
 import { createDish, Dish, updateDish } from "../../services/dish/dishService";
 import { Category, fetchCategories } from "../../services/dish/dishCategoryService";
-import { fetchIngredients, Ingredient } from "../../services/ingredients/ingredientsService";
+import { fetchIngredients, Ingredient } from "../../services/ingredient/ingredientService";
 import { fetchDishIngredientsByIds, DishIngredient } from "../../services/dish/dishIngredientService";
 
 interface ModalProps {
@@ -33,7 +33,7 @@ const RegisterDishModal: React.FC<ModalProps> = ({ onClose, dish }) => {
     useEffect(() => {
         async function loadData() {
             try {
-                const ingredientsData = await fetchIngredients({ page: 0, size: 1000 });
+                const ingredientsData = await fetchIngredients({ page: 0 });
                 setIngredients(ingredientsData.content);
                 const categoriesData = await fetchCategories({ page: 0 });
                 setCategories(categoriesData.content);

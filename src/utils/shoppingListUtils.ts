@@ -1,6 +1,6 @@
 import { Product } from "../services/product/productService";
 import { ShoppingList } from "../services/shopping/shoppingListService";
-import { Ingredient } from "../services/ingredients/ingredientsService";
+import { Ingredient } from "../services/ingredient/ingredientService";
 
 /**
  * Atualiza os nomes dos ingredientes dentro da lista de compras.

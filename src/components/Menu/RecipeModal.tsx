@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../../styles/components/Menu/Recipe/RecipeModal.css';
 import { Dish } from '../../services/dish/dishService';
-import { Ingredient } from '../../services/ingredients/ingredientsService';
+import { Ingredient } from '../../services/ingredient/ingredientService';
 
 interface RecipeModalProps {
     show: boolean;

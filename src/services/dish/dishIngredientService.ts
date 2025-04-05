@@ -1,6 +1,6 @@
 import { api } from '../api/apiConfig';
 import { Dish } from './dishService';
-import { Ingredient } from '../ingredients/ingredientsService';
+import { Ingredient } from '../ingredient/ingredientService';
 
 // Defina a interface para representar a estrutura do objeto retornado pela API
 export interface DishIngredient {

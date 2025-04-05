@@ -1,5 +1,5 @@
 import { api } from '../api/apiConfig';
-import { Ingredient } from '../ingredients/ingredientsService';
+import { Ingredient } from '../ingredient/ingredientService';
 import { Category } from './dishCategoryService';
 
 interface DishParams {

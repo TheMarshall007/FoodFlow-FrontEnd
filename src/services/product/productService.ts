@@ -1,4 +1,4 @@
-import { fetchIngredientsByIds, Ingredient } from "../ingredients/ingredientsService";
+import { findIngredientsByIds, Ingredient } from "../ingredient/ingredientService";
 import { api } from "../api/apiConfig";
 import { PaginatedResponse } from "../api/apiResponse";
 
@@ -120,7 +120,7 @@ export const fetchProductsWithDetailsByIds = async (productGtins: string[]) => {
         // Remove duplicates
         const uniqueIngredientIds = Array.from(new Set(ingredientIds)); // Use Array.from() here
         if (uniqueIngredientIds.length > 0) {
-            ingredients = await fetchIngredientsByIds(uniqueIngredientIds);
+            ingredients = await findIngredientsByIds(uniqueIngredientIds);
         }
         products = products.map((product) => ({
             ...product,

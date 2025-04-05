@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { createIngredient, Ingredient, IngredientType, updateIngredient } from '../../services/ingredients/ingredientsService';
-import { fetchIngredientCategories, IngredientCategory } from '../../services/ingredients/ingredientCategoryService';
+import { insertIngredient, Ingredient, IngredientType, updateIngredient } from '../../services/ingredient/ingredientService';
+import { fetchIngredientCategories, IngredientCategory } from '../../services/ingredient/ingredientCategoryService';
 
 interface IngredientFormProps {
   onClose: () => void;
@@ -31,7 +31,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ onClose, ingredient }) 
     if (ingredient) {
       setIsEditing(true);
       setName(ingredient.name);
-      setSelectedCategory(ingredient.category.id);
+      setSelectedCategory(ingredient.categoryId ?? null);
       setType(ingredient.type);
     }
   }, [ingredient]);
@@ -51,7 +51,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ onClose, ingredient }) 
         await updateIngredient({ ...ingredientData, id: ingredient.id });
         alert('Ingredient updated successfully!');
       } else {
-        await createIngredient(ingredientData);
+        await insertIngredient(ingredientData);
         alert('Ingredient created successfully!');
       }
       onClose();
