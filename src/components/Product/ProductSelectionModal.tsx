@@ -3,6 +3,7 @@ import "../../styles/components/Product/ProductSelectionModal.css";
 import {
     Product,
     ProductDTOResponseSimple,
+    SaleType,
     UnitOfMeasure,
     fetchProducts,
     findOrCreateTemporaryProduct,
@@ -61,15 +62,31 @@ const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ onClose, 
         return gtinMatch && nameMatch;
     };
 
-    const filteredProducts = products.filter((product) => matchesSearch(product, searchTerm, productNameSearch));
+    const filteredProducts = products.filter((product) => {
+        // 1. Verifica se corresponde aos termos de busca
+        const searchMatch = matchesSearch(product, searchTerm, productNameSearch);
+        if (!searchMatch) {
+            return false; // Se não corresponde à busca, não mostra
+        }
 
-    const handleAddProduct = async (gtin: string, name: string, brand: string, quantityPerUnit: number, unit: UnitOfMeasure) => {
+        // 2. Se corresponde à busca, aplica a lógica para produtos temporários
+        if (product.isTemporary) {
+            // Se é temporário, só mostra se o userId do produto for igual ao do usuário logado
+            // Certifique-se que 'product.userId' existe no seu tipo Product
+            return !!user && product.userId === user.id;
+        } else {
+            // Se não é temporário, mostra (pois já passou pelo filtro de busca)
+            return true;
+        }
+    });
+
+    const handleAddProduct = async (gtin: string, name: string, brand: string, quantityPerUnit: number, unit: UnitOfMeasure, saleType: SaleType) => {
         if (!user) {
             console.error("User not loaded. Cannot add temporary product.");
             return;
         }
         try {
-            const newProduct = await findOrCreateTemporaryProduct({ gtin, name, brand, quantityPerUnit, unit, userId: user.id });
+            const newProduct = await findOrCreateTemporaryProduct({ gtin, name, brand, quantityPerUnit, unit, userId: user.id, saleType });
             toggleProductSelection({ ...newProduct, brand }, true);
         } catch (error) {
             console.error("Error adding temporary product:", error);

@@ -1,5 +1,5 @@
 import { api } from "../api/apiConfig";
-import { Product } from "../product/productService";
+import { Product, SaleType } from "../product/productService";
 
 export interface ShoppingCartProductInsert {
     productGtin: string;

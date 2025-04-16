@@ -8,8 +8,13 @@ export interface Product {
     brand: string;
     quantityPerUnit: number;
     unit: UnitOfMeasure;
-    ingredientsIds: number[]; // Correctly using an array
-    ingredients?: Ingredient[]; // Added ingredient property for fetched detail
+    ingredientsIds: number[];
+    ingredients?: Ingredient[];
+    isTemporary?: boolean;
+    userId?: number;
+    saleType?: SaleType;
+    nutritionalInfo: NutritionalInfo;
+    categoriesIds: number[];
 }
 
 interface ProductDTOSearch {
@@ -25,6 +30,12 @@ export enum UnitOfMeasure {
     UNIT = "unit"
 }
 
+export enum SaleType {
+    BULK = "BULK",
+    FIXED_PACKAGE = "FIXED_PACKAGE",
+    VARIABLE_PACKAGE = "VARIABLE_PACKAGE",
+}
+
 export interface ProductDTOResponseSimple {
     gtin: string;
     name: string;
@@ -37,6 +48,7 @@ export interface ProductDTOInsert {
     name: string;
     quantityPerUnit: number;
     unit: UnitOfMeasure;
+    saleType: SaleType;
     ingredientsIds: number[];
     nutritionalInfo: {
         servingSize: string;
@@ -51,6 +63,7 @@ export interface ProductFindOrCreateTemporaryRequest {
     brand?: string;
     quantityPerUnit?: number;
     unit?: UnitOfMeasure;
+    saleType: SaleType;
     ingredientsIds?: number[];
     userId: number;
 }
@@ -72,11 +85,16 @@ export interface ProductDTOResponse {
     quantityPerUnit: number;
     unit: UnitOfMeasure;
     ingredientsIds: number[];
-    nutritionalInfo: { [key: string]: number };
+    nutritionalInfo: NutritionalInfo;
     categoriesIds: number[];
     isTemporary: boolean;
 }
 
+export interface NutritionalInfo {
+    id: number;
+    servingSize: string;
+    nutritionalDetails: { [key: string]: number };
+}
 
 export const fetchProductById = async (id: number): Promise<Product> => {
     try {

@@ -80,7 +80,9 @@ const Products = () => {
                 ) : state.systemProduct.length === 0 ? (
                     <p>Nenhum produto encontrado.</p>
                 ) : (
-                    state.systemProduct.map((product: Product) => {
+                    state.systemProduct
+                    .filter((product: Product) => !product.isTemporary)
+                    .map((product: Product) => {
                         const productData = shoppingListProducts[product.gtin.toString()] || { plannedQuantity: 0, shoppingListProductId: null };
                         console.log("LOGG state", state)
                         return (
