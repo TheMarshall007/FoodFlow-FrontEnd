@@ -6,164 +6,41 @@ import ProductSelectionModal from "../../Product/ProductSelectionModal";
 
 interface ShoppingCartTableProps {
     products: ShoppingCartProduct[];
-    onUpdateProduct: (product: ShoppingCartProduct, isAdvancedMode: boolean) => void;
-    onUpdateProductList: (product: ShoppingCartProduct, isAdvancedMode: boolean) => void;
+    onUpdateProduct: (product: ShoppingCartProduct) => void;
     onRemoveProduct: (productId: number) => void;
     onAddProducts: (selectedProducts: ShoppingCartProductInsert[]) => void;
-    isAdvancedMode: boolean;
-    setIsAdvancedMode: (value: boolean) => void;
 }
 
 const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
     products,
     onUpdateProduct,
-    onUpdateProductList,
     onRemoveProduct,
-    onAddProducts,
-    isAdvancedMode,
-    setIsAdvancedMode
+    onAddProducts
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editValues, setEditValues] = useState<{ [key: number]: Partial<ShoppingCartProduct> }>({});
 
-    const handleEditChange = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        product: ShoppingCartProduct,
-        field: keyof ShoppingCartProduct
-    ) => {
-        const newValue = e.target.value;
-        setEditValues((prev) => ({
-            ...prev,
-            [product.id]: {
-                ...prev[product.id],
-                [field]: newValue
-            }
-        }));
-    };
-
-    const handleEditBlur = (
-        product: ShoppingCartProduct,
-        field: keyof ShoppingCartProduct
-    ) => {
-        let newValue: string | number =
-            (editValues[product.id]?.[field] as string | number) ??
-            (product[field] as string | number) ?? 0;
-
-        let updatedProduct: ShoppingCartProduct = {
+    const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>, product: ShoppingCartProduct) => {
+        const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
+        onUpdateProduct({
             ...product,
-            [field]: newValue,
-        };
-
-        // Obtendo os valores antes do cálculo
-        const purchasedQuantity = Number(updatedProduct.purchasedQuantity) || 0;
-        const purchasedUnit = String(updatedProduct.purchasedUnit) || "Unidade";
-        const unitPrice = Number(updatedProduct.unitPrice) || 0;
-        const totalPrice = Number(updatedProduct.totalPrice) || 0;
-        const productUnit = String(product.systemProduct.unit) || "Unidade";
-        const productQuantity = Number(product.systemProduct.quantityPerUnit) || 1;
-
-        // ⚡ Chamando `calculatePrices` para calcular os valores corretos
-        const { totalPrice: newTotalPrice, unitPrice: newUnitPrice } = calculatePrices(
-            purchasedQuantity,
-            purchasedUnit,
-            unitPrice,
-            totalPrice,
-            productUnit,
-            productQuantity
-        );
-
-        // Atualiza os valores calculados no produto atualizado
-        updatedProduct.totalPrice = newTotalPrice;
-        updatedProduct.unitPrice = newUnitPrice;
-
-        // Atualiza o estado do produto no carrinho
-        onUpdateProductList(updatedProduct, isAdvancedMode);
-
-        // Remove o valor editado temporariamente para limpar o input
-        setEditValues((prev) => {
-            const newValues = { ...prev };
-            delete newValues[product.id];
-            return newValues;
+            purchasedQuantity: newQuantity,
+            totalPrice: newQuantity * product.unitPrice
         });
     };
 
-    const calculatePrices = (
-        purchasedQuantity: number,
-        purchasedUnit: string,
-        unitPrice: number,
-        totalPrice: number,
-        productUnit: string,
-        productQuantity: number
-    ) => {
-        let newTotalPrice = totalPrice;
-        let newUnitPrice = unitPrice;
-
-        // Se unidade no carrinho for Kg ou L → Multiplicar diretamente
-        if (purchasedUnit === "Kg" || purchasedUnit === "L") {
-            newTotalPrice = unitPrice * purchasedQuantity;
-        }
-        // Se unidade no carrinho for g ou ml → Dividir o preço por 1000
-        else if (purchasedUnit === "g" || purchasedUnit === "ml") {
-            newTotalPrice = (unitPrice / 1000) * purchasedQuantity;
-        }
-        // Se unidade no carrinho for UNIDADE e o produto for vendido por Kg ou L
-        else if (purchasedUnit === "Unidade" && (productUnit === "Kg" || productUnit === "L")) {
-            newTotalPrice = productQuantity * purchasedQuantity * unitPrice;
-        }
-        // Se unidade no carrinho for UNIDADE e o produto for vendido por g ou ml
-        else if (purchasedUnit === "Unidade" && (productUnit === "g" || productUnit === "ml")) {
-            newTotalPrice = (productQuantity * purchasedQuantity / 1000) * unitPrice;
-        }
-        // Se unidade no carrinho for UNIDADE e o produto também for UNIDADE
-        else if (purchasedUnit === "Unidade" && productUnit === "Unidade") {
-            newUnitPrice = newTotalPrice / purchasedQuantity;
-        }
-
-        return {
-            totalPrice: Number(newTotalPrice.toFixed(2)),
-            unitPrice: Number(newUnitPrice.toFixed(2))
-        };
-    };
-
-    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>, product: ShoppingCartProduct, field: string) => {
-        const { value } = e.target;
-        setEditValues((prev) => ({
-            ...prev,
-            [product.id]: {
-                ...prev[product.id],
-                [field]: value,
-            },
-        }));
+    const handleUnitPriceChange = (e: React.ChangeEvent<HTMLInputElement>, product: ShoppingCartProduct) => {
+        const newPrice = parseFloat(e.target.value) || 0;
+        onUpdateProduct({
+            ...product,
+            unitPrice: newPrice,
+            totalPrice: product.purchasedQuantity * newPrice
+        });
     };
 
     const totalPrice = products.reduce((sum, product) => sum + (product.totalPrice || 0), 0);
 
-    const getAllowedUnits = (productUnit: string | undefined): string[] => {
-        if (!productUnit) return ["Unidade", "g", "Kg", "ml", "L"];
-
-        const unitMap: Record<string, string[]> = {
-            "g": ["g", "Kg", "Unidade"],     // Ex: Frutas, legumes, temperos
-            "Kg": ["g", "Kg", "Unidade"],    // Ex: Carnes, arroz, frutas vendidas por Kg
-            "ml": ["ml", "L", "Unidade"],    // Ex: Óleos, leite em embalagens menores
-            "L": ["ml", "L", "Unidade"],     // Ex: Bebidas em garrafas maiores
-            "Unidade": ["Unidade", "g", "Kg", "ml", "L"], // Ex: Ovos, maçãs, caixas de leite
-        };
-
-        return unitMap[productUnit] || ["Unidade"];
-    };
-
     return (
         <div>
-            {/* Switch entre Modo Simples e Avançado */}
-            <div className="cart-header">
-                <label className="switch">
-                    <input type="checkbox" checked={isAdvancedMode} onChange={() => setIsAdvancedMode(!isAdvancedMode)} />
-                    <span className="slider">
-                        <span className="switch-text">{isAdvancedMode ? "Avançado" : "Simples"}</span>
-                    </span>
-                </label>
-            </div>
-
             <table className="shopping-cart-table">
                 <thead>
                     <tr>
@@ -172,8 +49,8 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                         <th>Product Name</th>
                         <th>Quantity in Cart</th>
                         <th>Unit of Measure</th>
-                        {isAdvancedMode && <th>Price per Kg, L or Unit</th>}
-                        {isAdvancedMode && <th>Total Price</th>}
+                        <th>Price per Unit</th>
+                        <th>Total Price</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -194,42 +71,36 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                             <td>
                                 <input
                                     type="number"
-                                    value={editValues[product.id]?.purchasedQuantity ?? product.purchasedQuantity}
-                                    onChange={(e) => handleEditChange(e, product, "purchasedQuantity")}
-                                    onBlur={() => handleEditBlur(product, "purchasedQuantity")}
+                                    value={product.purchasedQuantity}
+                                    onChange={(e) => handleQuantityChange(e, product)}
                                     min="0"
                                 />
                             </td>
                             <td>
                                 <select
-                                    value={String(editValues[product.id]?.purchasedUnit ?? product.purchasedUnit ?? product.plannedUnit ?? "Unidade")}
-                                    onChange={(e) => handleSelectChange(e, product, "purchasedUnit")}
-                                    onBlur={() => handleEditBlur(product, "purchasedUnit")}
+                                    value={String(product.purchasedUnit ?? product.plannedUnit ?? "Unidade")}
+                                    disabled // Assuming unit cannot be changed for now
                                 >
-                                    {getAllowedUnits(String(product.systemProduct.unit) || "").map((unit) => (
-                                        <option key={unit} value={unit}>
-                                            {unit} {unit === "Unidade" && product.systemProduct.quantityPerUnit ? `(${product.systemProduct.quantityPerUnit} ${product.systemProduct.unit})` : ""}
-                                        </option>
-                                    ))}
+                                    <option value="Unidade">Unidade</option>
+                                    <option value="g">g</option>
+                                    <option value="Kg">Kg</option>
+                                    <option value="ml">ml</option>
+                                    <option value="L">L</option>
                                 </select>
                             </td>
 
-                            {isAdvancedMode && (
-                                <td>
-                                    <input
-                                        type="number"
-                                        value={editValues[product.id]?.unitPrice ?? product.unitPrice}
-                                        onChange={(e) => handleEditChange(e, product, "unitPrice")}
-                                        onBlur={() => handleEditBlur(product, "unitPrice")}
-                                        step="0.01"
-                                    />
-                                </td>
-                            )}
-                            {isAdvancedMode && (
-                                <td>
-                                    <span>R$ {(editValues[product.id]?.totalPrice ?? product.totalPrice).toFixed(2)}</span>
-                                </td>
-                            )}
+                            <td>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={product.unitPrice}
+                                    onChange={(e) => handleUnitPriceChange(e, product)}
+                                />
+                            </td>
+
+                            <td>
+                                <span>R$ {product.totalPrice.toFixed(2)}</span>
+                            </td>
 
                             <td>
                                 {product.plannedQuantity == null && (
@@ -242,19 +113,17 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                     ))}
                     {/* Botão para adicionar itens */}
                     <tr>
-                        <td colSpan={isAdvancedMode ? 8 : 6} style={{ fontWeight: "bold", textAlign: "center" }}>
+                        <td colSpan={8} style={{ fontWeight: "bold", textAlign: "center" }}>
                             <button className="add-products-button" onClick={() => setIsModalOpen(true)}>
                                 <FaPlus /> Add Items
                             </button>
                         </td>
                     </tr>
-                    {isAdvancedMode && (
-                        <tr>
-                            <td colSpan={6} style={{ fontWeight: "bold", textAlign: "right" }}>Total:</td>
-                            <td style={{ fontWeight: "bold" }}>{totalPrice.toFixed(2)}</td>
-                            <td></td>
-                        </tr>
-                    )}
+                    <tr>
+                        <td colSpan={6} style={{ fontWeight: "bold", textAlign: "right" }}>Total:</td>
+                        <td style={{ fontWeight: "bold" }}>{totalPrice.toFixed(2)}</td>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
 

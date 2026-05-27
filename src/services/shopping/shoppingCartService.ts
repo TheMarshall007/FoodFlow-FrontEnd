@@ -32,7 +32,7 @@ export interface ShoppingCart {
  */
 export const fetchShoppingCart = async (pantryId: number): Promise<ShoppingCart> => {
     try {
-        const response = await api.get(`/pantries/${pantryId}/shopping-cart`)
+        const response = await api.get(`/pantries/${pantryId}/shopping-cart`);
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar o carrinho de compras:', error);
@@ -69,22 +69,9 @@ export const addProductToShoppingCart = async (pantryId: number, products: Shopp
 /**
  * Atualiza um product do carrinho de compras.
  */
-export const updateShoppingCartProduct = async (pantryId: number, productId: number, product: ShoppingCartProduct, isAdvancedMode: boolean): Promise<ShoppingCart> => {
+export const updateShoppingCartProduct = async (pantryId: number, productId: number, product: ShoppingCartProduct): Promise<ShoppingCart> => {
     try {
-        const response = await api.put(`/pantries/${pantryId}/shopping-cart/products/${productId}`, {...product, isAdvancedMode});
-        return response.data;
-    } catch (error) {
-        console.error('Erro ao atualizar product do carrinho:', error);
-        throw error;
-    }
-};
-
-/**
- * Atualiza uma lista de product do carrinho de compras.
- */
-export const updateShoppingCartProducts = async (pantryId: number, products: {products: ShoppingCartProduct[], isAdvancedMode: boolean}): Promise<ShoppingCart> => {
-    try {
-        const response = await api.put(`/pantries/${pantryId}/shopping-cart/products/updateItems`, products);
+        const response = await api.put(`/pantries/${pantryId}/shopping-cart/products/${productId}`, product);
         return response.data;
     } catch (error) {
         console.error('Erro ao atualizar product do carrinho:', error);
@@ -108,9 +95,9 @@ export const removeShoppingCartProduct = async (pantryId: number, productId: num
 /**
  * Finaliza a compra e limpa o carrinho.
  */
-export const finalizePurchase = async (pantryId: number, isAdvancedMode: boolean): Promise<void> => {
+export const finalizePurchase = async (pantryId: number): Promise<void> => {
     try {
-        await api.post(`/pantries/${pantryId}/shopping-cart/finalize`, isAdvancedMode);
+        await api.post(`/pantries/${pantryId}/shopping-cart/finalize`);
     } catch (error) {
         console.error('Erro ao finalizar a compra:', error);
         throw error;
