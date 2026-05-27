@@ -11,25 +11,13 @@ interface ShoppingCartProductCardProps {
 
 const ShoppingCartProductCard: React.FC<ShoppingCartProductCardProps> = ({ product, onUpdateQuantity, onRemoveProduct }) => {
     const [purchasedQuantity, setPurchasedQuantity] = useState(product.purchasedQuantity);
-    const [unitPrice, setUnitPrice] = useState(product.unitPrice);
 
     const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
         setPurchasedQuantity(newQuantity);
         onUpdateQuantity({
             ...product,
-            purchasedQuantity: newQuantity,
-            totalPrice: newQuantity * unitPrice
-        });
-    };
-
-    const handleUnitPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newPrice = parseFloat(e.target.value) || 0;
-        setUnitPrice(newPrice);
-        onUpdateQuantity({
-            ...product,
-            unitPrice: newPrice,
-            totalPrice: purchasedQuantity * newPrice
+            purchasedQuantity: newQuantity
         });
     };
 
@@ -45,21 +33,6 @@ const ShoppingCartProductCard: React.FC<ShoppingCartProductCardProps> = ({ produ
                     onChange={handleQuantityChange}
                     min="0"
                 />
-            </div>
-
-            <div className="product-controls">
-                <label>Preço Unitário:</label>
-                <input
-                    type="number"
-                    step="0.01"
-                    value={unitPrice}
-                    onChange={handleUnitPriceChange}
-                />
-            </div>
-
-            <div className="product-controls">
-                <label>Total Price:</label>
-                <span>{(purchasedQuantity * unitPrice).toFixed(2)}</span>
             </div>
 
             <button className="remove-button" onClick={() => onRemoveProduct(product.id)}>

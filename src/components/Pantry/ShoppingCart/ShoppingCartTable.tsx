@@ -23,21 +23,11 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
         const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
         onUpdateProduct({
             ...product,
-            purchasedQuantity: newQuantity,
-            totalPrice: newQuantity * product.unitPrice
+            purchasedQuantity: newQuantity
         });
     };
 
-    const handleUnitPriceChange = (e: React.ChangeEvent<HTMLInputElement>, product: ShoppingCartProduct) => {
-        const newPrice = parseFloat(e.target.value) || 0;
-        onUpdateProduct({
-            ...product,
-            unitPrice: newPrice,
-            totalPrice: product.purchasedQuantity * newPrice
-        });
-    };
-
-    const totalPrice = products.reduce((sum, product) => sum + (product.totalPrice || 0), 0);
+    const totalPrice = products.reduce((sum, product) => sum + (product.purchasedQuantity * product.systemProduct.quantityPerUnit), 0);
 
     return (
         <div>
@@ -49,7 +39,6 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                         <th>Product Name</th>
                         <th>Quantity in Cart</th>
                         <th>Unit of Measure</th>
-                        <th>Price per Unit</th>
                         <th>Total Price</th>
                         <th>Actions</th>
                     </tr>
@@ -90,16 +79,7 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                             </td>
 
                             <td>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    value={product.unitPrice}
-                                    onChange={(e) => handleUnitPriceChange(e, product)}
-                                />
-                            </td>
-
-                            <td>
-                                <span>R$ {product.totalPrice.toFixed(2)}</span>
+                                <span>R$ {(product.purchasedQuantity * product.systemProduct.quantityPerUnit).toFixed(2)}</span>
                             </td>
 
                             <td>
@@ -136,7 +116,6 @@ const ShoppingCartTable: React.FC<ShoppingCartTableProps> = ({
                             const formattedProducts = selectedProducts.map((product) => ({
                                 productGtin: product.gtin,
                                 cartQuantity: 0,
-                                price: 0,
                             }));
                             onAddProducts(formattedProducts);
                         }

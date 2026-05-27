@@ -5,7 +5,6 @@ export interface ShoppingCartProductInsert {
     productGtin: string;
     plannedQuantity?: number;
     cartQuantity: number;
-    price: number;
 }
 
 export interface ShoppingCartProduct {
@@ -16,8 +15,6 @@ export interface ShoppingCartProduct {
     plannedUnit: String;
     purchasedQuantity: number;
     purchasedUnit: String;
-    unitPrice: number;
-    totalPrice: number;
 }
 
 export interface ShoppingCart {
