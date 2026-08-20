@@ -27,36 +27,30 @@ const Home: React.FC = () => {
 
                 const pant = await fetchPantry({ userId: user.id, page: 0 });
                 if (pant) {
-                    const pantryWithLowProduct = await Promise.all(pant?.map(async (invent: Pantry) => {
+                    const pantryWithLowProduct = await Promise.all(pant.map(async (invent: Pantry) => {
                         const lowProduct = await fetchLowQuantityProducts(invent?.id, 5);
-                        if (lowProduct) {
-                            return {
-                                ...invent,
-                                lowQuantityProducts: lowProduct,
-                            }
+                        return {
+                            ...invent,
+                            lowQuantityProducts: lowProduct,
                         }
-                    }))
+                    }));
                     setPantry(pantryWithLowProduct);
+
+                    const daily = pant.length > 0
+                        ? await fetchDailySuggestion(pant[0].id)
+                        : null;
+                    const suggestion = Array.isArray(daily) ? daily[0] : daily;
+
+                    if (suggestion) {
+                        let image = suggestion.image;
+                        if (image?.id && (!image.image || !image.type)) {
+                            const images = await fetchDishImage([image.id]);
+                            image = images.find((item: { id: number }) => item.id === image.id) || image;
+                        }
+                        setDailySuggestion({ ...suggestion, image });
+                    }
                 }
             }
-
-            const daily = await fetchDailySuggestion(1);
-            // if (daily) {
-            //     const dailyWithImages = await Promise.any(daily?.map(async (dish: Dish) => {
-            //         if (typeof dish.image === 'object' && dish.image.id) {
-            //             const imageResponse = await fetchDishImage(dish.image.id);
-            //             if (imageResponse) {
-            //                 return {
-            //                     ...dish,
-            //                     image: imageResponse.image
-            //                 };
-            //             }
-            //         }
-            //         return dish;
-            //     }));
-            //     setDailySuggestion(dailyWithImages);
-            // }
-            // setDailySuggestion(daily)
         }
         fetchData();
     }, [user, navigate]);
@@ -77,11 +71,13 @@ const Home: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        <img
-                            src={typeof dailySuggestion.image === 'string' && require(dailySuggestion.image)}
-                            alt="Suggested Dish"
-                            className="suggestion-image"
-                        />
+                        {dailySuggestion.image?.image && dailySuggestion.image?.type && (
+                            <img
+                                src={`data:image/${dailySuggestion.image.type};base64,${dailySuggestion.image.image}`}
+                                alt={dailySuggestion.name}
+                                className="suggestion-image"
+                            />
+                        )}
                     </div>
                 )}
             </section>

@@ -6,7 +6,6 @@ import RecipeModal from "../../components/Menu/RecipeModal";
 import { fetchDishImage } from "../../services/dish/dishImageService";
 
 const AdminDishes: React.FC = () => {
-    const [dishes, setDishes] = useState<Dish[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groupedDishes, setGroupedDishes] = useState<Record<string, Dish[]>>({});
     const [selectedDish, setSelectedDish] = useState<Dish | undefined>(undefined);
@@ -33,8 +32,6 @@ const AdminDishes: React.FC = () => {
                 ...dish,
                 image: imagesMap.get(dish.image?.id) || dish.image, // Mantém a imagem original se não for encontrada
             }));
-
-            setDishes(updatedDishes);
 
             // Agrupar os pratos por categoria usando `displayName`
             const grouped = updatedDishes.reduce((acc: Record<string, Dish[]>, dish: Dish) => {

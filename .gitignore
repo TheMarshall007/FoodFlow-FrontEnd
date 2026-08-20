@@ -21,3 +21,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.aider*
+.env
+.aider.conf.yml
+.aider.heavy.conf.yml

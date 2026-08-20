@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../../styles/components/Product/ProductForm.css"
 // import { createProduct } from "../../services/product/productService";
 
-const ProductForm: React.FC<{}> = ({ }) => {
+const ProductForm: React.FC = () => {
     const [brand, setBrand] = useState("");
     const [quantity, setQuantity] = useState("");
     const [unit, setUnit] = useState("KG");

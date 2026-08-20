@@ -10,7 +10,6 @@ import {
 } from "../services/shopping/shoppingListService";
 import { useParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
-import { Ingredient } from "../services/ingredients/ingredientsService";
 
 interface ProductState {
     systemProduct: Product[];

@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import {
   updateShoppingCartProduct,
   removeShoppingCartProduct,
@@ -8,7 +8,6 @@ import {
   addProductToShoppingCart,
   loadCartFromShoppingList,
   ShoppingCartProductInsert,
-  updateShoppingCartProducts,
 } from "../services/shopping/shoppingCartService";
 import { useUser } from "../context/UserContext";
 import { fetchProductsWithDetailsByIds, Product } from "../services/product/productService";
@@ -167,10 +166,10 @@ export const useShoppingCart = () => {
   };
 
 
-  const handleUpdateCartProduct = async (data: ShoppingCartProduct, isAdvancedMode: boolean) => {
+  const handleUpdateCartProduct = async (data: ShoppingCartProduct) => {
     if (id) {
       try {
-        const apiResponse = await updateShoppingCartProduct(parseInt(id), data.id, data, isAdvancedMode);
+        const apiResponse = await updateShoppingCartProduct(parseInt(id), data.id, data);
         const updatedCart = transformCartResponse(apiResponse); // Converte para ShoppingCart
 
         dispatch({ type: "SET_CART", payload: updatedCart });
@@ -180,82 +179,6 @@ export const useShoppingCart = () => {
         dispatch({ type: "SET_ERROR", payload: errorMessage });
       }
     }
-  };
-
-  const [pendingUpdates, setPendingUpdates] = useState<{ [key: number]: ShoppingCartProduct }>({});
-  const [updateTimer, setUpdateTimer] = useState<NodeJS.Timeout | null>(null);
-
-  const handleUpdateCartProductList = async (data: ShoppingCartProduct, isAdvancedMode: boolean) => {
-    // 🔹 Atualiza a lista de produtos pendentes corretamente
-    setPendingUpdates((prev) => {
-      const updatedPendingUpdates = { ...prev };
-
-      if (updatedPendingUpdates[data.id]) {
-        // ✅ Se o produto já está na lista, atualiza os valores mantendo os existentes
-        updatedPendingUpdates[data.id] = { ...updatedPendingUpdates[data.id], ...data };
-      } else {
-        // ✅ Se o produto **não** está na lista, adiciona como novo
-        updatedPendingUpdates[data.id] = data;
-      }
-
-      return updatedPendingUpdates;
-    });
-
-    // 🔹 Atualiza o estado global do carrinho imediatamente no frontend
-    dispatch({
-      type: "SET_CART",
-      payload: state.cart
-        ? {
-          ...state.cart,
-          cartProducts: state.cart.cartProducts.map((product) =>
-            product.id === data.id ? { ...product, ...data } : product
-          ),
-        }
-        : { cartProducts: [data] }, // Se `state.cart` for `null`, cria um novo carrinho com o item atualizado
-    });
-
-    // 🔹 Se já houver um timer, cancela e reinicia
-    if (updateTimer) {
-      clearTimeout(updateTimer);
-    }
-
-    // 🔹 Define um novo timer para enviar as alterações ao backend após 10 segundos
-    const newTimer = setTimeout(async () => {
-      setUpdateTimer(null); // Limpa o timer ativo
-
-      setPendingUpdates((prevUpdates) => {
-        const productsToUpdate = Object.values(prevUpdates);
-
-        if (productsToUpdate.length > 0 && id) {
-          (async () => {
-            try {
-              // ✅ Enviando no formato correto para o backend
-              const payload = {
-                products: productsToUpdate,
-                isAdvancedMode,
-              };
-
-              const apiResponse = await updateShoppingCartProducts(parseInt(id), payload);
-              const updatedCart = transformCartResponse(apiResponse);
-
-              // 🔹 Atualiza o estado global do carrinho com os dados do backend
-              dispatch({ type: "SET_CART", payload: updatedCart });
-
-              // 🔹 Limpa os produtos pendentes após a atualização
-              setPendingUpdates({});
-            } catch (error: unknown) {
-              console.error("Erro ao atualizar produto:", error);
-              const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-              dispatch({ type: "SET_ERROR", payload: errorMessage });
-            }
-          })();
-        }
-
-        return prevUpdates; // Mantém o estado atualizado
-      });
-    }, 10000); // ⏳ Aguarda 10 segundos antes de enviar ao backend
-
-    setUpdateTimer(newTimer);
   };
 
   const handleRemoveCartProduct = async (cartProductId: number) => {
@@ -271,10 +194,10 @@ export const useShoppingCart = () => {
     }
   };
 
-  const handleFinalizePurchase = async (isAdvancedMode: boolean) => {
+  const handleFinalizePurchase = async () => {
     if (id) {
       try {
-        await finalizePurchase(parseInt(id), isAdvancedMode);
+        await finalizePurchase(parseInt(id));
         dispatch({ type: "FINALIZE_PURCHASE" });
       } catch (error: unknown) {
         console.error("Erro ao finalizar a compra:", error);
@@ -290,7 +213,6 @@ export const useShoppingCart = () => {
     error: state.error,
     handleAddToCart,
     handleUpdateCartProduct,
-    handleUpdateCartProductList,
     handleRemoveCartProduct,
     handleFinalizePurchase,
   };

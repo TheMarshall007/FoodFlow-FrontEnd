@@ -11,11 +11,6 @@ export interface DishIngredient {
   unit: string;
 }
 
-// Interface para enviar os ids para o back end
-interface DishIngredientRequest {
-  ids: number[];
-}
-
 // Função para buscar os DishIngredients por uma lista de IDs
 export async function fetchDishIngredientsByIds(ids: number[]): Promise<DishIngredient[]> {
   try {

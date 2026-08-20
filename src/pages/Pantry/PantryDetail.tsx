@@ -1,14 +1,37 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { usePantryDetail } from "../../hooks/pentry/usePantryDetail";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ProductCard from "../../components/Product/ProductCard";
 import "../../styles/pages/Pantry/PantryDetail.css";
+import FiscalReceiptImportModal from "../../components/FiscalReceipt/FiscalReceiptImportModal";
+import { fetchPendingFiscalReceipts } from "../../services/fiscalReceipt/fiscalReceiptService";
 
 const PantryDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const pantryId = id ? parseInt(id) : 0;
     const { state, dispatch, handleUpdateProductQuantityInShoppingList, handleRemoveProductFromShoppingList, handleReduceQuantity } = usePantryDetail(pantryId);
     const navigate = useNavigate(); // Hook para navegação
+    const location = useLocation();
+    const routeState = location.state as { fiscalReceiptConfirmed?: boolean } | null;
+    const [nfceModalOpen, setNfceModalOpen] = useState(false);
+    const [nfceSuccess, setNfceSuccess] = useState(
+        routeState?.fiscalReceiptConfirmed ? "Compra confirmada e despensa atualizada." : ""
+    );
+    const [pendingReviews, setPendingReviews] = useState(0);
+
+    const refreshPendingReviews = useCallback(async () => {
+        if (!pantryId) return;
+        try {
+            const pending = await fetchPendingFiscalReceipts(pantryId);
+            setPendingReviews(pending.length);
+        } catch {
+            // O contador não deve impedir o uso normal da despensa.
+        }
+    }, [pantryId]);
+
+    useEffect(() => {
+        void refreshPendingReviews();
+    }, [refreshPendingReviews]);
 
     if (!state.pantry) {
         return <p>Carregando ou despensa não encontrada...</p>;
@@ -26,6 +49,16 @@ const PantryDetail: React.FC = () => {
                     <p className="low-quantity-text">{state.pantry?.lowQuantityProducts?.length} itens quase acabando</p>
                 </div>
                 <button className="back-button" onClick={() => navigate("/pantries")}>Voltar</button>
+            </div>
+
+            <div className="nfce-import-bar">
+                <button className="nfce-import-button" onClick={() => { setNfceSuccess(""); setNfceModalOpen(true); }}>
+                    Importar NFC-e
+                </button>
+                <button className="nfce-review-button" onClick={() => navigate(`/pantry/${pantryId}/fiscal-receipts`)}>
+                    Revisões pendentes ({pendingReviews})
+                </button>
+                {nfceSuccess && <p role="status">{nfceSuccess}</p>}
             </div>
 
             {/* Abas de navegação */}
@@ -162,6 +195,11 @@ const PantryDetail: React.FC = () => {
                     </div>
                 )}
             </div>
+            <FiscalReceiptImportModal open={nfceModalOpen} pantryId={pantryId}
+                onClose={() => setNfceModalOpen(false)} onSuccess={() => {
+                    setNfceSuccess("Nota fiscal importada e aguardando revisão.");
+                    void refreshPendingReviews();
+                }} />
         </div>
     );
 };

@@ -2,6 +2,15 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Importação de NFC-e
+
+Na tela de uma despensa, use **Importar NFC-e** para ler o QR Code com a câmera ou
+colar o link da nota. O frontend envia o link ao backend e nunca recebe a chave privada
+do scraper.
+
+O acesso à câmera funciona em `localhost` durante o desenvolvimento e exige HTTPS em
+outros endereços. Se a permissão for negada, a opção **Colar link** continua disponível.
+
 ## Available Scripts
 
 In the project directory, you can run:

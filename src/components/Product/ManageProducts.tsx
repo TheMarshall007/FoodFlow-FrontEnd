@@ -1,22 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     fetchProducts,
     deleteProduct,
     updateProduct,
     ProductDTOInsert,
-    validateTemporaryProduct,
     ProductDTOResponse,
+    ProductDTOSearch,
 } from '../../services/product/productService';
 import styles from '../../styles/components/Product/ManageProducts.module.css';
 import { FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import { PaginatedResponse } from '../../services/api/apiResponse';
 import AddTemporaryProductModal from './AddTemporaryProductModal';
-
-// Add this interface here
-interface ProductDTOSearch {
-    id?: number;
-    page: number
-}
 
 const ManageProducts: React.FC = () => {
     const [products, setProducts] = useState<ProductDTOResponse[]>([]);
@@ -28,11 +22,7 @@ const ManageProducts: React.FC = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState<ProductDTOResponse | null>(null);
 
-    useEffect(() => {
-        loadProducts();
-    }, [currentPage, searchTerm, productNameSearch]);
-
-    const loadProducts = async () => {
+    const loadProducts = useCallback(async () => {
         setLoading(true);
         try {
             const productData: PaginatedResponse<ProductDTOResponse> = await fetchProducts({ page: currentPage } as ProductDTOSearch);
@@ -43,7 +33,11 @@ const ManageProducts: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [currentPage]);
+
+    useEffect(() => {
+        loadProducts();
+    }, [loadProducts]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);

@@ -27,7 +27,7 @@ const SelectPantryModal: React.FC<SelectPantryModalProps> = ({ show, onClose, on
                 })
                 .catch((error) => console.error("Erro ao buscar as dispensas:", error));
         }
-    }, [show]);
+    }, [show, user]);
 
     const handleConfirm = () => {
         if (selectedPantryId !== null) {

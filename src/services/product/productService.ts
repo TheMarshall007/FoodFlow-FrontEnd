@@ -3,6 +3,7 @@ import { api } from "../api/apiConfig";
 import { PaginatedResponse } from "../api/apiResponse";
 
 export interface Product {
+    id: number;
     gtin: string;
     name: string;
     brand: string;
@@ -12,9 +13,12 @@ export interface Product {
     ingredients?: Ingredient[]; // Added ingredient property for fetched detail
 }
 
-interface ProductDTOSearch {
-    id?: number;
-    page: number
+export interface ProductDTOSearch {
+    id?: string;
+    productId?: number;
+    gtin?: string;
+    name?: string;
+    page: number;
 }
 
 export enum UnitOfMeasure {
@@ -26,6 +30,7 @@ export enum UnitOfMeasure {
 }
 
 export interface ProductDTOResponseSimple {
+    id: number;
     gtin: string;
     name: string;
     brand?: string;
@@ -66,6 +71,7 @@ export interface ProductDTOInsertTemporary {
 }
 
 export interface ProductDTOResponse {
+    id: number;
     gtin: string;
     name: string;
     brand: string;
@@ -80,7 +86,7 @@ export interface ProductDTOResponse {
 
 export const fetchProductById = async (id: number): Promise<Product> => {
     try {
-        const response = await api.get(`/product/${id}`);
+        const response = await api.get(`/product/by-id/${id}`);
         return response.data;
     } catch (error) {
         console.error("Erro ao buscar produto por ID:", error);
@@ -102,7 +108,7 @@ export const fetchProducts = async (
     dto: ProductDTOSearch
 ): Promise<PaginatedResponse<ProductDTOResponse>> => {
     try {
-        const response = await api.post(`/product/pagination `, dto);
+        const response = await api.post(`/product/pagination`, dto);
         return response.data;
     } catch (error) {
         console.error("Erro ao buscar produtos paginados:", error);

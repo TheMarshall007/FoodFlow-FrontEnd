@@ -1,8 +1,6 @@
 // PantryForm.tsx
 import React, { useState } from 'react';
 import { useUser } from '../../context/UserContext';
-import { createPantry } from '../../services/pantry/pantryService';
-import { useNavigate } from 'react-router-dom';
 import '../../styles/pages/Pantry/PantryForm.css';
 import { usePantry } from '../../hooks/pentry/usePentry';
 
@@ -18,7 +16,6 @@ const PantryForm: React.FC<PantryModalProps> = ({ isOpen, onClose }) => {
     const { handleCreatePantry } = usePantry();
     const [propertyName, setPropertyName] = useState('');
     const [selectedImage, setSelectedImage] = useState('');
-    const [error, setError] = useState('');
 
     const availableImages = [
         require('../../assets/fotos/summer-beach-house.png'),
@@ -67,7 +64,6 @@ const PantryForm: React.FC<PantryModalProps> = ({ isOpen, onClose }) => {
                         ))}
                     </div>
                 </div>
-                {error && <p className="error-message">{error}</p>}
                 <button type="submit" className="submit-button">Cadastrar</button>
                 <button type="button" onClick={onClose} className="cancel-button">Cancelar</button>
 

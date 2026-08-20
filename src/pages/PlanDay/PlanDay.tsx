@@ -10,10 +10,10 @@ interface MenuProduct {
 
 const PlanDay: React.FC = () => {
     const { pantryId } = useParams<{ pantryId: string }>();
-    const [menuProducts, setMenuProducts] = React.useState<MenuProduct[]>([
+    const menuProducts: MenuProduct[] = [
         { id: 1, name: 'Strogonoff de Frango', description: 'Delicioso strogonoff de frango com arroz.' },
         { id: 2, name: 'Salada de Frutas', description: 'Salada fresca de frutas.' },
-    ]);
+    ];
 
     const handleAddToPantry = (menuProductId: number) => {
         alert(`Prato ${menuProductId} vinculado ao inventário ${pantryId}!`);

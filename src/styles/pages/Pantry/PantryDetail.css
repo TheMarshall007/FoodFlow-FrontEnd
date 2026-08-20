@@ -14,6 +14,15 @@
     margin-bottom: 30px;
 }
 
+.nfce-import-bar { display: flex; align-items: center; justify-content: flex-end; gap: 14px; margin: -12px 0 22px; }
+.nfce-import-bar p { margin: 0; color: #237a43; font-weight: 600; }
+.nfce-import-button, .nfce-review-button { padding: 11px 18px; border: 0; border-radius: 7px; color: #fff; font-weight: 600; cursor: pointer; }
+.nfce-import-button { background: #237a43; }
+.nfce-import-button:hover { background: #195d32; }
+.nfce-review-button { background: #315f8f; }
+.nfce-review-button:hover { background: #234b73; }
+@media (max-width: 600px) { .nfce-import-bar { align-items: stretch; flex-direction: column; text-align: center; margin-top: 0; } }
+
 .pantry-image {
     width: 150px;
     height: 150px;

@@ -17,7 +17,14 @@ const PantryCard: React.FC<PantryCardProps> = ({ pant, onClick }) => {
             <h3>{pant?.propertyName}</h3>
             <div className='property-profile'>
                 {pant?.sharedWith?.map((user, key) => {
-                    return <img className='property-profile-image' src={user?.picture || require('../../assets/fotos/user-icon.png')} />
+                    return (
+                        <img
+                            key={user.id ?? key}
+                            className='property-profile-image'
+                            src={user?.picture || require('../../assets/fotos/user-icon.png')}
+                            alt={user.name || 'Usuário com acesso à despensa'}
+                        />
+                    )
                 })}
             </div>
             {pant?.lowQuantityProducts?.length === 0 ?

@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
-import { addDishesToMenu, createMenu, getMenuById, getMenusPaginated, Menu, MenuInsertData } from "../../services/menu/menuService";
+import { createMenu, getMenusPaginated, Menu, MenuInsertData } from "../../services/menu/menuService";
 
 export const initialState = {
     menus: [] as Menu[],

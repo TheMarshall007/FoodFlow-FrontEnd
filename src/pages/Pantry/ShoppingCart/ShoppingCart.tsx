@@ -8,23 +8,10 @@ import ProductSelectionModal from "../../../components/Product/ProductSelectionM
 
 const ShoppingCart: React.FC = () => {
     let { id } = useParams<{ id: string }>();
-    const { cart, loading, error, handleUpdateCartProduct, handleUpdateCartProductList, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart();
+    const { cart, loading, error, handleUpdateCartProduct, handleRemoveCartProduct, handleFinalizePurchase, handleAddToCart } = useShoppingCart();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate(); // Hook para navegação
-    const [isAdvancedMode, setIsAdvancedMode] = useState<boolean>(() => {
-        // 🔹 Recupera a preferência do usuário do LocalStorage ao carregar a página
-        const savedMode = localStorage.getItem("shoppingCartMode");
-        return savedMode ? JSON.parse(savedMode) : true; // Padrão: Modo Avançado
-      });
-      
-      const toggleMode = () => {
-        setIsAdvancedMode((prevMode) => {
-          const newMode = !prevMode;
-          localStorage.setItem("shoppingCartMode", JSON.stringify(newMode)); // 🔹 Salva a escolha do usuário no LocalStorage
-          return newMode;
-        });
-      };
-      
+
     console.log("LOGG cart", cart)
 
     if (loading) {
@@ -45,11 +32,8 @@ const ShoppingCart: React.FC = () => {
                     <ShoppingCartTable
                         products={cart.cartProducts}
                         onUpdateProduct={handleUpdateCartProduct}
-                        onUpdateProductList={handleUpdateCartProductList}
                         onRemoveProduct={handleRemoveCartProduct}
                         onAddProducts={handleAddToCart}
-                        isAdvancedMode={isAdvancedMode}
-                        setIsAdvancedMode={toggleMode}
                     />
                 </div>
             ) : (
@@ -63,7 +47,7 @@ const ShoppingCart: React.FC = () => {
             }
             {
                 (cart?.cartProducts?.length ?? 0) > 0 && (
-                    <button className="finalize-button" onClick={() => handleFinalizePurchase(isAdvancedMode)}>
+                    <button className="finalize-button" onClick={handleFinalizePurchase}>
                         Finalizar Compra
                     </button>
                 )

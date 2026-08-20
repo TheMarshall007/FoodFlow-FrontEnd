@@ -24,6 +24,8 @@ import ProtectedRoute from './Router/ProtectedRoute';
 import AdminDishes from './pages/Dish/AdminDishes';
 import Products from './pages/Products/Products';
 import ManageProducts from './components/Product/ManageProducts';
+import FiscalReceiptPendingList from './pages/FiscalReceipt/FiscalReceiptPendingList';
+import FiscalReceiptReview from './pages/FiscalReceipt/FiscalReceiptGroupedReview';
 
 function AppContent() {
   const location = useLocation();
@@ -70,6 +72,8 @@ function AppContent() {
           <Route path="/suggestion" element={<Suggestion />} />
           <Route path="/pantries" element={<PantryPage />} />
           <Route path="/pantry/:id" element={<PantryDetail />} />
+          <Route path="/pantry/:pantryId/fiscal-receipts" element={<FiscalReceiptPendingList />} />
+          <Route path="/pantry/:pantryId/fiscal-receipts/:importId" element={<FiscalReceiptReview />} />
           <Route path="/pantry/:pantryId/low-quantity" element={<LowQuantityProducts />} />
           <Route path="/shopping-cart/:id" element={<ShoppingCart />} />
           <Route path="/products/:id?" element={<Products />} />
