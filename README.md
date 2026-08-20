@@ -1,5 +1,16 @@
 # Getting Started with Create React App
 
+## Revisão semântica de NFC-e
+
+Na revisão agrupada, o FoodFlow mostra sugestões globais, confiança e os motivos usados
+pelo backend. Conteúdo detectado é apenas um preenchimento editável. Se a descrição
+fiscal divergir do catálogo, o usuário escolhe explicitamente qual valor usar nesta
+compra ou seleciona outro produto; o cadastro nunca é alterado silenciosamente.
+
+Multiplicadores permanecem visíveis como fatores. Medidas ambíguas ou de capacidade não
+são usadas como entrada de despensa. Uma sugestão não é uma decisão salva: o aprendizado
+só ocorre quando a compra é confirmada.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Importação de NFC-e

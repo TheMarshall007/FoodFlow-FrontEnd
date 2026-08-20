@@ -4,6 +4,11 @@ import { UnitOfMeasure } from "../product/productService";
 export type FiscalResolutionAction = "USE_EXISTING_PRODUCT" | "CREATE_TEMPORARY_PRODUCT" | "EXPENSE_ONLY" | "IGNORE";
 export type ReviewGroupStatus = "PENDING" | "PARTIAL" | "CONFLICT" | "SAVED";
 export type ConversionRuleAction = "CURRENT_ONLY" | "UPDATE_LEARNED" | "USE_LEARNED";
+export type ContentResolutionAction = "USE_PRODUCT_CONTENT"|"USE_DESCRIPTION_CONTENT"|"USE_LEARNED_CONVERSION"|"USE_MANUAL_CONTENT"|"CHOOSE_ANOTHER_PRODUCT";
+export interface ParsedMeasurement { value:number; unit:UnitOfMeasure; role:"CONTENT"|"PACKAGE_COUNT"|"CAPACITY"|"UNKNOWN"; confidence:number; rawExpression:string }
+export interface ParsedDescriptor { rawDescription:string; normalizedDescription:string; normalizationVersion:number; possibleProductConcept?:string; brand?:string; brandConfidence:number; measurements:ParsedMeasurement[]; packaging?:{unitsPerCommercialUnit:number;contentQuantityPerUnit:number;contentUnit:UnitOfMeasure;rawExpression:string;confidence:number}; attributeTokens:string[];presentationTokens:string[];unknownTokens:string[] }
+export interface ProductCandidate { productId:number;displayName:string;brand?:string;quantityPerUnit?:number;unit?:UnitOfMeasure;productConcept?:string;confidence:number;confidenceLevel:"HIGH"|"MEDIUM"|"LOW";reasons:string[];source:string }
+export interface ContentEvidenceComparison {status:"AGREEMENT"|"CONFLICT"|"SINGLE_SOURCE"|"UNKNOWN";requiresResolution:boolean;productQuantity?:number;productUnit?:UnitOfMeasure;descriptionQuantity?:number;descriptionUnit?:UnitOfMeasure;learnedQuantity?:number;learnedUnit?:UnitOfMeasure;suggestedQuantity?:number;suggestedUnit?:UnitOfMeasure;suggestionSource?:string;selectedResolution?:ContentResolutionAction}
 export interface FiscalReceiptItem {
     id: number; itemNumber: number; gtin?: string; merchantProductCode?: string; description: string;
     quantity: number; commercialUnit: string; unitPrice: number; totalPrice: number;
@@ -17,13 +22,15 @@ export interface FiscalReceiptItem {
 export interface CommercialUnitGroup {
     commercialUnit: string; lineCount: number; totalQuantity: number; totalValue: number; directMeasurement: boolean;
     unitsPerCommercialUnit?: number; contentQuantityPerUnit?: number; contentUnit?: UnitOfMeasure;
-    calculatedStockQuantity?: number; calculatedStockUnit?: UnitOfMeasure; learnedSuggestion?: boolean; lines: FiscalReceiptItem[];
+    calculatedStockQuantity?: number; calculatedStockUnit?: UnitOfMeasure; learnedSuggestion?: boolean; lines: FiscalReceiptItem[]; contentEvidenceComparison?:ContentEvidenceComparison;
 }
 export interface FiscalReviewGroup {
     reviewGroupId: string; description: string; gtin?: string; merchantProductCode?: string; identityType: string;
     identityWarning?: boolean; status: ReviewGroupStatus; lineCount: number; totalValue: number;
     resolutionAction?: FiscalResolutionAction; matchedProductId?: number; matchedProductName?: string; matchedProductBrand?: string;
     matchedProductQuantityPerUnit?: number; matchedProductUnit?: UnitOfMeasure; commercialUnitGroups: CommercialUnitGroup[];
+    parsedDescriptor?:ParsedDescriptor;productCandidates?:ProductCandidate[];
+    temporaryProductDraft?:{name?:string;brand?:string;productConceptId?:number;quantityPerUnit?:number;unit?:UnitOfMeasure;detectedAttributes?:string[]};
 }
 export interface FiscalReceiptImportResponse {
     id: number; pantryId: number; state: string; issuerName: string; issuerCnpj?: string;
@@ -38,6 +45,8 @@ export interface ResolveReviewGroupRequest {
     resolutionAction: FiscalResolutionAction; productId?: number;
     conversions?: Array<{ commercialUnit: string; unitsPerCommercialUnit: number; contentQuantityPerUnit: number;
         contentUnit: UnitOfMeasure; ruleAction: ConversionRuleAction }>;
+    contentResolutionAction?:ContentResolutionAction;
+    temporaryProductDraft?:{name?:string;brand?:string;productConceptId?:number;quantityPerUnit?:number;unit?:UnitOfMeasure;detectedAttributes?:string[]};
 }
 export interface ResolveFiscalItemRequest {
     resolutionAction: FiscalResolutionAction; productId?: number;
